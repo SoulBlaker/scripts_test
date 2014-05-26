@@ -1,1 +1,17 @@
-Diretório em desenvolvimento.
+		.----------------------------------------------------------.
+		.            SoulBlaker Scripts Apresenta:                 .
+		.                ___________________                       .
+		.               /   _____/\______   \                      .
+		.               \_____  \  |    |  _/                      .
+		.               /        \ |    |   \                      .
+		.              /_______  / |______  /                      .
+		.                      \/         \/                       .
+		.            [ Cronus Advanced Scripts ]                   .
+		.                                                    v1.1  .
+		.----------------------------------------------------------.
+		;  http://forum.cronus-emulator.com/user/20800-soulblaker  ;
+		*----------------------------------------------------------*
+
+		2014/05/26 - Scripts em teste
+
+		Aqui se encontra todos scripts feito que nescessita ser testados.

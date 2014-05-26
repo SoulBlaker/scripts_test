@@ -1,0 +1,269 @@
+// .----------------------------------------------------------.
+// .            SoulBlaker Scripts Apresenta:                 .
+// .                ___________________                       .
+// .               /   _____/\______   \                      .
+// .               \_____  \  |    |  _/                      .
+// .               /        \ |    |   \                      .
+// .              /_______  / |______  /                      .
+// .                      \/         \/                       .
+// .            [ Cronus Advanced Scripts ]                   .
+// .                                                    v1.1  .
+// .----------------------------------------------------------.
+// ;  http://forum.cronus-emulator.com/user/20800-soulblaker  ;
+// .----------------------------------------------------------.
+// . Script:                                                  .
+// .  Evento Páginas da Sobrevivênça                          .
+// .----------------------------------------------------------.
+// . Por: SoulBlaker   Compátivel: Cronus       versão: 1.0   .
+// .----------------------------------------------------------.
+// . Descrição:                                               .
+// .  Os jogadores devem encontrar páginas espalhadas em um   .
+// .  mapa cujo foi tomado por monstros.                      .
+// .----------------------------------------------------------.
+// . Changelog da Versão:                                     .
+// .  * 1.0 [SoulBlaker]                                      .
+// .	- Iniciado NPC, idéia original de [Cloudwolf].        .
+// *----------------------------------------------------------*
+// . [Nota Obrigatória]: Procure por 'Configurações' para     .
+// .                     encontrar  tipos de configurações    .
+// .                     por todo script.                     .
+// .                                                          .
+// . [Nota 1]: Ponha 0 para desabilitar esta opção.           .
+// .                                                          .
+// . [Nota 2]: Não alterar com dúvidas.                       .
+// .                                                          .
+// . [Nota 3]: Tipos de recompensa para sobreviventes:        .
+// .           1: Ganha o item ao encontrar uma página.       .
+// .           2: Ganha um item ao matar o monstro.           .
+// .           3: Ganha um item ao encontrar uma página ou a  .
+// .              matar o monstro.                            .
+// *----------------------------------------------------------*
+// Configurações Globais
+-	script	Evento Sobrevivênça#Config	-1,{
+OnInit:
+	// Configurações
+	set $@ev_pagesurvival, 8;		// Quantidade de Páginas. [Nota 2]
+	set $@ev_ps_premium_mode, 1;		// Tipo de recompensa para os sobreviventes. [Nota 1] [Nota 3]
+
+	// Configurações dos monstros.
+	setarray $@ev_ps_monster[0], 1704, 1, 1705, 1, 1706, 1, 1707, 1, 1708, 1;	// [Exemplo]: mob_id, amount, mob_id, amount...
+
+	// Configurações de itens de recompensa.
+	setarray $@ev_ps_item[0], 501, 1, 502, 1, 503, 1, 504, 1, 505, 1;		// [Exemplo]: item_id 1, amount, item_id 2, amount, item_id 3...
+	end;
+}
+
+// Script do Evento
+jupe_ele,49,50,5	script	Evento Sobrevivênça#main::EventSurvivor	705,{
+
+	// Configurações
+	set .@BaseLvl, 99;		// Nível de Base para pode participar do evento. [Nota 1]
+	set .@ZenyCost, 3000;		// Custo para participar deste evento. [Nota 1]
+	set .@UserWarp, 5;		// Quantidade máxima de jogadores que podem entrar no evento. [Nota 1]
+	set .@AdminPanel, 99;		// Nível de Administração para ligar/desligar o evento. [Nota 1]
+
+	mes "[Estranho]";
+	mes "Olá aventureiro, eu tenho um desafio para você.";
+	mes "Quero que você colete 8 páginas em uma velha casa para mim.";
+	mes "Você aceita?";
+	while(1)
+	{
+		next;
+		switch( select((getgmlevel()>=.@adm_lvl?($@ev_pagesurvival_flag?"^0000FF- Desligar o Evento.^000000":"^0000FF- Ligar o Evento.^000000"):""), ($@ev_pagesurvival_flag==1?"- Aceito o desafio.":""), "- Informações.", "- Não, obrigado.") )
+		{
+			case 1:
+				mes "^483D8B[Recepcionista]^000000";
+
+				if( $@ev_survival_flag )
+					mes "Deseja desligar a ^0000FFEvento Páginas da Sobrevivência^000000?";
+				else
+					mes "Deseja ligar a ^0000FFEvento Páginas da Sobrevivência^000000?";
+
+				next;
+				if( select("- Sim", "- Não.") == 1 )
+				{
+					if( !$@ev_pagesurvival_flag )
+						donpcevent "EventSurvival::OnStart";
+					else
+					{
+						donpcevent "EventSurvival::OnEnd";
+						announce "O Evento Sobrevivência foi cancelado!",8;
+					}
+				}
+				break;
+			case 2:
+				mes "^483D8B[Recepcionista]^000000";
+
+				if( !$@ev_pagesurvival_flag )
+					mes "Me desculpe, mais o evento ainda não começou!";
+				else if( $@ev_pagesurvival_flag == 2 )
+					mes "Me desculpe, mais o evento já começou!";
+				else if( .@BaseLvl && BaseLevel < .@BaseLvl )
+					mes "Me desculpe, mais você deve ter o Nv. Base equivalente à " + .@BaseLvl + ".";
+				else if( .@ZenyCost && Zeny < .@ZenyCost )
+					mes "Me desculpe, mais você deve ter " + .@ZenyCost + " Zeny(s).";
+				else if( .@UserWarp && getmapusers("job3_guild03") >= .@UserWarp )
+					mes "Me desculpe, mais o evento está com a quantidade máxima de jogadores!";
+				else {
+					mes "Vou te mandar agora para o evento!";
+					close2;
+					if( .@ZenyCost ) set Zeny, Zeny - .@ZenyCost;
+					warp "job3_guild03", 23, 67;
+					end;
+				}
+
+				close;
+			case 3:
+				mes "^483D8B[Recepcionista]^000000";
+				mes "Neste desafio você terá que encontrar 08 páginas escondidas pelo mapa,";
+				mes "talvez haja algum contratempo, então tome cúidado!";
+
+				if( .@BaseLvl )
+					mes "Para participar do evento você deve ter o Nv. de Base equivalente a " + .@BaseLvl + ".";
+				if( .@ZenyCost )
+					mes "E há um custo de " + .@ZenyCost + " Zeny(s) para participar do evento!";
+
+				mes "E não se esqueça, caso não consiga participar do evento, ele ocorre a cada 1 hora."; 
+
+				break;
+			case 4:
+				mes "^483D8B[Recepcionista]^000000";
+				mes "Tudo bem, volte quando haver alguma dúvida.";
+				close;
+		}
+	}
+
+// Horário do Evento.
+OnMinute01;
+	if( !$@ev_pagesurvival_flag )
+		donpcevent "EventSurvivor::OnStartArena";
+	end;
+
+OnStartArena:
+	// Matando todos monstro do mapa.
+	killmonsterall "job3_guild03";
+
+	// Retirando todos jogadores do mapa.
+	mapwarp "job3_guild03", "jupe_ele", 49, 52;
+
+	// Mapflags
+	setmapflag "job3_guild03", mf_noteleport;
+	setmapflag "job3_guild03", mf_nomemo;
+	setmapflag "job3_guild03", mf_nosave;
+	setmapflag "job3_guild03", mf_nowarp;
+	setmapflag "job3_guild03", mf_nowarpto;
+	setmapflag "job3_guild03", mf_nomobloot;
+	setmapflag "job3_guild03", mf_nomvploot;
+
+	waitingroom "Aberto o Evento", 0;
+
+	announce "[Evento Sobrevivênça]: O Portal está aberto e será fechado dentro de 5 minutos.", 8;
+	set $@ev_pagesurvival_flag, 1;
+	setnpctimer 0;
+	initnpctimer;
+	startnpctimer;
+	end;
+
+OnTimer60000:
+	announce "[Evento Sobrevivênça]: O Portal está aberto e será fechado dentro de 4 minutos.", 8;
+	end;
+
+OnTimer120000:
+	announce "[Evento Sobrevivênça]: O Portal está aberto e será fechado dentro de 3 minutos.", 8;
+	end;
+
+OnTimer180000:
+	announce "[Evento Sobrevivênça]: O Portal está aberto e será fechado dentro de 2 minutos.", 8;
+	end;
+
+OnTimer240000:
+	announce "[Evento Sobrevivênça]: O Portal está aberto e será fechado dentro de um minuto.", 8;
+	end;
+
+OnTimer300000:
+	// Iniciando o Evento!
+	for( set .@i,1; .@i <= $@ev_pagesurvival; set .@i, .@i + 1 )
+		enablenpc "Página#0"+.@i;
+
+	// Monstros
+	if( getarraysize($@ev_ps_monster) )
+	{
+		for( set .@i, 0; .@i < getarraysize($@ev_ps_monster); set .@i, .@i + 2 )
+			monster "job3_guild03", 0, 0, "[EvPS]: "+getmonsterinfo($@ev_ps_monster[.@i], 0), $@ev_ps_monster[.@i], $@ev_ps_monster[(.@i+1)], "EventSurvivor::OnMobDead";
+	}
+
+	set $@ev_pagesurvival_count, $@ev_pagesurvival;
+
+	set $@ev_pagesurvival_flag, 2;
+	announce "[Evento Sobrevivênça]: O Portal está fechado, aqueles que não tiveram oportunidade podem tentar na próxima vez!", 8;
+	end;
+
+OnMobDead:
+	if( $@ev_ps_premium_mode == 2 || $@ev_ps_premium_mode == 3 )
+		callfunc "Ev_PS_Premium";
+	end;
+
+OnEnd:
+	// Matando todos monstro do mapa.
+	killmonsterall "job3_guild03";
+
+	// Retirando todos jogadores do mapa.
+	mapwarp "job3_guild03", "jupe_ele", 49, 52;
+
+	// Mapflags
+	removemapflag "job3_guild03", mf_noteleport;
+	removemapflag "job3_guild03", mf_nomemo;
+	removemapflag "job3_guild03", mf_nosave;
+	removemapflag "job3_guild03", mf_nowarp;
+	removemapflag "job3_guild03", mf_nowarpto;
+	removemapflag "job3_guild03", mf_nomobloot;
+	removemapflag "job3_guild03", mf_nomvploot;
+
+	delwaitingroom;
+	stopnpctimer;
+	end;
+}
+
+// Páginas do Evento
+job3_guild03,0,0,5	script	Página#01::PageSurvival	HIDDEN_NPC,{
+
+	if( $@ev_ps_premium_mode == 1 && $@ev_ps_premium_mode == 3 )
+		callfunc "EV_PS_Premium";
+
+	if( $@ev_pagesurvival_count == 1 )
+	{
+		announce getmapusers("job3_guil03") + " jogador(es) conseguiu sobreviver ao evento.",8;
+		set $@ev_pagesurvival_count, 0;
+		donpcevent "EventSurvivor::OnEnd";
+	}
+	else if( $@ev_pagesurvival_count > 1 ) {
+		set $@ev_pagesurival_count, $@ev_pagesurvival_count - 1;
+		mapannounce "job3_guild03", "Falta apenas encontrar " + $@ev_pagesurival_count + " Páginas para se salvarem!",0;
+		hideoffnpc strnpcinfo(0);
+	}
+	end;
+}
+
+job3_guild03,0,0,5	duplicate(PageSurvival)	Página#02	HIDDEN_NPC
+job3_guild03,0,0,5	duplicate(PageSurvival)	Página#03	HIDDEN_NPC
+job3_guild03,0,0,5	duplicate(PageSurvival)	Página#04	HIDDEN_NPC
+job3_guild03,0,0,5	duplicate(PageSurvival)	Página#05	HIDDEN_NPC
+job3_guild03,0,0,5	duplicate(PageSurvival)	Página#06	HIDDEN_NPC
+job3_guild03,0,0,5	duplicate(PageSurvival)	Página#07	HIDDEN_NPC
+job3_guild03,0,0,5	duplicate(PageSurvival)	Página#08	HIDDEN_NPC
+
+// Função para dar o premio ao jogador.
+function	script	EV_PS_Premium	{
+
+	for( set .@i, 0; .@i < getarraysize($@ev_ps_item); .@i, .@i + 2 )
+	{
+		set .@tmp_itemid[getarraysize(.@tmp_itemid)], $@ev_ps_item[.@i];
+		set .@tmp_itemqt[getarraysize(.@tmp_itemqt)], $@ev_ps_item[(.@i+1)];
+	}
+
+	set .@item, rand((getarraysize(.@tmp_itemid)-1));
+
+	getitem .@tmp_itemid[.@item], .@tmp_itemqt[.@item];
+
+	return;	
+}
