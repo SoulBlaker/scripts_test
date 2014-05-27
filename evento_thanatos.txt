@@ -128,7 +128,7 @@ OnTimer240000:
 
 OnTimer300000:
 	// Monstros
-	monster "pvp_y_2-5", 0, 0, "[Ev. Thanatos]: Thanatos", 1708, 30, "::OnMobDead;
+	monster "pvp_y_2-5", 0, 0, "[Ev. Thanatos]: Thanatos", 1708, 30, "::OnMobDead";
 	set $@ev_thanatos_count, 30;
 	set $@ev_thanatos_flag, 2;
 
