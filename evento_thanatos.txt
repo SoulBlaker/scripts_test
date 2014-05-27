@@ -66,7 +66,8 @@ prontera,150,150,5	script	Evento Thanatos#et_01::EventoThanatos	45,{
 				mes "^483D8B[Recepcionista]^000000";
 				mes "Vou te mandar agora para o evento!";
 				close2;
-				warp "job3_guild03", 23, 67;
+				warp "pvp_y_2-5", 0, 0;
+				end;
 			case 3:
 				mes "^483D8B[Recepcionista]^000000";
 				mes "Tudo bem, volte quando haver alguma dúvida.";
