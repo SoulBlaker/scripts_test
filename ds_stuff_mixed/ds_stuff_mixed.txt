@@ -1,0 +1,583 @@
+// .----------------------------------------------------------.
+// .            SoulBlaker Scripts Apresenta:                 .
+// .                ___________________                       .
+// .               /   _____/\______   \                      .
+// .               \_____  \  |    |  _/                      .
+// .               /        \ |    |   \                      .
+// .              /_______  / |______  /                      .
+// .                      \/         \/                       .
+// .            [ Cronus Advanced Scripts ]                   .
+// .                                                    v1.1  .
+// .----------------------------------------------------------.
+// ;  http://forum.cronus-emulator.com/user/20800-soulblaker  ;
+// .----------------------------------------------------------.
+// . Script:                                                  .
+// .  Devil Square                                            .
+// .----------------------------------------------------------.
+// . Por: SoulBlaker   Compátivel: Cronus       versão: 2.0   .
+// .----------------------------------------------------------.
+// . Descrição:                                               .
+// .  Evento Devil Square.                                    .
+// .----------------------------------------------------------.
+// . Changelog da Versão:                                     .
+// .  * 2.0 [SoulBlaker]                                      .
+// .	- Iniciado a DevilSquare 2.0.                         .
+// .  * 2.0b [SoulBlaker]                                     .
+// .    - Correções no for responsável por invocar monstros.  .
+// .  * 2.1 [SoulBlaker]                                      .
+// .    - Adicionado stuff mixed                              .
+// *----------------------------------------------------------*
+-	script	Devil Square#ds_01::DevilSquareEvent	-1,{
+
+OnInit:
+	// Qual nível de Base para Entrar na Devil Square
+	//
+	// Deixe 0 para desabilitar esta opção.
+	set $@ds_baselevel, 1;
+
+	// Qual o custo de Zeny para entrar na Devil Square?
+	//
+	// Deixe '0' para desabilitar esta opção ou ponha a
+	// quantidade de Zeny a ser conbrado.
+	set $@ds_zenycost, 0;
+
+	// Configurações das Recompensas.
+	// Os itens são entregue aos jogadores que quebrarem
+	// o Arca do Tesouro ao terminar o combate contra os
+	// monstros. Logo abaixo, terá uma série de informações
+	// e configurações, para você configurar da melhor
+	// maneira que achar para o seu servidor.
+
+	// Configurações de EXP por Recompensa.
+	//
+	// Quanto de Experiência de Base o Jogador vai ganhar
+	// ao matar uma Arca do Tesouro?
+	//
+	// Deixe '0' para desabilitar esta opção ou ponha a
+	// quantidade de exp a ser ganha.
+	set $@ds_baseexp, 0;
+
+	// Quanto de Experiência de Classe o jogador vai ganhar
+	// ao matar uma Arca do Tesouro?
+	//
+	// Deixe '0' para desabilitar esta opção.
+	set $@ds_jobexp, 0;
+
+	// Configurações dos Itens.
+	//
+	// Os itens são configurados em váriaveis do tipo 'Array'.
+	// Você deve determinar a chave do array e o id do item no valor.
+	//
+	// Exemplo:
+	//	* set $@ds_itemid[<chave>], <valor>
+	//	- set $@ds_itemid[0], 501;
+	//
+	// A chave de ser adicionado entre 0~127, no total de 128 itens.
+	// Sempre comece com o índice 0 na chave.
+	//
+	// Exemplo:
+	//	set $@ds_itemid[0], 501; // Poção_Vermelha
+	//	set $@ds_itemid[1], 502; // Poção_Laranja
+	//
+	// Se você for um usuário avançado, pode adicionar vários valores
+	// em um settarray.
+	//
+	// Exemplo:
+	//	* setarray $@ds_itemid[0], <valor1>, <valor2>, <valor3>;
+	//	- setarray $@ds_itemid[0], 501, 502, 503; // 0 = 501, 1 = 502, 2 = 503
+	//
+	// Para desabilitar esta opção, habilite a linha abaixo e em seguida desabilite
+	// a linha que está sendo configurado o array!
+	// deletearray $@ds_itemid[0], getarraysize($@ds_itemid);
+	setarray $@ds_itemid[0], 501, 0;
+
+	// De acordo com a configuração dos ids de itens, ponha a quantidade
+	// do item a ser ganho de acordo com a chave do item.
+	//
+	// Exempo:
+	//	set $@ds_itemid[0], 501;
+	//	set $@ds_itemqt[0], 10;
+	//
+	// A recompensada será '10'x'501'.
+	setarray $@ds_itemqt[0], 10, 0;
+
+	// Configurações de Jogadores.
+	//
+	// Qual o mínimo de jogadores para começar o evento DevilSquare?
+	// ATENÇÃO: Nunca ponhe '0' na configuração abaixo.
+	set $@ds_min_player, 1;
+
+	// Qual o máximo de jogadores que podem entrar no evento DevilSquare?
+	// Ponha '0' para desabilitar esta função.
+	set $@ds_max_player, 30;
+
+	// Configurações dos Monstros.
+	//
+	// Em Array defina <id>, <quantidade>, <horda>;
+	//
+	// <id>: Id do monstro assassino, ponha '0' para desabilitar o monstro assassino.
+	// <quantidade>: Quantidade do monstro assassino.
+	// <horda>: Em qual horda ele será chamado.
+	//
+	// Para desabilitar, ponha '//' na frente da linha abaixo.
+	setarray $@ds_mobassassin[0], 0, 1785, 1, 5;
+
+	// Deseja bloquear o uso de Habilidades ao gerar a Arca do Tesouro?
+	// Ponha '0' para desabilitar esta opção.
+	set $@ds_noskilltreasure, 1;
+
+	// Quantos Rodadas de horda de monstros irá conter no evento?
+	// ATENÇÃO: Nunca remova esta opção, irá causar falhas no evento.
+	set $@ds_horde, 6;
+
+	// De acordo com a quantidade de horda, em 'Array' defina o gênero da horda.
+	//
+	// 0: Horda Comum.
+	// 1: Horda Mini-Boss.
+	// 2: Horda MvP.
+	//
+	// Exemplo:
+	// setarray $@ds_hogen[0], 0, 0, 0, 1, 2, 0;
+	setarray $@ds_hogen[0], 0, 0, 0, 1, 2, 0;
+
+	// Os monstros são configurados em váriaveis do tipo 'Array'.
+	// Você deve determinar a chave do array e o id do monstro no valor.
+	//
+	// Exemplo:
+	//	* set $@ds_mobid[<chave>], <valor>
+	//	- set $@ds_mobid[0], 1189;
+	//
+	// A chave de ser adicionado entre 0~127, no total de 128 monstros.
+	// Sempre comece com o índice 0 na chave.
+	//
+	// Exemplo:
+	//	set $@ds_mobid[0], 1189; // Orc Herói
+	//	set $@ds_mobid[1], 1019; // Esqueleto Arqueiro
+	//
+	// Se você for um usuário avançado, pode adicionar vários valores
+	// em um settarray.
+	//
+	// Exemplo:
+	//	* setarray $@ds_mobid[0], <valor1>, <valor2>, <valor3>;
+	//	- setarray $@ds_mobid[0], 1189, 1019, 1149; // 0 = 1189, 1 = 1019, 2 = 1149
+	//
+	// ATENÇÃO: Nunca remova esta opção, irá causar falhas no evento.
+	setarray $@ds_mobid[0],
+				1189, 1016, 1149, 1028, 1165, 1164,				// Round 1
+				1253, 1191, 1193, 1257, 1192,					// Round 2
+				1206, 1208, 1131, 1109, 1302, 1190, 1272, 1511,			// Round 3
+				1507, 1449, 1268, 1456, 1388, 1120, 1259, 1308, 1296,		// Round 4
+				1399, 1373, 1312, 1190, 1272, 1389, 1157, 1038, 1418, 1087,	// Round 5
+				1511, 1038, 1373;						// Round 6
+
+	// De acordo com a configuração dos ids de monstros, ponha a quantidade
+	// de monstros a ser invocado de acordo com a chave do monstro.
+	//
+	// Exempo:
+	//	set $@ds_mobid[0], 1189;
+	//	set $@ds_mobqt[0], 10;
+	//
+	// Será invocado 10 monstros do id 1189.
+	setarray $@ds_mobqt[0],
+				15, 15, 15, 10, 10, 10,		// Round 1
+				15, 15, 10, 10, 10,		// Round 2
+				15, 15, 15, 10, 1, 1, 1, 1,	// Round 3
+				6, 6, 5, 4, 3, 3, 3, 3, 2,	// Round 4
+				2, 2, 2, 2, 2, 1, 1, 1, 1, 1,	// Round 5
+				5, 3, 2;			// Round 6
+
+	// De acordo com a configuração dos ids de monstros, ponha a orda
+	// que ele será invocado de acordo com a chave do monstro.
+	//
+	// Exempo:
+	//	set $@ds_mobid[0], 1189;
+	//	set $@ds_mobho[0], 1;
+	//
+	// O monstro do id 1189 será invocado na horda 1.
+	setarray $@ds_mobho[0],
+				1, 1, 1, 1, 1, 1,		// Round 1
+				2, 2, 2, 2, 2,			// Round 2
+				3, 3, 3, 3, 3, 3, 3, 3,		// Round 3
+				4, 4, 4, 4, 4, 4, 4, 4, 4,	// Round 4
+				5, 5, 5, 5, 5, 5, 5, 5, 5, 5,	// Round 5
+				6, 6, 6;			// Round 6		
+
+	// As Arcas são configurados em váriaveis do tipo 'Array'.
+	// Você deve determinar a chave do array e o id do monstro arca no valor.
+	//
+	// Exemplo:
+	//	* set $@ds_treasureid[<chave>], <valor>
+	//	- set $@ds_treasureid[0], 1324;
+	//
+	// A chave de ser adicionado entre 0~127, no total de 128 monstros arca.
+	// Sempre comece com o índice 0 na chave.
+	//
+	// Exemplo:
+	//	set $@ds_treasureid[0], 1189; // Orc Herói
+	//	set $@ds_treasureid[1], 1019; // Esqueleto Arqueiro
+	//
+	// Se você for um usuário avançado, pode adicionar vários valores
+	// em um settarray.
+	//
+	// Exemplo:
+	//	* setarray $@ds_treasureid[0], <valor1>, <valor2>, <valor3>;
+	//	- setarray $@ds_treasureid[0], 1328, 1332, 1336; // 0 = 1328, 1 = 1332, 2 = 1336
+	//
+	// ATENÇÃO: Nunca remova esta opção, irá causar falhas no evento.
+	setarray $@ds_treasureid[0], 1324, 1328, 1332, 1336, 1340, 1344, 1348, 1352, 1356, 1360;
+
+	// De acordo com a configuração dos ids de monstros arca, ponha a quantidade
+	// de monstros arca a ser invocado de acordo com a chave do monstro arca.
+	//
+	// Exempo:
+	//	set $@ds_treasureid[0], 1328;
+	//	set $@ds_treasureqt[0], 10;
+	//
+	// Será invocado 10 monstros arca do id 1328.
+	setarray $@ds_treasureqt[0], 1, 1, 1, 1, 1, 1, 1, 1, 1, 1;
+	end;
+
+// O Evento irá começar neste esquema de hora:
+//
+//        09:00 - 11:00 - 13:00 - 15:00
+//        17:00 - 19:00 - 21:00 - 23:00
+//
+OnMinute00:
+	if( !$@ds_flag && (gettime(3) == 9 || gettime(3) == 11 || gettime(3) == 13 || gettime(3) == 15 || gettime(3) == 20) )
+		donpcevent "DevilSquareEvent::OnStart";
+	end;
+
+OnStart:
+	if( !$@ds_flag )
+	{
+		// Iniciando Variáveis nescessária.
+		set $@ds_clock, 4;
+		set $@ds_flag, 1;
+		// Matando monstros que se encontra no mapa.
+		killmonsterall "ordeal_1-1";
+		// Adicionando mapflags.
+		setmapflag "ordeal_1-1", mf_nomemo;
+        	setmapflag "ordeal_1-1", mf_noteleport;
+        	setmapflag "ordeal_1-1", mf_nowarp;
+        	setmapflag "ordeal_1-1", mf_nowarpto;
+        	setmapflag "ordeal_1-1", mf_nomemo;
+		setmapflag "ordeal_1-1", mf_nomobloot;
+		setmapflag "ordeal_1-1", mf_nomvploot;
+		// Habilitando chat no npc.
+		donpcevent "DevilSquareWarp::OnStartArena";
+		// Iniciando contagem de tempo do npc.
+		initnpctimer;
+		announce "[Devil Square]: O Portal está aberto e será fechado em 5 minutos, corram para a arena!",bc_all,"0x00FF00";
+	}
+	end;
+
+OnTimer60000:
+
+	if( !$@ds_clock )
+	{
+		// Inicia o Evento
+		if( getmapusers("ordeal_1-1") )
+		{
+			set $@ds_round, 1;
+			set $@ds_flag, 2;
+
+			announce "[Devil Square]: O Portal está fechado, aqueles que não tiveram oportunidade podem tentar na próxima vez!",bc_all,"0x00FF00";
+			donpcevent "DevilSquareEvent::OnStartArena";
+		}
+		else {
+			announce "[Devil Square]: A Devil Square foi cancelada por não haver jogadores na arena!",bc_all,"0x00FF00";
+			donpcevent "DevilSquareWarp::OnEnd";
+		}
+
+		delwaitingroom "DevilSquareWarp";
+		stopnpctimer;
+
+	}
+	else {
+		announce "[Devil Square]: O Portal está aberto e será fechado em " + $@ds_clock + " minutos, corram para a arena!",bc_all,"0x00FF00";
+		setnpctimer 0;
+		set $@ds_clock, $@ds_clock - 1;
+	}
+	end;
+
+OnStartArena:
+	if( $@ds_flag == 2 && $@ds_round <= $@ds_horde )
+	{
+		// Invocando Monstros
+		for( set .@i, 0; .@i < getarraysize($@ds_mobid); set .@i, .@i + 1 )
+		{
+			if( $@ds_mobid[.@i] && $@ds_mobqt[.@i] && $@ds_mobho[.@i] == $@ds_round && (getmonsterinfo($@ds_mobid[.@i], 0)?1:0) )
+				monster "ordeal_1-1", 0, 0, "[Devil Square] "+getmonsterinfo($@ds_mobid[.@i], 0), $@ds_mobid[.@i], $@ds_mobqt[.@i],"DevilSquareEvent::OnMobDead";
+		}
+
+		// Monstro Assassino
+		if( $@ds_mobassassin[0] && $@ds_mobassassin[1] && $@ds_mobassassin[2] == $@ds_round && (getmonsterinfo($@ds_mobassassin[0], 0)?1:0) )
+			monster "ordeal_1-1", 0, 0, "[Devil Square] Assassino", $@ds_mobassassin[0], $@ds_mobassassin[1],"DevilSquareEvent::OnAssassinDead";
+
+		if( $@ds_hogen[($@ds_round-1)] == 1 )
+			 mapannounce "ordeal_1-1", "[Devil Square]: Começou a " + $@ds_round + "ª Square e os Mini-Boss atacam!", bc_all, "0x00FF00";
+		else if( $@ds_hogen[($@ds_round-1)] == 2 )
+			 mapannounce "ordeal_1-1", "[Devil Square]: Começou a " + $@ds_round + "ª Square e os Mvp's atacam!", bc_all, "0x00FF00";
+		else
+			 mapannounce "ordeal_1-1", "[Devil Square]: Começou a " + $@ds_round + "ª Square!", bc_all, "0x00FF00";
+
+		set $@ds_round, $@ds_round + 1;
+	}
+	else if( $@ds_flag == 2 )
+	{
+		mapwarp "ordeal_1-1", "prontera", 154, 175;
+
+		query_sql "SELECT `char_id` FROM `ds_stuff` ORDER BY `kills` DESC LIMIT 5", .@ds_char_id;
+
+		for( set .@i, 0; .@i < getarraysize(.@ds_char_id); set .@i, .@i + 1 )
+			warpchar "ordeal_1-1", 0, 0, .@ds_char_id[0];
+
+		query_sql "UPDATE `ds_stuff` SET `kills`='0'";
+
+		// Checando a possibilidade de usar Habilidades nas arca.
+		if( $@ds_noskilltreasure )
+			 setmapflag "ordeal_1-1", mf_noskill;
+
+		// Invocando as Arca Monstro.
+		for( set .@i, 0; .@i < getarraysize($@ds_treasureid); set .@i, .@i + 1 )
+		{
+			if( $@ds_treasureid[.@i] && $@ds_treasureid[.@i] && (getmonsterinfo($@ds_treasureid[.@i], 0)?1:0) )
+				monster "ordeal_1-1", 0, 0, "[Devil Square] Arca do Tesouro", $@ds_treasureid[.@i], $@ds_treasureqt[.@i],"DevilSquareEvent::OnTreasureDead";
+		}
+
+		announce "[Devil Square]: Parabéns guerreiros, vocês derrotaram todos ataques dos monstros. Agora começa a Caça ao Tesouro para os TOP 5.", bc_all, "0x00FF00";
+	}
+
+	end;
+
+OnMobDead:
+	query_sql "SELECT `kills` FROM `ds_stuff` WHERE `char_id`='" + GetArg(0) + "'", .@ds_kills;
+
+	if( getarraysize(.@ds_kills) )
+		query_sql "UPDATE `ds_stuff` SET `kills`=`kills`+'1' WHERE `char_id`='" + getcharid(0) + "'";
+	else
+		query_sql "INSERT INTO `ds_stuff` (char_id, kills) VALUES (" + getcharid(0) + ", 1)";
+
+	if( mobcount("ordeal_1-1", "all") > 0 && $@ds_flag <= $@ds_horde )
+		mapannounce "ordeal_1-1", "[Devil Square]: Faltam " + mobcount("ordeal_1-1", "all") + " monstros para a " + $@ds_round + "ª Square.",bc_all,"0x00FF00";
+	else if( mobcount("ordeal_1-1", "all") > 0 )
+		mapannounce "ordeal_1-1", "[Devil Square]: Faltam " + mobcount("ordeal_1-1", "all") + " monstros para eliminar a Devil Square.",bc_all,"0x00FF00";
+	else
+		donpcevent "DevilSquareEvent::OnStartArena";
+	end;
+
+OnAssassinDead:
+	mapannounce "ordeal_1-1", "[Devil Square]: O Jogador [ " + strcharinfo(0) + " ] matou o Monstro Assassino.", bc_all, "0x00FF00";
+	donpcevent "DevilSquareEvent::OnMobDead";
+	end;
+
+OnTreasureDead:
+	mapannounce "ordeal_1-1", "[Devil Square]: O Jogador [ " + strcharinfo(0) + " ] abriu uma das Arcas do Tesouro.", bc_all, "0x00FF00";
+
+	while(1)
+	{
+		set .@rand_1, rand(0, 2);
+
+		if( .@rand_1 == 0 && $@ds_baseexp )
+		{
+			set BaseExp, BaseExp + $@ds_baseexp;
+			break;
+		}
+		else if( .@rand_1 == 1 && $@ds_jobexp )
+		{
+			set JobExp, JobExp + 1;
+			break;
+		}
+		else if( .@rand_1 == 2 && getarraysize($@ds_itemid) )
+		{
+			set .@rand, rand(0, (getarraysize($@ds_itemid)-1));
+			getitem $@ds_itemid[.@rand], $@ds_itemqt[.@];
+			break;
+		}
+		else if( !getarraysize($@ds_itemid) && !$@ds_baseexp && !$@ds_jobexp )
+			break;
+	}
+
+	if( !mobcount("ordeal_1-1", "all") )
+	{
+		announce "[Devil Square]: Parabéns a todos guerreiros que venceram a lutaram contra os Monstros na Devil Square.", bc_all, "0x00FF00";
+		donpcevent "DevilSquareWarp::OnEndArena";
+	}
+	end;
+}
+
+-	script	Devil Square#ds_02::DevilSquarePlayer	-1,{
+
+OnPlayerCheck:
+OnPCLogoutEvent:
+OnPCDieEvent:
+	getmapxy(.@map$, .@x, .@y, 0);
+
+	if( $@ds_flag == 2 && .@map$ == "ordeal_1-1" )
+		initnpctimer;
+	end;
+
+OnTimer6000:
+	announce "[Devil Square]: Todos falharam na Devil Square, os Monstros sairam vitoriosos na " + ($@ds_round-1) + "ª Square.",bc_all,"0x00FF00";
+	donpcevent "DevilSquareWarp::OnEndArena";
+	stopnpctimer;
+	end;
+}
+
+prontera,149,189,5	script	Devil Square#ds_03::DevilSquareWarp	733,{
+
+	set .@adm_lvl, 99;
+
+	mes "^483D8B[Recepcionista]^000000";
+	mes "Bem-vindo a ^0000FFDevil Square^000000.";
+	mes "^FF0000Se você falhar você morre!^000000";
+
+	if( !$@ds_flag )
+		mes "No momemento nosso portal está fechado, por não estár no horário da batalha na Arena.";
+	else if( $@ds_flag == 2 )
+		mes "No momemento nosso portal está fechado por estar ocorrendo uma batalha na Arena.";
+
+	mes "Em que posso ajudar?";
+	next;
+	switch( select((getgmlevel()>=.@adm_lvl?($@ds_flag?"^0000FF- Desligar a Devil Square.^000000":"^0000FF- Ligar a Devil Square.^000000"):""), ($@ds_flag==1?"^0000FF- Entrar na Devil Square.^000000":""), "- Informações.", "^FF0000- Saír.^000000") )
+	{
+		case 1:
+			mes "^483D8B[Recepcionista]^000000";
+
+			if( $@ds_flag )
+				mes "Deseja desligar a ^0000FFDevil Square^000000?";
+			else
+				mes "Deseja ligar a ^0000FFDevil Square^000000?";
+
+			next;
+			if( select("- Sim", "- Não.") == 1 )
+			{
+				if( !$@ds_flag )
+					donpcevent "DevilSquareEvent::OnStart";
+				else
+					donpcevent "DevilSquareWarp::OnEnd";
+			}
+			break;
+		case 2:
+			if( $@ds_flag != 1 )
+			{
+				mes "^483D8B[Recepcionista]^000000";
+                                mes "Me desculpe, mais a arena não está aberta.";
+                                mes "Volte mais tarde!";
+				close;
+			}
+			else if( $@ds_baselevel && BaseLevel < $@ds_baselevel )
+			{
+				mes "^483D8B[Recepcionista]^000000";
+				mes "Para entrar na ^0000FFDevil Square^000000, você deve ter o ^0000FFNível de Base^000000 ^FF000000" + $@ds_baselevel + "^000000 ou superior.";
+				close;
+			}
+			else if( $@ds_zenycost && Zeny < $@ds_zenycost )
+			{
+				mes "^483D8B[Recepcionista]^000000";
+				mes "Para entrar na ^0000FFDevil Square^000000, você precisa ter ^FF000000" + $@ds_zenycost + "^000000 Zenys.";
+				close;
+			}
+			else if( $@ds_maxplayer && getmapusers("ordeal_1-1") >= $@ds_maxplayer )
+			{
+				mes "^483D8B[Recepcionista]^000000";
+				mes "O limite de jogadores na ^0000FFDevil Square^000000 foi atingido, você não pode entrar na arena.";
+				close;
+			}
+			else {
+				mes "^483D8B[Recepcionista]^000000";
+				mes "Realmente deseja entrar na arena?";
+				next;
+				if( select("- Sim.", "- Não.") == 1 )
+				{
+					mes "^483D8B[Recepcionista]^000000";
+					mes "Tudo bem, vou te mandar para lá!";
+					close2;
+					if( $@ds_zenycost ) set Zeny, Zeny - $@ds_zenycost;
+					warp "ordeal_1-1", 0, 0;
+					end;
+				}
+			}
+			break;
+		case 3:
+			mes "^483D8B[Recepcionista]^000000";
+			mes "A ^0000FFDevil Square^000000 é uma arena que seguirá de ^FF0000" + $@ds_horde + "^000000 ^0000FFroundes^000000 em que são invocado hordas de monstros para os jogadores exterminar.";
+
+			if( $@ds_baselevel )
+				mes "Para entrar na ^0000FFDevil Square^000000, você deve ter o ^0000FFNível de Base^000000 ^FF0000" + $@ds_baselevel + "^000000 ou superior.";
+			else
+				mes "Qualquer ^0000FFNível de Base^000000 é aceito na ^0000FFDevil Square^000000.";
+
+			if( $@ds_zenycost )
+				mes "Na entrada ^0000FFDevil Square^000000, será cobrado ^FF0000" + $@ds_zenycost + "^000000 Zenys.";
+			else
+				mes "Não há custo para entrar na ^0000FFDevil Square^000000.";
+
+			if( $@ds_maxplayer )
+				mes "O limite de jogadores dentro da ^0000FFDevil Square^000000 é de ^FF0000" + $@ds_maxplayer + "^000000 jogadores.";
+			else
+				mes "Não há limite de jogadores dentro da ^0000FFDevil Square^000000.";
+
+			mes "Sua ^0000FFmissão^000000 é sobreviver todos os ^0000FFroundes^000000.";
+			mes "Quando terminar os ^0000FFroundes^000000, aprece-rá as ^0000FFArcas do Tesouro^000000, no qual nela você pode ganhar:";
+
+			if( getarraysize($@ds_itemid) )
+				mes "^FF0000- Itens.^000000";
+			if( $@ds_baseexp )
+				mes "^FF0000- Experiência de Base.^000000";
+			if( $@ds_jobexp )
+				mes "^FF0000- Experiência de Classe.^000000";
+
+			mes " ";
+			mes "Preste muita atenção quando essas Arcas forem invocadas!";
+			next;
+			mes "^483D8B[Recepcionista]^000000";
+			mes "A arena é aberta nos seguintes horários:";
+			mes " ";
+			mes "^0000FF09:00H^000000 - ^0000FF17:00H^000000";
+			mes "^0000FF11:00H^000000 - ^0000FF19:00H^000000";
+			mes "^0000FF13:00H^000000 - ^0000FF21:00H^000000";
+			mes "^0000FF15:00H^000000 - ^0000FF23:00H^000000";
+			close;
+		case 4:
+			break;
+
+	}
+
+	mes "^483D8B[Recepcionista]^000000";
+        mes "Muito bem, volte quando desejar entrar na ^0000FFArena Devil Square^000000!";
+        close;
+
+OnStartArena:
+	waitingroom "Aberta a Devil Square", 0;
+	end;
+
+OnEnd:
+	// Segurança
+	delwaitingroom;
+	stopnpctimer "DevilSquareEvent";
+	announce "[Devil Square]: A Devil Square foi cancelada!", bc_all, "0x00FF00";
+	donpcevent "DevilSquareWarp::OnEndArena";
+	end;
+
+OnEndArena:
+	killmonsterall "ordeal_1-1";
+	// Removendo MapFlags
+	removemapflag "ordeal_1-1", mf_nomemo;
+        removemapflag "ordeal_1-1", mf_noteleport;
+        removemapflag "ordeal_1-1", mf_nowarp;
+        removemapflag "ordeal_1-1", mf_nowarpto;
+        removemapflag "ordeal_1-1", mf_nomemo;
+	removemapflag "ordeal_1-1", mf_nomobloot;
+	removemapflag "ordeal_1-1", mf_nomvploot;
+	removemapflag "ordeal_1-1", mf_noskill;
+	set $@ds_flag, 0;
+	initnpctimer;
+	end;
+
+OnTimer6000:
+	mapwarp "ordeal_1-1", "prontera", 154, 175;
+	stopnpctimer;
+	end;
+
+}
