@@ -142,7 +142,7 @@ OnMobDead:
 	if( $@ev_thanatos_count == 0 )
 	{
 		announce "[Evento Thanatos: O evento terminou, obrigado a todos que participaram!", 8;
-		donpcevent "EventoThanatos::OnEnd;
+		donpcevent "EventoThanatos::OnEnd";
 	}
 	end;
 
