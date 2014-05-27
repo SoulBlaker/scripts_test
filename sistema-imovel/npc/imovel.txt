@@ -1,0 +1,153 @@
+// by SoulBlaker
+// Créditos ao script do Kamper, estou utilizando como base.
+
+-	script	Config#SellerProperty	-1,{
+OnInit:
+	set $@SP_Zeny_Cost, 10000000;			// Custo para se comprar um imóvel.
+	set $@SP_Get_Key, 10;				// Total de chaves entregue para o jogador.
+	set $@SP_Properties, 32;			// Total de casas.
+	set $@SP_Item_Main, 15000;			// ID inicial do item chave da propriedade.
+
+	// Banco de dados de casa.
+	setarray $@SP_Propeties_01$[0], "house_1", 61, 137, 68, 130, 70, 143, 70, 162;
+	setarray $@SP_Propeties_02$[0], "house_2", 61, 137, 68, 130, 70, 143, 70, 162;
+	setarray $@SP_Propeties_03$[0], "house_3", 61, 137, 68, 130, 70, 143, 70, 162;
+	setarray $@SP_Propeties_04$[0], "house_4", 61, 137, 68, 130, 70, 143, 70, 162;
+	setarray $@SP_Propeties_05$[0], "house_5", 61, 137, 68, 130, 70, 143, 70, 162;
+	setarray $@SP_Propeties_06$[0], "house_6", 61, 137, 68, 130, 70, 143, 70, 162;
+	setarray $@SP_Propeties_07$[0], "house_7", 61, 137, 68, 130, 70, 143, 70, 162;
+	setarray $@SP_Propeties_08$[0], "house_8", 61, 137, 68, 130, 70, 143, 70, 162;
+	setarray $@SP_Propeties_09$[0], "house_9", 61, 137, 68, 130, 70, 143, 70, 162;
+	setarray $@SP_Propeties_10$[0], "house_10", 61, 137, 68, 130, 70, 143, 70, 162;
+	setarray $@SP_Propeties_11$[0], "house_11", 61, 137, 68, 130, 70, 143, 70, 162;
+	setarray $@SP_Propeties_12$[0], "house_12", 61, 137, 68, 130, 70, 143, 70, 162;
+	setarray $@SP_Propeties_13$[0], "house_13", 61, 137, 68, 130, 70, 143, 70, 162;
+	setarray $@SP_Propeties_14$[0], "house_14", 61, 137, 68, 130, 70, 143, 70, 162;
+	setarray $@SP_Propeties_15$[0], "house_15", 61, 137, 68, 130, 70, 143, 70, 162;
+	setarray $@SP_Propeties_16$[0], "house_16", 61, 137, 68, 130, 70, 143, 70, 162;
+	setarray $@SP_Propeties_17$[0], "house_17", 61, 137, 68, 130, 70, 143, 70, 162;
+	setarray $@SP_Propeties_18$[0], "house_18", 61, 137, 68, 130, 70, 143, 70, 162;
+	setarray $@SP_Propeties_19$[0], "house_19", 61, 137, 68, 130, 70, 143, 70, 162;
+	setarray $@SP_Propeties_20$[0], "house_20", 61, 137, 68, 130, 70, 143, 70, 162;
+	setarray $@SP_Propeties_21$[0], "house_21", 61, 137, 68, 130, 70, 143, 70, 162;
+	setarray $@SP_Propeties_22$[0], "house_22", 61, 137, 68, 130, 70, 143, 70, 162;
+	setarray $@SP_Propeties_23$[0], "house_23", 61, 137, 68, 130, 70, 143, 70, 162;
+	setarray $@SP_Propeties_24$[0], "house_24", 61, 137, 68, 130, 70, 143, 70, 162;
+	setarray $@SP_Propeties_25$[0], "house_25", 61, 137, 68, 130, 70, 143, 70, 162;
+	setarray $@SP_Propeties_26$[0], "house_26", 61, 137, 68, 130, 70, 143, 70, 162;
+	setarray $@SP_Propeties_27$[0], "house_27", 61, 137, 68, 130, 70, 143, 70, 162;
+	setarray $@SP_Propeties_28$[0], "house_28", 61, 137, 68, 130, 70, 143, 70, 162;
+	setarray $@SP_Propeties_29$[0], "house_29", 61, 137, 68, 130, 70, 143, 70, 162;
+	setarray $@SP_Propeties_30$[0], "house_30", 61, 137, 68, 130, 70, 143, 70, 162;
+	setarray $@SP_Propeties_31$[0], "house_31", 61, 137, 68, 130, 70, 143, 70, 162;
+	setarray $@SP_Propeties_32$[0], "house_32", 61, 137, 68, 130, 70, 143, 70, 162;
+	end;
+}
+
+// Vendedor de Casa
+-	script	Vendedor de Imóveis#sp01::SellerProperty	111,{
+
+	mes "[Vendedor de Imóveis]";
+	mes "Bem-vindo " + strcharinfo(0) + "!";
+	mes "Gostaria de comprar um imóvel?";
+	set .@m_1, 1;
+	while( .@m_1 )
+	{
+		next;
+		switch( select("- Comprar.", "- Informações.", "- Cancelar.") )
+		{
+			case 1:
+				mes "[Vendedor de Imóveis]";
+				mes "O preço de cada propriedade é de " + $@SP_Zeny_Cost + " Zenys.";
+				mes "Muito bem, escolha o imóvel que deseja se apropriar.";
+				next;
+
+				for( set .@i, 1; .@i <= $@SP_Properties; set .@i, .@i + 1 )
+					set .@menu$, .@menu$ + ($SP_Properties[.@i] == 0?("- Imóvel nº " + .@i + "."):"")+":";
+
+				set .@menu, select(.@menu$ + ":- Cancelar.");
+
+				if( .@menu > $@SP_Properties )
+				{
+					set .@m_1, 0;
+					break;
+				}
+
+				mes "[Vendedor de Imóveis]";
+				mes "Tem certeza que deseja comprar o imóvel nº " + .@menu + "?";
+				next;
+				if( select("- Sim.", "- Não, obrigado.") == 2 )
+				{
+					set .@m_1, 0;
+					break;
+				}
+
+				if( $@SP_Zeny_Cost && Zeny < $@SP_Zeny_Cost )
+				{
+					mes "[Vendedor de Imóveis]";
+					mes "Você não tem zeny suficiente para comprar um imóvel!";
+					mes "Volte quando tiver a quantia suficiente!";
+					close;
+				}
+
+				set Zeny, Zeny - $@SP_Zeny_Cost;
+				getitem ($@SP_Item_Main+.@menu), $@SP_Get_Key;
+				set $SP_Properties[.@menu], 1;
+
+				mes "[Vendedor de Imóveis]";
+				mes "Muito bem, você acaba de adquirir um imóvel.";
+				mes "Para adentrar ao imóvel, basta você falar com o porteiro!";
+				close;
+			case 2:
+			case 3:
+				set .@m_1, 0;
+				break;
+		}
+	}
+
+	mes "[Vendedor de Imóveis]";
+	mes "Volte quando deseja adquirir um imóvel.";
+	close;
+}
+
+-	script	Porteiro#sp01::PropertyPorter	111,{
+
+	for( set .@i, 1; .@i <= $@SP_Properties; set .@i, .@i + 1 )
+	{
+		if( countitem(($@SP_Item_Main+.@i)) )
+			set .@propeties[getarraysize(.@propeties)], .@i;
+	}
+
+	if( !getarraysize(.@propeties) )
+	{
+		mes "[Porteiro]";
+		mes "Hmm... você não é morar da nossa rede de imóvel.";
+		mes "Para adquirir um imóvel, basta falar com o Vendedor de Imóveis!";
+		close;
+	}
+	
+	mes "[Porteiro]";
+	mes "Bem-vindo, " + strcharinfo(0) + ", deseja adentrar em que imóvel?";
+	next;
+
+	for( set .@i, 0; .@i < getarraysize(.@propeties); set .@i, .@i + 1 )
+		set .@menu$, .@menu$ + "- Imóvel nº " + .@propeties + ".:";
+
+	set .@menu, select(.@menu$ + "- Cancelar.");
+
+	if( .@menu == getarraysize(.@propeties) )
+	{
+		mes "[Porteiro]";
+		mes "Muito bem, volte quando desejar adentrar em um imóvel.";
+		close;
+	}
+
+	mes "[Porteiro]";
+	mes "Muito bem, vou te mandar para o Imóvel nº " + .@propeties[.@menu] + ".";
+	close2;
+	warp getd("$@SP_Propeties_"+.@propeties[.@menu]+"$[0]"), getd("$@SP_Propeties_"+.@propeties[.@menu]+"$[1]"), getd("$@SP_Propeties_"+.@propeties[.@menu]+"$[2]");
+	end;
+}
+
+// Warps
+-	script	Porta#SP_Warp_01::SP_Warp_Main_01	111,{ end; }
