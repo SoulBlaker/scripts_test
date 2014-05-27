@@ -1,0 +1,181 @@
+// .----------------------------------------------------------.
+// .            SoulBlaker Scripts Apresenta:                 .
+// .                ___________________                       .
+// .               /   _____/\______   \                      .
+// .               \_____  \  |    |  _/                      .
+// .               /        \ |    |   \                      .
+// .              /_______  / |______  /                      .
+// .                      \/         \/                       .
+// .            [ Cronus Advanced Scripts ]                   .
+// .                                                    v1.1  .
+// .----------------------------------------------------------.
+// ;  http://forum.cronus-emulator.com/user/20800-soulblaker  ;
+// .----------------------------------------------------------.
+// . Script:                                                  .
+// .  Evento Thanatos                                         .
+// .----------------------------------------------------------.
+// . Por: SoulBlaker   Compátivel: Cronus       versão: 1.0   .
+// .----------------------------------------------------------.
+// . Descrição:                                               .
+// .  Os jogadores devem derrotar todos os monstros Thanatos. .
+// .----------------------------------------------------------.
+// . Changelog da Versão:                                     .
+// .  * 1.0 [SoulBlaker]                                      .
+// .	- - Iniciado NPC, idéia original de [xKazin].         .
+// *----------------------------------------------------------*
+prontera,150,150,5	script	Evento Thanatos#et_01::EventoThanatos	45,{
+
+	// Configurações
+	set .@AdminPanel, 99;		// Nível para Administração do Evento.
+	set .@GroupID, 1;		// GroupID que pode entrar no evento.
+
+	if( getgmlevel() < .@AdminPanel || getgroupid() != .@GroupID )
+	{
+		mes "^483D8B[Recepcionista]^000000";
+		mes "Me desculpe, mais você não pode entrar no evento!";
+		close;
+	}
+
+	mes "^483D8B[Recepcionista]^000000";
+	mes "Bem-vindo, em que posso te ajudar?";
+	while(1)
+	{
+		next;
+		switch( select((getgmlevel()>=.@AdminPanel?($@ev_thanatos_flag?"^0000FF- Desligar o Evento.^000000":"^0000FF- Ligar o Evento.^000000"):""), ($@ev_thanatos_flag==1?"- Entrar no evento.":""), "- Não, obrigado.") )
+		{
+			case 1:
+				mes "^483D8B[Recepcionista]^000000";
+				if( $@ev_survival_flag )
+					mes "Deseja desligar a ^0000FFEvento Thanatos^000000?";
+				else
+					mes "Deseja ligar a ^0000FFEvento Thanatos^000000?";
+
+				next;
+				if( select("- Sim", "- Não.") == 1 )
+				{
+					if( !$@ev_pagesurvival_flag )
+						donpcevent "EventoThanatos::OnStart";
+					else
+					{
+						donpcevent "EventoThanatos::OnEnd";
+						announce "O Evento Thanatos foi cancelado!",8;
+					}
+				}
+				break;
+			case 2:
+				mes "^483D8B[Recepcionista]^000000";
+				mes "Vou te mandar agora para o evento!";
+				close2;
+				warp "job3_guild03", 23, 67;
+			case 3:
+				mes "^483D8B[Recepcionista]^000000";
+				mes "Tudo bem, volte quando haver alguma dúvida.";
+				close;
+		}
+	}
+
+OnMinute00:
+	set $@ev_thanatos_timer, $@ev_thanatos_timer + 1;
+
+	if( $@ev_thanatos_timer )
+	{
+		donpcevent "EventoThanatos::OnStartArena";
+		set $@ev_thanatos_timer, 0;
+	}
+	end;
+
+OnStartArena:
+	// Matando todos monstro do mapa.
+	killmonsterall "pvp_y_2-5";
+
+	// Retirando todos jogadores do mapa.
+	mapwarp "pvp_y_2-5", "prontera", 150, 150;
+
+	// Mapflags
+	setmapflag "pvp_y_2-5", mf_noteleport;
+	setmapflag "pvp_y_2-5", mf_nomemo;
+	setmapflag "pvp_y_2-5", mf_nosave;
+	setmapflag "pvp_y_2-5", mf_nowarp;
+	setmapflag "pvp_y_2-5", mf_nowarpto;
+	setmapflag "pvp_y_2-5", mf_nomobloot;
+	setmapflag "pvp_y_2-5", mf_nomvploot;
+
+	waitingroom "Aberto o Evento", 0;
+
+	announce "[Evento Thanatos]: O Portal está aberto e será fechado dentro de 5 minutos.", 8;
+	set $@ev_thanatos_flag, 1;
+	setnpctimer 0;
+	initnpctimer;
+	startnpctimer;
+	end;
+
+OnTimer60000:
+	announce "[Evento Thanatos]: O Portal está aberto e será fechado dentro de 4 minutos.", 8;
+	end;
+
+OnTimer120000:
+	announce "[Evento Thanatos]: O Portal está aberto e será fechado dentro de 3 minutos.", 8;
+	end;
+
+OnTimer180000:
+	announce "[Evento Thanatos]: O Portal está aberto e será fechado dentro de 2 minutos.", 8;
+	end;
+
+OnTimer240000:
+	announce "[Evento Thanatos]: O Portal está aberto e será fechado dentro de um minuto.", 8;
+	end;
+
+OnTimer300000:
+	// Monstros
+	monster "pvp_y_2-5", 0, 0, "[Ev. Thanatos]: Thanatos", 1708, 30, "::OnMobDead;
+	set $@ev_thanatos_count, 30;
+	set $@ev_thanatos_flag, 2;
+
+	announce "[Evento Thanatos: O Portal está fechado, aqueles que não tiveram oportunidade podem tentar na próxima vez!", 8;
+	stopnpctimer;
+	end;
+
+OnMobDead:
+	set $@ev_thanatos_count, $@ev_thanatos_count - 1;
+
+	if( $@ev_thanatos_count == 0 )
+	{
+		announce "[Evento Thanatos: O evento terminou, obrigado a todos que participaram!", 8;
+		donpcevent "EventoThanatos::OnEnd;
+	}
+	end;
+
+OnEnd:
+	// Matando todos monstro do mapa.
+	killmonsterall "pvp_y_2-5";
+
+	// Retirando todos jogadores do mapa.
+	mapwarp "pvp_y_2-5", "prontera", 150, 150;
+
+	// Mapflags
+	removemapflag "pvp_y_2-5", mf_noteleport;
+	removemapflag "pvp_y_2-5", mf_nomemo;
+	removemapflag "pvp_y_2-5", mf_nosave;
+	removemapflag "pvp_y_2-5", mf_nowarp;
+	removemapflag "pvp_y_2-5", mf_nowarpto;
+	removemapflag "pvp_y_2-5", mf_nomobloot;
+	removemapflag "pvp_y_2-5", mf_nomvploot;
+
+	set $@ev_thanatos_flag, 0;
+	delwaitingroom;
+	stopnpctimer;
+	end;
+
+OnPCDieEvent:
+	if( strcharinfo(3) == "pvp_y_2-5" && (getmapusers("pvp_y_2-5")-1) <= 0 )
+	{
+		announce "[Evento Thanatos]: Todos jogadores foram mortos no evento!", 8;
+		donpcenvet "EventoThanatos::OnEnd";
+	}
+
+	end;
+
+OnInterIfInitOnce:
+	set $@ev_thanatos_timer, 0;
+	end;
+}

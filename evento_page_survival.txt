@@ -14,7 +14,7 @@
 // . Script:                                                  .
 // .  Evento Páginas da Sobrevivênça                          .
 // .----------------------------------------------------------.
-// . Por: SoulBlaker   Compátivel: Cronus       versão: 1.0   .
+// . Por: SoulBlaker   Compátivel: Cronus       versão: 1.1   .
 // .----------------------------------------------------------.
 // . Descrição:                                               .
 // .  Os jogadores devem encontrar páginas espalhadas em um   .
@@ -23,6 +23,8 @@
 // . Changelog da Versão:                                     .
 // .  * 1.0 [SoulBlaker]                                      .
 // .	- Iniciado NPC, idéia original de [Cloudwolf].        .
+// .  * 1.1 [SoulBlaker]                                      .
+// .    - Pequenas correções.                                 .
 // *----------------------------------------------------------*
 // . [Nota Obrigatória]: Procure por 'Configurações' para     .
 // .                     encontrar  tipos de configurações    .
@@ -72,7 +74,7 @@ jupe_ele,49,50,5	script	Evento Sobrevivênça#main::EventSurvivor	705,{
 		switch( select((getgmlevel()>=.@adm_lvl?($@ev_pagesurvival_flag?"^0000FF- Desligar o Evento.^000000":"^0000FF- Ligar o Evento.^000000"):""), ($@ev_pagesurvival_flag==1?"- Aceito o desafio.":""), "- Informações.", "- Não, obrigado.") )
 		{
 			case 1:
-				mes "^483D8B[Recepcionista]^000000";
+				mes "^483D8B[Estranho]^000000";
 
 				if( $@ev_survival_flag )
 					mes "Deseja desligar a ^0000FFEvento Páginas da Sobrevivência^000000?";
@@ -92,7 +94,7 @@ jupe_ele,49,50,5	script	Evento Sobrevivênça#main::EventSurvivor	705,{
 				}
 				break;
 			case 2:
-				mes "^483D8B[Recepcionista]^000000";
+				mes "^483D8B[Estranho]^000000";
 
 				if( !$@ev_pagesurvival_flag )
 					mes "Me desculpe, mais o evento ainda não começou!";
@@ -114,7 +116,7 @@ jupe_ele,49,50,5	script	Evento Sobrevivênça#main::EventSurvivor	705,{
 
 				close;
 			case 3:
-				mes "^483D8B[Recepcionista]^000000";
+				mes "^483D8B[Estranho]^000000";
 				mes "Neste desafio você terá que encontrar 08 páginas escondidas pelo mapa,";
 				mes "talvez haja algum contratempo, então tome cúidado!";
 
@@ -127,7 +129,7 @@ jupe_ele,49,50,5	script	Evento Sobrevivênça#main::EventSurvivor	705,{
 
 				break;
 			case 4:
-				mes "^483D8B[Recepcionista]^000000";
+				mes "^483D8B[Estranho]^000000";
 				mes "Tudo bem, volte quando haver alguma dúvida.";
 				close;
 		}
@@ -219,8 +221,18 @@ OnEnd:
 	removemapflag "job3_guild03", mf_nomobloot;
 	removemapflag "job3_guild03", mf_nomvploot;
 
+	set $@ev_pagesurival_flag, 0;
 	delwaitingroom;
 	stopnpctimer;
+	end;
+
+OnPCDieEvent:
+	if( strcharinfo(3) == "job3_guild03" && (getmapusers("job3_guild03")-1) <= 0 )
+	{
+		announce "[Evento Sobrevivênça]: Todos jogadores foram mortos no evento!", 8;
+		donpcenvet "EventSurvivor::OnEnd";
+	}
+
 	end;
 }
 
