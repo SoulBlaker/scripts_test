@@ -1,0 +1,391 @@
+// .----------------------------------------------------------.
+// .            SoulBlaker Scripts Apresenta:                 .
+// .                ___________________                       .
+// .               /   _____/\______   \                      .
+// .               \_____  \  |    |  _/                      .
+// .               /        \ |    |   \                      .
+// .              /_______  / |______  /                      .
+// .                      \/         \/                       .
+// .            [ Cronus Advanced Scripts ]                   .
+// .                                                    v1.1  .
+// .----------------------------------------------------------.
+// ;  http://forum.cronus-emulator.com/user/20800-soulblaker  ;
+// .----------------------------------------------------------.
+// . Script:                                                  .
+// .  Master Of Quests                                        .
+// .----------------------------------------------------------.
+// . Por: SoulBlaker   Compátivel: Cronus       versão: 1.0   .
+// .----------------------------------------------------------.
+// . Descrição:                                               .
+// .  Script que cria quests em jogo.                         .
+// .                                                          .
+// . Funções:                                                 .
+/  . [100%] - Adicionar Categoria para quests.                .
+// . [100%] - Remover Categoria para quests.                  .
+// .   [0%] - Editar uma categoria.                           .
+// . [100%] - Adicionar quests.                               .
+// .   [0%] - Remover quests.                                 .
+// .   [0%] - Configurar quests. (Edição com base nisso)      .
+// .   [0%] - Funções de quests para os jogadores.            .
+// .   [0%] - Banco de Dados (SQL).                           .
+// .   [0%] - Suporte a WebSite.                              .
+// .----------------------------------------------------------.
+// . Changelog da Versão:                                     .
+// .  * 1.0 [SoulBlaker]                                      .
+// .	- Iniciado NPC.                                       .
+// *----------------------------------------------------------*
+
+// Tabela Categoria
+// auto_id: AId da Categoria.
+// name: Nome da Categoria.
+// description: Descrição da Categoria.
+// status: Estado da Categoria.
+
+// Tabela quests
+// auto_id: AId da quest.
+// name: Nome da Quest.
+// subjection: Sujeição da categoria.
+// description: Descrição da quest.
+// status: Estado da quest.
+
+// Tabela itens
+// auto_id: AId do item
+// item_id: Id do item
+// amount: Quantidade do item
+// type: Tipo do item, 0 é para entrega e 1 para requisito.
+// subjection: Sujeição do item.
+// status: Estado do item 0 habilitado/1 desabilitado.
+
+// Tabela Zenys
+// auto_id: AID do Zeny
+// zeny: Quantidade de zeny
+// type: Tipo do zeny, 0 é para entrega e 1 para requisito.
+// subjection: Sujeição do Zeny.
+// status: Estado do zeny
+
+prontera,148,183,4	script	Master of Quests#mofq_01	811,{
+
+	set .@AdminLvl, 99;
+
+	if( getgmlevel() >= .@AdminLvl )
+	{
+		mes "^00BFFF[Master of Quests]^000000";
+		mes "Bem-vindo Administrador, em que posso ajudar?";
+		next;
+	}
+
+	set .@loop_1, 1;
+	while(.@loop_1)
+	{
+		if( getgmlevel()>=.@AdminLvl )
+			set .@choose, select("- Gerenciar Categorias.", "- Gerenciar Quests.", "- Menu dos Jogadores.", "- Cancelar.");
+		else
+			set .@choose, 3;
+
+		switch( .@choose )
+		{
+			case 1: // Gerenciar Categorias
+				set .@loop_2, 1;
+				while( .@loop_2 )
+				{
+					mes "^00BFFF[Master of Quests]^000000";
+					mes "Em que posso ajudar com as categorias?";
+					next;
+					switch( select("- Cadastrar uma Categoria.", "- Remover uma Categoria.", "- Voltar ao menu anterior.", "- Cancelar." ) )
+					{
+						case 1: // Cadastrar uma Categoria.
+							set .@loop_3, 1;
+							while( .@loop_3 )
+							{
+								mes "^00BFFF[Master of Quests]^000000";
+								mes "Por favor, digite o nome da nova categoria!";
+								next;
+								input .@CategoryName$;
+								if( !.@CategoryName$)
+								{
+									mes "^00BFFF[Master of Quests]^000000";
+									mes "Você tem que digitar o nome para uma categoria!";
+									mes "Deseja tentar novamente?";
+									next;
+									if( select("- Sim, por favor.", "- Não, obrigado.") == 2 )
+										set .@loop_3, 0;
+								}
+								else {
+									set .@loop_4, 1;
+									mes "^00BFFF[Master of Quests]^000000";
+									mes "Por favor, digite uma descrição para a categoria!";
+									next;
+									input .@CategoryDesc$;
+									if( !.@CategoryDesc$ )
+									{
+										mes "^00BFFF[Master of Quests]^000000";
+										mes "Você tem que digitar uma descrição para a categoria!";
+										mes "Deseja tentar novamente?";
+										next;
+										if( select("- Sim, por favor.", "- Não, obrigado.") == 2 )
+										{
+											set .@loop_3, 0;
+											set .@loop_4, 0;
+										}
+									}
+									else {
+										mes "^00BFFF[Master of Quests]^000000";
+										mes "Você tem certeza que deseja criar uma categoria com o nome de " + .@CategoryName$ + " com a descrição de " + .@CategoryDesc$ + "?";
+										next;
+										if( select("- Sim, por favor.", "- Não, obrigado.") == 1 )
+										{
+											query_sql "INSERT INTO `moq_category` (name, description, status) VALUES ('" + .@CategoryName$ + "', '" + .@CategoryDesc$ + "', 1)";
+											mes "^00BFFF[Master of Quests]^000000";
+											mes "Categoria criada com sucesso!";
+											next;
+										}
+
+										set .@loop_3, 0;
+										set .@loop_4, 0;
+									}
+								}
+							}
+							break;
+						case 2: // Remover uma Categoria.
+							query_sql "SELECT * FROM `moq_category` WHERE `status`='1' ORDER BY `name` DESC", .@cAID, .@cName$, .@cDesc$;
+							if( !getarraysize(.@cAID) )
+							{
+								mes "^00BFFF[Master of Quests]^000000";
+								mes "Não há categorias a ser exibida!";
+								next;
+								break;
+							}
+
+							mes "^00BFFF[Master of Quests]^000000";
+							mes "Selecione a categoria que deseja remover:";
+							next;
+							for( set .@c, 0; .@c < getarraysize(.@cAID); set .@c, .@c + 1 )
+								set .@CategoryMenu$, "- " + .@CategoryMenu$ + .@cName$[.@c] + ":";
+
+							set .@CategoryMenu$, .@CategoryMenu$ + "- Voltar.:- Cancelar.";
+							set .@Category, select(.@CategoryMenu$)-1;
+
+							if( .@Category == getarraysize(.@cAID) )
+								break;
+							else if( .@Category > getarraysize(.@cAID) )
+							{
+								set .@loop_1, 0;
+								set .@loop_2, 0;
+								break;
+							}
+
+							mes "^00BFFF[Master of Quests]^000000";
+							mes "Tem certeza que deseja remover a categoria " + .@cName$[.@Category] + "?";
+							next;
+							if( select("- Sim, por favor.", "- Não, obrigado.") == 2 )
+							{
+								set .@loop_2, 0;
+								break;
+							}
+
+							mes "^00BFFF[Master of Quests]^000000";
+							mes "Deseja mover as quests da categoria " + .@cName$[.@Category] + " para outra categoria?";
+							mes "Caso não mova as quests, elas serão excluída do sistema.";
+							next;
+							if( select("- Sim, por favor.", "- Não, obrigado.") == 1 )
+							{
+								set .@loop_3, 1;
+								while( .@loop_3 )
+								{
+									mes "^00BFFF[Master of Quests]^000000";
+									mes "Por favor, selecione a categoria no qual deseja mover as quests.";
+									next;
+									set .@toCategory, select($CategoryMenu$)-1;
+
+									if( .@toCategory == getarraysize(.@cAID) )
+										break;
+									else if( .@toCategory > getarraysize(.@cAID) )
+									{
+										set .@loop_1, 0;
+										set .@loop_2, 0;
+										break;
+									}
+
+									mes "^00BFFF[Master of Quests]^000000";
+									mes "Tem certeza que deseja mover as quest da categoria " + .@cName$[.@Category] + " para " + .@cName$[.@toCategory] + "?";
+									next;
+									switch( select("- Sim, por favor.", "- Não, trocar.", "- Não desejo mais mover as quests.", "- Voltar.", "- Cancelar.") )
+									{
+										case 1:
+											query_sql "UPDATE `moq_quests` SET `subjection`='" + .@cAID[.@toCategory] + "' WHERE `subjection`='" + .@cAID[.@Category] + "'";
+											set .@loop_3, 0;
+											break;
+										case 2:
+											break;
+										case 3:
+											query_sql "SELECT auto_id FROM `moq_quests` WHERE `subjection`='" + .@cAID[.@Category] + "'", .@qAID;
+
+											for( set .@i, 0; .@i < getarraysize(.@cAID); set .@i, .@i + 1 )
+											{
+												query_sql "DELETE FROM `moq_itens` WHERE `subjection`='" + .@qAID[.@i] + "'";
+												query_sql "DELETE FROM `mob_zenys` WHERE `subjection`='" + .@qAID[.@i] + "'";
+											}
+
+											query_sql "DELETE FROM `moq_quests` WHERE `subjection`='" + .@cAID[.@Category] + "'";
+											set .@loop_3, 0;
+											break;
+										case 4:
+											set .@loop_2, 0;
+											set .@loop_3, 0;
+											set .@ignore, 1;
+											break;
+										case 5:
+											set .@loop_1, 0;
+											set .@loop_2, 0;
+											set .@loop_3, 0;
+											set .@ignore, 1;
+											break;
+									}
+								}
+							}
+							else {
+								query_sql "SELECT auto_id FROM `moq_quests` WHERE `subjection`='" + .@cAID[.@Category] + "'", .@qAID;
+
+								for( set .@i, 0; .@i < getarraysize(.@cAID); set .@i, .@i + 1 )
+								{
+									query_sql "DELETE FROM `moq_itens` WHERE `subjection`='" + .@qAID[.@i] + "'";
+									query_sql "DELETE FROM `mob_zenys` WHERE `subjection`='" + .@qAID[.@i] + "'";
+								}
+
+								query_sql "DELETE FROM `moq_quests` WHERE `subjection`='" + .@cAID[.@Category] + "'";
+							}
+
+							if( .@ignore )
+								break;
+
+							query_sql "DELETE FROM `moq_category` WHERE `auto_id`='" + .@cAID[.@Category] + "'";
+							mes "^00BFFF[Master of Quests]^000000";
+							mes "Categoria " + .@cAID[.@Category] + " foi removida com sucesso!";
+							next;
+							break;
+						case 3:
+							set .@loop_2, 0;
+							break;
+						case 4:
+							set .@loop_1, 0;
+							set .@loop_2, 0;
+							break;
+					}
+				}
+				break;
+			case 2: // Gerenciar Quests.
+				set .@loop_2, 1;
+				while( .@loop_2 )
+				{
+					mes "^00BFFF[Master of Quests]^000000";
+					mes "Em que posso ajudar com as quests?";
+					next;
+					switch( select("- Adicionar uma Quest.", "- Remover uma Quest.", "- Editar uma Quest.", "- Voltar.", "- Cancelar.") )
+					{
+						case 1: // Adicionar uma quest.
+							query_sql "SELECT * FROM `moq_category` WHERE `status`='1' ORDER BY `name` DESC", .@cAID, .@cName$, .@cDesc$;
+							if( !getarraysize(.@cAID) )
+							{
+								mes "^00BFFF[Master of Quests]^000000";
+								mes "Não há categorias a ser exibida!";
+								next;
+								break;
+							}
+
+							mes "^00BFFF[Master of Quests]^000000";
+							mes "Muito bem, selecione uma categoria para adicionar a nova quest.";
+							next;
+							for( set .@c, 0; .@c < getarraysize(.@cAID); set .@c, .@c + 1 )
+								set .@CategoryMenu$, "- " + .@CategoryMenu$ + .@cName$[.@c] + ":";
+
+							set .@CategoryMenu$, .@CategoryMenu$ + "- Voltar.:- Cancelar.";
+							set .@Category, select(.@CategoryMenu$)-1;
+
+							if( .@Category == getarraysize(.@cAID) )
+								break;
+							else if( .@Category > getarraysize(.@cAID) )
+							{
+								set .@loop_1, 0;
+								set .@loop_2, 0;
+								break;
+							}
+
+							mes "^00BFFF[Master of Quests]^000000";
+							mes "Tem certeza que deseja adicionar a nova quest na categoria " + .@cName$[.@Category] + "?";
+							next;
+							if( select("- Sim, por favor.", "- Não, obrigado.") == 2 )
+							{
+								set .@loop_2, 0;
+								break;
+							}
+
+							set .@loop_3, 1;
+							while(.@loop_3)
+							{
+								mes "^00BFFF[Master of Quests]^000000";
+								mes "Por favor, digite um nome para a quest.";
+								next;
+								input .@QuestName$;
+								if( !.@QuestName$ )
+								{
+									mes "^00BFFF[Master of Quests]^000000";
+									mes "Você tem que digitar um nome para a quest.";
+									mes "Deseja tentar novamente?";
+									next;
+									if( select("- Sim, por favor.", "- Não, obrigado.") == 2 )
+										set .@loop_3, 0;
+								}
+								else {
+									set .@loop_4, 1;
+									while(.@loop_4)
+									{
+										input .@QuestDesc$;
+										if( !.@QuestDesc$ )
+										{
+											mes "^00BFFF[Master of Quests]^000000";
+											mes "Você tem que digitar uma descrição para a quest.";
+											mes "Deseja tentar novamente?";
+											next;
+											if( select("- Sim, por favor.", "- Não, obrigado.") == 2 )
+											{
+												set .@loop_3, 0;
+												set .@loop_4, 0;
+											}
+										}
+										else {
+											mes "^00BFFF[Master of Quests]^000000";
+											mes "Você tem certeza que deseja adicionar a quest " + .@QuestName$ + " na categoria " + .@cName$[.@Category] + " com a descrição de " + .@QuestDesc$ + "?";
+											next;
+											if( select("- Sim, por favor.", "- Não, obrigado.") == 1 )
+											{
+												query_sql "INSERT INTO `moq_quests` (name, description, subjection, status) VALUES ('" + .@QuestName$ + "', '" + .@QuestDesc$ + "', " + .@cAID[.@Category] + ", 1)";
+												mes "^00BFFF[Master of Quests]^000000";
+												mes "Quest criada com sucesso!";
+												next;
+											}
+
+											set .@loop_3, 0;
+											set .@loop_4, 0;
+										}
+									}
+								}
+							}
+							break;
+						case 2: // Remover uma quest.
+					}
+				}
+				break;
+			case 3: // Menu dos Jogadores
+				mes "^00BFFF[Master of Quests]^000000";
+				mes "Bem-vindo " + strcharinfo(0) + ", em que posso ajudar?"
+				break;
+			case 4:
+				set .@loop_1, 0;
+				break;
+		}
+	}
+
+	mes "^00BFFF[Master of Quests]^000000";
+	mes "Muito bem, volte quand nescessitar dos meus serviços!";
+	close;
+}
