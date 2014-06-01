@@ -1,0 +1,3407 @@
+// .----------------------------------------------------------.
+// .  		    SoulBlaker Scripts Apresenta:             .
+// .		    ___________________ 		      .
+// .		   /   _____/\______   \                      .
+// .		   \_____  \  |    |  _/		      .
+// .		   /        \ |    |   \		      .
+// .		  /_______  / |______  /		      .
+// .			  \/         \/		              .
+// .           	[ eAthena Advanced Scripts ]                  .
+// .							v1.0  .
+// .----------------------------------------------------------.
+// ;   http://www.eathena.ws/board/SoulBlaker-m271867.html    ;
+// .----------------------------------------------------------.
+// . Script:                                                  .
+// .  Super VIP                                       	      .
+// .----------------------------------------------------------.
+// . Por: SoulBlaker   Compátivel: eAthena SVN	 versão: 1.1  .
+// .----------------------------------------------------------.
+// . Descrição:                                               .
+// .  NPC com várias funções para VIP e um controlador de dias.
+// .----------------------------------------------------------.
+// . Changelog da Versão:                                     .
+// .   - 1.0 Iniciado o NPC. [SoulBlaker]                     .
+// .   - 1.1 Adicionado novas Funções. [SoulBlaker]           .
+// .   - 1.2 Corrigido retorno da QueryFunc. [SoulBlaker]     .
+// .	     Reportagem por Rafoka.			      .
+// *----------------------------------------------------------*
+prontera,164,160,4	script	Super VIP#npc01::SuperVIP	97,{
+
+	/*====================================================
+	  =	Configurações dos Level de Acesso	     =
+	  ====================================================*/
+
+	/* Level de GM para Menus de Administração
+	*/ set .@gLevel, 99;
+
+	/* Level de GM para Menus de Usuário VIP
+	*/ set .@vLevel, 10;
+
+	/*====================================================
+	  =	Configurações dos NPCs			     =
+	  ====================================================*/
+
+	/* Nome de Exibição do NPC
+	*/ set .@nPCname$,"Super VIP - Funcionário";
+
+	/* Site Oficial do Servidor
+	*/ set .@WebSite$, "www.eathena.ws";
+
+	/*====================================================
+	  =	Configurações do Menu da Sala VIP	     =
+	  ====================================================*/
+
+	/* Mapa da Salal VIP
+	*/ set .@vMap$,"sec_in01";
+
+	/* Coordenada 'X' para Teleporte a Sala VIP
+	*/ set .@xCoX,150;
+
+	/* Coordenada 'Y' para Teleporte a Sala VIP
+	*/ set .@xCoY,150;
+
+	/*====================================================
+	  =	Configurações do Menu da Cura		     =
+	  ====================================================*/
+
+	/* Quanto irá custar a Cura?
+	*/ set .@cZenyCost, 10000;
+
+	/* Porcentagem de HP ganho na Cura
+	*/ set .@cHealHP, 100;
+
+	/* Porcentagem de SP ganho na Cura
+	*/ set .@cHealSP, 100;
+
+	/*====================================================
+	  =	Configurações do Menu do Estilista	     =
+	  ====================================================*/
+
+	/* Minimo de Estilo de Cabelo
+	*/ set .@MinHairStyle, GetBattleFlag("min_hair_style");
+
+	/* Máximo de Estilo de Cabelo
+	*/ set .@MaxHairStyle, GetBattleFlag("max_hair_style");
+
+	/* Minimo da Cor de Cabelo
+	*/ set .@MinHairColor, GetBattleFlag("min_hair_color");
+
+	/* Máximo da Cor de Cabelo
+	*/ set .@MaxHairColor, GetBattleFlag("max_hair_color");
+
+	/* Minimo da Cor de Roupa
+	*/ set .@MinClotColor, GetBattleFlag("min_cloth_color");
+
+	/* Máximo da Cor de Roupa
+	*/ set .@MaxClotColor, GetBattleFlag("max_cloth_color");
+
+	/*====================================================
+	  =	Configurações do Menu dos Homunculus	     =
+	  ====================================================*/
+
+	/* Quanto irá custar para criar um Homunculu?
+	*/ set .@homZenyCost, 10000;
+
+	/* Qual o tipo de Menu de Seleção dos Homunculus? (Leia-me)
+	*/ set .@homModeChoose, 0;
+
+	/* Qualquer Classe pode Criar um Homunculu?
+	*/ set .@homClass, 0;
+
+	/* Quanto irá custar para Ressucitar um Homunculu?
+	*/ set .@homAliveCost, 15000;
+
+	/* Quanto irá custar para Envoluir um Homunculu?
+	*/ set .@homEvolCost, 35000;
+
+	/*====================================================
+	  =	Configurações do Menu dos Assistentes	     =
+	  ====================================================*/
+
+	/* Nível Máximo do Assistente que pode ser vendido
+	*/ set .@mLevel, 10;
+
+	/* Valor do Assistente 
+	*/ set .@mZenyCost, 10000;
+
+	/* Tempo de Duração do Assistente em Milisegundos.
+	*/ set .@mTimer, 1800000;
+
+	/*====================================================
+	  =	Configurações do Menu do Refinamento	     =
+	  ====================================================*/
+
+	/* Preço para Refinar um Item
+	*/ set .@rZenyCost, 2000000;
+
+	/* Level máximo de Refinamento que o refinador pode refinar
+	*/ set .@rLevel, 10;
+
+	/* Level de Refine que o Refinador vai fazer por vez
+	*/ set .@rUpLevel, 1;
+
+	/* Habilitar cobrança de itens para refinar algo?
+	*/ set .@rItemReq, 1;
+
+	/* Em Arrays, bote o item que o refinador vai precisar para refinar algo.
+	*/ set .@rItem[0], 985; /* Elunium */
+
+	/* De acordo com o ponto de array do item, ponha a quantidade de itens que o refinador vai precisar para refinar um item.
+	*/ set .@rAmount[0], 10; /* 10 Elunium */
+
+	/* Habilitar refinamento no Topo da Cabeça?
+	*/ set .@rMenu[0], 1;
+
+	/* Habilitar refinamento em Armaduras?
+	*/ set .@rMenu[1], 1;
+
+	/* Habilitar refinamento na Mão Esquerda? (Armas)
+	*/ set .@rMenu[2], 1;
+
+	/* Habilitar refinamento na Mão Direita? (Armas)
+	*/ set .@rMenu[3], 1;
+
+	/* Habilitar refinamento em Vestimentos?
+	*/ set .@rMenu[4], 1;
+
+	/* Habilitar refinamento nos Sapatos?
+	*/ set .@rMenu[5], 1;
+
+	/* Habilitar refinamento nos Acessórios Esquerdo?
+	*/ set .@rMenu[6], 1;
+
+	/* Habilitar refinamento nos Acessórios Direito?
+	*/ set .@rMenu[7], 1;
+
+	/* Habilitar refinamento na Cabeça? (Meio)
+	*/ set .@rMenu[8], 1;
+
+	/* Habilitar refinamento na Cabeça? (Baixo)
+	*/ set .@rMenu[9], 1;
+
+	/*====================================================
+	  =	Configurações do Menu de Reparar Itens	     =
+	  ====================================================*/
+
+	/* Quanto irá custar para reparar um item?
+	*/ set .@repZenyCost, 20000;
+
+	/*====================================================
+	  =	Configurações do Menu de Remover Cartas	     =
+	  ====================================================*/
+
+	/* Preço do Serviço de Remoção de Cartas
+	*/ set .@rPrice, 32000;
+
+	/* Preço para cada Carta removida
+	*/ set .@rPriceCard, 20000;
+
+	/*====================================================
+	  =	Configurações do Menu da Menssagem Global    =
+	  ====================================================*/
+
+	/* Preço para Enviar uma Menssagem para o Mapa
+	*/ set .@mgZenyCostMap, 1000;
+
+	/* Preço para Enviar uma Menssagem para o Servidor
+	*/ set .@mgZenyCostAll, 1500;
+
+	/* Tempo de Espera para Enviar uma Menssagem após a outra (Delay)
+	*/ set .@mgDelay, 3;
+
+	/* Configurações dos Palavrões Restritos
+	   Exemplo: set .@anuncio_palavrao$[<ponto>],"<Palavrão Aqui>";
+	*/
+	set .@anuncio_palavrao$[0],"puta";
+	set .@anuncio_palavrao$[1],"gay";
+	set .@anuncio_palavrao$[2],"viadinho";
+	set .@anuncio_palavrao$[3],"prostituta";
+	set .@anuncio_palavrao$[4],"cuzão";
+
+	/* Configurações dos Sites Restritos
+	   Exemplo: set .@anuncio_sites$[<ponto>],"<Site>";
+	*/
+	set .@anuncio_sites$[0],"eathena.ws";
+	set .@anuncio_sites$[1],"orkut.com";
+	set .@anuncio_sites$[2],"cronus-emulator.com";
+	set .@anuncio_sites$[3],"venus-emulator.net";
+	set .@anuncio_sites$[4],"amazon-project.org";
+
+	/*====================================================
+	  =	Configurações do Menu de Aluguel	     =
+	  ====================================================*/
+
+	/* Preço para Alugar um Carrinho
+	*/ set .@rtCartZenyCost, 1000;
+
+	/* Preço para Alugar um PecoPeco
+	*/ set .@rtPecoZenyCost, 1000;
+
+	/* Preço para Alugar um Falcão
+	*/ set .@rtFalconZenyCost, 1000;
+
+	/*====================================================
+	  =	Configurações do Menu do Editor de Pontos    =
+	  ====================================================*/
+
+	/* Habilitar Menu de Compra de Pontos de Estatus?
+	*/ set .@skMenu[0], 1;
+
+	/* Habilitar Menu de Compra de Pontos de Habilidades?
+	*/ set .@skMenu[1], 1;
+
+	/* Habilitar Menu de Venda de Pontos de Estatus Sobrando?
+	*/ set .@skMenu[2], 1;
+
+	/* Habilitar Menu de Venda de Pontos de Habilidades Sobrando?
+	*/ set .@skMenu[3], 1;
+
+	/* Habilitar Menu de Resetar Estatus?
+	*/ set .@skMenu[4], 1;
+
+	/* Habilitar Menu de Resetar Habilidades?
+	*/ set .@skMenu[5], 1;
+
+	/* Quanto irá custar cada Ponto de Estatus comprado?
+	*/ set .@StatusBuyCost, 1000;
+
+	/* Quanto irá custar cada Ponto de Estatus vendido?
+	*/ set .@StatusSellCost, 500;
+
+	/* Quanto irá custar cada Ponto de Habilidade comprado?
+	*/ set .@SkillsBuyCost, 1000;
+
+	/* Quanto irá custar cada Ponto de Habilidade vendido?
+	*/ set .@SkillsSellCost, 500;
+
+	/* Quanto irá custar para resetar os Estatus?
+	*/ set .@ResetStatusCost, 100000;
+
+	/* Quanto irá custar para resetar as Habilidade?
+	*/ set .@ResetSkillsCost, 100000;
+
+	/* Quantas vezes pode se resetar os Estaus e Habilidade?
+	*/ set .@ResetMaxLimit, 3;
+
+	/*====================================================
+	  =	Configurações do Menu de Armazém Pessoal     =
+	  ====================================================*/
+
+	/* Habilitar Requerimento de Habilidades Básicas Nível 6?
+	*/ set .@storageSkills, 1;
+
+	/* Habilitar Requerimento da Senha do Jogador para abrir o Armazém?
+	*/ set .@storagePassword, 1;
+
+	/* Quanto irá custar para abrir o Armazém Pessoal?
+	*/ set .@storageZenyCost, 100;
+
+	/*====================================================
+	  =	Configurações do Menu de Armazém do Clãn     =
+	  ====================================================*/
+
+	/* Habilitar Requerimento de Habilidades Básicas Nível 6?
+	*/ set .@gstorageSkills, 1;
+
+	/* Habilitar Requerimento da Senha do Jogador para abrir o Armazém?
+	*/ set .@gstoragePassword, 1;
+
+	/* Quanto irá custar para abrir o Armazém do Clãn?
+	*/ set .@gstorageZenyCost, 100;
+
+	/*====================================================
+	  =	Configurações do Menu de Teleporte           =
+	  ====================================================*/
+
+	/* Quanto irá custar para Teletransportar a uma Cidade?
+	*/ set .@warpcityZenyCost, 1000;
+
+	/* Quanto irá custar para Teletransportar a um Calabouço?
+	*/ set .@warpdungZenyCost, 2000;
+
+	/*====================================================
+	  =     Configurações do Menu de Teleporte GDE       =
+	  ====================================================*/
+
+	/* Quanto irá custar para Teletransportar a um Castelo?
+	*/ set .@warpGuildCost, 3000;
+
+	/* Habilitar Teleporte da Guerra pra Jogadores que não possue um Clãn?
+	*/ set .@warpGetGuild, 0;
+
+	/* Habilitar Teleporte da Guerra até quando a Woe estiver desligada?
+	*/ set .@warpAgitEnd, 0;
+
+	/*====================================================
+	  =   Configurações do Menu do Sistema de Clonagem   =
+	  ====================================================*/
+
+	/* Quanto irá custar para Invocar um Clone?
+	*/ set .@cloneZenyCost, 20000;
+
+	/* Qual a duração de um Clone em segundos?
+	*/ set .@cloneDuration, 900;
+
+	/*====================================================
+	  =     Configurações do Menu de Alterar Tamanho     =
+	  ====================================================*/
+
+	/* Quanto irá custar para Mudar de Tamanho?
+	*/ set .@sizeZenyCost, 10000;
+
+	/*====================================================
+	  =     	Configurações do Banco               =
+	  ====================================================*/
+
+	/* Qual o tipo de registro de contas do banco?
+	*/ set .@bankRegType, 0;
+
+	/*====================================================
+	  =     Configurações do Menu da Arena PvP           =
+	  ====================================================*/
+
+	/* Quanto irá custar para ír a Arena PvP?
+	*/ set .@pvpZenyCost, 1000;
+
+	/* Qual o Level de Base que pode acessar a Arena PvP?
+	*/ set .@pvpBaseLevel, 20;
+
+	/* Qual o Mapa da Arena PvP?
+	*/ set .@pvpMapName$,"pvp_n_1-1";
+
+	/* Qual a coordenada 'X' que o jogador vai ser teleportado?
+	*/ set .@pvpMapx, 0;
+
+	/* Qual a coordenada 'Y' que o jogador vai ser teleportado?
+	*/ set .@pvpMapy, 0;
+
+	/*====================================================
+	  =	Configurações dos Menus de Seleção	     =
+	  ====================================================*/
+
+	/* Habilitar Sala VIP?
+	*/ set .@Menu[0], 1;
+
+	/* Habilitar Cura?
+	*/ set .@Menu[1], 1;
+
+	/* Habilitar Estilista?
+	*/ set .@Menu[2], 1;
+
+	/* Habilitar Criação de Homunculus?
+	*/ set .@Menu[3], 1;
+
+	/* Habilitar Criação de Assistentes?
+	*/ set .@Menu[4], 1;
+
+	/* Habilitar Refinamento de Itens?
+	*/ set .@Menu[5], 1;
+
+	/* Habilitar Reparamento de Itens?
+	*/ set .@Menu[6], 1;
+
+	/* Habilitar Removedora de Cartas?
+	*/ set .@Menu[7], 1;
+
+	/* Habilitar Menssagem Global?
+	*/ set .@Menu[8], 1;
+
+	/* Habilitar Aluguel de Carrinhos, PecoPeco e Falcão?
+	*/ set .@Menu[9], 1;
+
+	/* Habilitar Editor de Pontos de Estatus e Habilidades?
+	*/ set .@Menu[10], 1;
+
+	/* Habilitar o Uso do Armazém Pessoal?
+	*/ set .@Menu[11], 1;
+
+	/* Habilitar o Uso do Armazém do Clãn?
+	*/ set .@Menu[12], 1;
+
+	/* Habilitar o Teletransporte a Cidade e Calabouços?
+	*/ set .@Menu[13], 1;
+
+	/* Habilitar o Teletransporte aos Castelos?
+	*/ set .@Menu[14], 1;
+
+	/* Habilitar o Sistema de Clonagem?
+	*/ set .@Menu[15], 1;
+
+	/* Habilitar a Alteração de Tamanho?
+	*/ set .@Menu[16], 1;
+
+	/* Habilitar o Banco Super VIP?
+	*/ set .@Menu[17], 1;
+
+	/* Habilitar a Arena PvP?
+	*/ set .@Menu[18], 1;
+
+	/*====================================================
+	  =	Configurações dos Display dos Menus	     =
+	  ====================================================*/
+
+	/* Menu da Sala VIP
+	*/ set .@Show$[0],"- Sala VIP [" + GetMapUsers(.@vMap$) + "].";
+
+	/* Menu da Cura
+	*/ set .@Show$[1],"- Cura.";
+
+	/* Menu do Estilista
+	*/ set .@Show$[2],"- Estilista.";
+
+	/* Menu do Homunculu
+	*/ set .@Show$[3],"- Homunculus.";
+
+	/* Menu do Assistente (Mercenary System)
+	*/ set .@Show$[4],"- Assistentes.";
+
+	/* Menu do Refinamento de Itens
+	*/ set .@Show$[5],"- Refinar Itens.";
+
+	/* Menu do Reparamento de Itens
+	*/ set .@Show$[6],"- Reparar Itens.";
+
+	/* Menu do Removimento de Cartas
+	*/ set .@Show$[7],"- Remover Cartas.";
+
+	/* Menu da Menssagem Global
+	*/ set .@Show$[8],"- Torpedo.";
+
+	/* Menu do Aluguel de Carrinhos, PecoPecos e Falcões
+	*/ set .@Show$[9],"- Alugar Carrinho, PecoPeco ou Falcão.";
+
+	/* Menu de Edições de Pontos de Estatus e Habilidade
+	*/ set .@Show$[10],"- Editar Pontos de Estatus e Habilidade.";
+
+	/* Menu do Armazém Pessoal
+	*/ set .@Show$[11],"- Armazém Pessoal.";
+
+	/* Menu do Armazém do Clãn
+	*/ set .@Show$[12],"- Armazém do Clãn.";
+
+	/* Menu do Teletransporte
+	*/ set .@Show$[13],"- Teletransporte.";
+
+	/* Menu do Teletransporte aos Castelos
+	*/ set .@Show$[14],"- Teletransporte há Guerra.";
+
+	/* Menu do Sistema de Clonagem
+	*/ set .@Show$[15],"- Sistema de Clonagem.";
+
+	/* Menu de Alterar Tamanho
+	*/ set .@Show$[16],"- Alterar Tamanho.";
+
+	/* Menu do Banco Super VIP
+	*/ set .@Show$[17],"- Banco.";
+
+	/* Menu da Arena PvP
+	*/ set .@Show$[18],"- Arena PvP.";
+
+	/*====================================================
+	  =	Iniciando a Estrutura do Script              =
+	  ====================================================*/
+
+	if( GetGmLevel() < .@vLevel )
+	{
+		mes "[ " + .@nPCname$ + " ]";
+		mes "Me desculpe, mais você não é um usuário VIP.";
+		mes "Para se tornar um usuário VIP, por favor";
+		mes "acesse nosso WebSite:";
+		mes .@WebSite$;
+		close;
+	}
+	else
+	if( GetGmLevel() >= .@gLevel )
+	{
+		function QueryFunc;
+		mes "[ " + .@nPCname$ + " ]";
+		mes "Bem-vindo Administrador, o que deseja?";
+		next;
+		Switch( Select("- Menu VIP.","- Editar Contas.","- Cancelar.") )
+		{
+			case 1:
+				break;
+			case 2:
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Por favor, o que deseja fazer?";
+				next;
+				Switch( Select("- Adicionar dias em uma Conta.","- Remover Conta VIP.","- Cancelar.") )
+				{
+					case 1:
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Por favor, digite a ID ou UserID da Conta do Usuário.";
+						next;
+						input .@UserID$;
+
+						set .@AccountID, QueryFunc("Login",0,.@UserID$);
+
+						if( !.@AccountID )
+						{
+							mes "[ " + .@nPCname$ + " ]";
+							mes "Me desculpe, mais esta UID/AID não existe.";
+							close;
+						}
+
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Por favor, digite quantos dias VIP este jogador vai ter.";
+						next;
+						input .@Day;
+
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Tem certeza que deseja adicionar " + .@Days + " dias nesta UID/AID " + .@UserID$ + "?";
+						next;
+						if( Select("- Sim.","- Não.") == 1 )
+						{
+							set .@Timer, .@Day*1440;
+							while(1)
+							{
+								set .@Check, QueryFunc("Select",0,.@AccountID);
+
+								if( !.@Check)
+									QueryFunc("Create",.@AccountID);
+								else
+									break;
+							}
+
+							set .@TotalTimer, QueryFunc("Select",1,.@AccountID);
+							set .@TotalTimer, .@TotalTimer+.@Timer;
+
+							while(1)
+							{
+								set .@aaLevel, QueryFunc("Login",1,.@AccountID);
+								set .@abLevel, QueryFunc("Select",2,.@AccountID);
+
+								if( !.@aaLevel )
+									QueryFunc("Update",0,.@AccountID,10);
+
+								if( !.@abLevel )
+									QueryFunc("Update",1,.@AccountID,10);
+
+								if( .@aaLevel && .@abLevel )
+									break;
+							}
+
+							QueryFunc("Update",2,.@AccountID,1);
+							QueryFunc("Update",3,.@AccountID,.@TotalTimer);
+
+							set .@CheckAcc, QueryFunc("Select",0,.@AccountID); //Account
+							set .@CheckTim, QueryFunc("Select",1,.@AccountID); //expiretime
+							set .@CheckLvl, QueryFunc("Select",2,.@AccountID); //Level
+							set .@CheckFlg, QueryFunc("Select",3,.@AccountID); //Flag
+
+							if( .@CheckAcc != .@AccountID || .@CheckTim != .@TotalTimer || .@CheckLvl != .@aaLevel || .@CheckFlg != 1 )
+							{
+								mes "[ " + .@nPCname$ + " ]";
+								mes "Erro ao adicionar os dias VIP neste UID/AID " + .@UserID$ + ".";
+								close;
+							}
+							mes "[ " + .@nPCname$ + " ]";
+							mes "Os Dias VIP foi adicionado com sucesso.";
+							close;
+						}
+						break;
+					case 2:
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Por favor, digite a ID ou UserID da Conta do Usuário.";
+						next;
+						input .@UserID$;
+
+						set .@AccountID, QueryFunc("Login",0,.@UserID$);
+
+						if( !.@AccountID )
+						{
+							mes "[ " + .@nPCname$ + " ]";
+							mes "Me desculpe, mais esta UID/AID não existe.";
+							close;
+						}
+
+						while(1)
+						{
+							set .@CheckAID, QueryFunc("Select",0,.@AccountID);
+
+							if( !.@CheckAID)
+								QueryFunc("Create",.@AccountID);
+							else
+								break;
+						}
+
+						set .@CheckTime, QueryFunc("Select",1,.@AccountID);
+						if( .@CheckTime < 1440 )
+						{
+							mes "[ " + .@nPCname$ + " ]";
+							mes "Este jogador tem '0' dias e não tem o que remover.";
+							close;
+						}
+
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Quantos dias você deseja remover desta UID/AID " + .@UserID$ + "?";
+						next;
+						input .@Days;
+
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Tem certeza que deseja remover " + .@Days + " dias VIP desta UID/AID " + .@UserID$ + "?";
+						next;
+						if( Select("- Sim.","- Não.") == 1 )
+						{
+							set .@CheckTime, .@CheckTime-(.@Days*1440);
+							QueryFunc("Update",3,.@AccountID,.@CheckTime);
+							set .@Check, QueryFunc("Select",1,.@AccountID);
+
+							if( .@Check != .@CheckTime )
+							{
+								mes "[ " + .@nPCname$ + " ]";
+								mes "Erro ao Remover " + .@Days + " dias de vip na UID/AID " + .@UserID$ + ".";
+								close;
+							}
+
+							mes "[ " + .@nPCname$ + " ]";
+							mes "Removido " + .@Days + " dias de vip da UID/AID " + .@UserID$ + ".";
+							close;
+						}
+						break;
+					case 3:
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Muito bem administrador,";
+						mes "volte quando desejar algo!";
+						close;
+				}
+				break;
+			case 3:
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Muito bem administrador,";
+				mes "volte quando desejar algo!";
+				close;
+		}
+	}
+	else
+	if( GetGmLevel() == .@vLevel )
+	{
+		mes "[ " + .@nPCname$ + " ]";
+		mes "Bem-vindo usuário VIP,";
+		mes "O que deseja?";
+		next;
+	}
+
+	// scriptinit
+	for( set .@i,0; .@i < GetArraySize(.@Menu); set .@i, .@i + 1 )
+	{
+		if( .@Menu[.@i] )
+			set .@ChooseMenu$, .@ChooseMenu$+.@Show$[.@i];
+
+		set .@ChooseMenu$, .@ChooseMenu$+":";
+	}
+
+	set .@ChooseMenu$,.@ChooseMenu$+"Cancelar"; // default?
+
+	Switch( Select( .@ChooseMenu$ ) )
+	{
+
+		case 1:
+			mes "[ " + .@nPCname$ + " ]";
+			mes "Deseja mesmo ir a sala vip?";
+			next;
+			if( Select("- Sim.","- Não.") == 1 )
+			{
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Vou te mandar para lá!";
+				close2;
+				warp .@vMap$, .@vCoX, .@vCoY;
+				end;
+			}
+			break;
+		case 2:
+			if( .@cZenyCost )
+			{
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Bem-vindo " + StrCharInfo(0) + ", deseja se curar?";
+				mes "Custa apenas " + .@cZenyCost + " Zenys.";
+			}
+			else
+			{
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Bem-vindo " + StrCharInfo(0) + ", deseja se curar?";
+			}
+			next;
+			if( Select("- Sim.","- Não.") == 1 )
+			{
+				if( .@cZenyCost &&  Zeny < .@cZenyCost )
+				{
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Me desculpe, mas você não tem Zeny Suficiente.";
+					close;
+				}
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Muito bem, aqui está sua cura!";
+				percentheal .@cHealHP,.@cHealSP;
+
+				if( .@cZenyCost )
+					set Zeny, Zeny - .@cZenyCost;
+
+				close;
+			}
+			break;
+		case 3:
+			function SetLookFunc;
+			mes "[ " + .@nPCname$ + " ]";
+			mes "Muito bem, o que deseja mudar?";
+			next;
+			switch( select("- Estilo do Cabelo.","- Cor do Cabelo.","- Estilo do Cabelo.","- Cancelar.") )
+			{
+				case 1:
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Muito bem, os Estilos de Cabelo vão de " + .@MinHairStyle + " á " + .@MaxHairStyle + ".";
+					mes "Deseja ver um por vez, ou já sabe o número do Estilo de Cabelo que você deseja?";
+					next;
+					set .@Choose, Select("- Já sei o número.","- Ver um por vez.")-1;
+					SetLookFunc .@Choose,1,SC_WEIGHT90,.@MinHairStyle,.@MaxHairStyle,.@nPCname$;
+					break;
+				case 2:
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Muito bem, as Cores de Cabelo vão de " + .@MinHairColor + " á " + .@MaxHairColor + ".";
+					mes "Deseja ver uma por vez, ou já sabe o número da Cor do Cabelo que você deseja?";
+					next;
+					set .@Choose, Select("- Já sei o número.","- Ver uma por vez.")-1;
+					SetLookFunc .@Choose,9,SC_ASDPOTION0,.@MinHairColor,.@MaxHairColor,.@nPCname$;
+					break;
+				case 3:
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Muito bem, as Cores de Roupa vão de " + .@MinClotColor + " á " + .@MaxClotColor + ".";
+					mes "Deseja ver uma por vez, ou já sabe o número da Cor de Roupa que você deseja?";
+					next;
+					set .@Choose, Select("- Já sei o número.","- Ver uma por vez.")-1;
+					SetLookFunc .@Choose,7,SC_ASPDPOTION1,.@MinClotColor,.@MaxClotColor,.@nPCname$;
+					break;
+				case 4:
+					break;
+			}
+			break;
+		case 4:
+			function AtCommandFunc;
+
+			if( !.@homClass && (Class != Job_Alchem && Class != Job_Creator) )
+			{
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Me desculpe, mais só Alquimistas";
+				mes "e Criadores podem utilizar esta Opção.";
+				close;
+			}
+
+			mes "[ " + .@nPCname$ + " ]";
+			mes "Muito bem, o que deseja?";
+			next;
+
+			if( GetHomInfo(1) && GetHomInfo(6) >= 99 && GetHomInfo(3) >= 100000 && GetHomInfo(4) >= 100 )
+				set .@Choose2, Select("","- Ressucitar Homunculus.","- Envoluir Homunculus.","- Cancelar.");
+			else
+			if( GetHomInfo(1) )
+				set .@Choose2, Select("","- Ressucitar Homunculus.","","- Cancelar.");
+			else
+			if( !GetHomInfo(1) )
+				set .@Choose2, Select("- Criar Homunculus.","","","- Cancelar.");
+			else
+				set .@Choose2, 4;
+
+			Switch( .@Choose2 )
+			{
+				case 1:
+					if( .@homModeChoose )
+					{
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Por favor, selecione o Homunculus";
+						mes "que você deseja criar!";
+						next;
+						if( .@homModeChoose )
+							set .@HomChoose, Select("- Lif[1].","- Amistr[1].","- Filir[1].","- Vanilmirth[1].","- Lif[2].","- Amistr[2].","- Filir[2].","- Vanilmirth[2].","^FF0000- Lif[3].^000000","^FF0000- Amistr[3].^000000","^FF0000- Filir[3].^000000","^FF0000- Vanilmirth[3].^000000","^FF0000- Lif[4].^000000","^FF0000- Amistr[4].^000000","^FF0000- Filir[4].^000000","^FF0000- Vanilmirth[4].^000000");
+						else
+							set .@HomChoose, Select("- Lif[1].","- Amistr[1].","- Filir[1].","- Vanilmirth[1].","- Lif[2].","- Amistr[2].","- Filir[2].","- Vanilmirth[2].");
+					}
+					else set .@HomChoose, rand(1,8);
+
+					set .@HomID, 6000+.@HomChoose;
+
+					if(.@homZenyCost )
+					{
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Para criar um Homunculus,";
+						mes "é nescessário de " + .@homZenyCost + " Zenys.";
+						mes "Deseja criar este Homunculus?";
+						next;
+						if( Select("- Sim.","- Não.") == 2 )
+							break;
+						else
+						{
+							if( Zeny < .@homZenyCost )
+							{
+								mes "[ " + .@nPCname$ + " ]";
+								mes "Me desculpe, mas você não tem " + .@homZenyCost + " Zenys.";
+								close;
+							}
+							set Zeny, Zeny - .@homZenyCost;
+						}
+					}
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Seu homunculu foi criado com sucesso!";
+
+					AtCommandFunc StrCharInfo(0),3,.@HomID;
+
+					close;
+				case 2:
+					if( .@homAliveCost )
+					{
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Para resussitar seu Homunculu,";
+						mes "é preciso de " + .@homAliveCost + " Zenys.";
+						mes "Deseja Ressuscitar seu Homunculu?";
+					}
+					else
+					{
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Deseja Ressucitar seu Homunculu?";
+					}
+					next;
+					if( Select("- Sim.","- Não.") == 1 )
+					{
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Seu Homunculu foi ressucitado com sucesso!";
+
+						AtCommandFunc StrCharInfo(0),4,247,10;
+						//atcommand "@useskill 247 10 "+strcharinfo(0);
+						mes GetCharID(0);
+						close;
+					}
+					break;
+				case 3:
+					if( .@homEvolCost )
+					{
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Para envoluir seu Homunculu,";
+						mes "é nescessário " + .@homEvolCost + " Zenys.";
+						mes "Deseja envoluir seu Homunculu?";
+					}
+					else
+					{
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Ddeseja envoluir seu Homunculu?";
+					}
+					next;
+					if( Select("- Sim.","- Não") == 2 )
+						break;
+					else
+					{
+						if( .@homEvolCost && Zeny < .@homEvolCost )
+						{
+							mes "[ " + .@nPCname$ + " ]";
+							mes "Me desculpe, mas você não tem " + .@homEvolCost + " Zenys.";
+							close;
+						}
+
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Muito bem, espero que seu Homunculu envolua com sucesso!";
+
+						homevolution;
+
+						if( .@homEvolCost )
+							set Zeny,Zeny - .@homEvolCost;
+					}
+					close;
+				default:
+					break;
+			}
+			break;
+		case 5:
+			mes "[ " + .@nPCname$ + " ]";
+			mes "Deseja criar um Assistente? Por favor, me diga qual a Classe do seu Assistente.";
+			next;
+			Switch( Select("- Assistente Arqueiro.","- Assistente Espadachim.","- Assistente Lanceiro." ) )
+			{
+				case 1:
+					set .@ItemID,12152;
+					set .@MercID,6017;
+					set .@mName$,"Arqueiro";
+					break;
+				case 2:
+					set .@ItemID,12162;
+					set .@MercID,6037;
+					set .@mName$,"Espadaachim";
+					break;
+				case 3:
+					set .@ItemID,12172;
+					set .@MercID,6027;
+					set .@mName$,"Lanceiro";
+					break;
+			}
+
+			for( set .@i,1; .@i < .@mLevel; set .@i, .@i + 1 )
+			{
+				set .@mMenu$,.@mMenu$+"Assistente " + .@mName$ + " Nível " + .@i + ".";
+				set .@mMenu$,.@mMenu$+":";
+			}
+
+			set .@Choose, Select(.@mMenu$);
+			set .@mZenyCost2, .@Choose*.@mZenyCost;
+
+			mes "[ " + .@nPCname$ + " ]";
+			mes "Deseja comprar um Assistente " + .@mName$ + " Nível " + .@Choose + "?";
+
+			if( .@mZenyCost2 )
+				mes "Custa apensa " + .@mZenyCost2 + " Zenys.";
+
+			next;
+			if( Select("- Sim.","- Não.") == 1 )
+			{
+				if( .@mZenyCost && Zeny < .@mZenyCost2 )
+				{
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Me desculpe, mais você não tem " + .@mZenyCost + " para contratar um Assistente " + .@mName$ + " Nível " + .@Choose + ".";
+					next;
+				}
+				else
+				{
+					set .@MercID, .@MercID + .@Choose;
+					mercenary_create .@MercID,.@mTimer;
+
+					if( .@mZenyCost )
+						set Zeny, Zeny - .@mZenyCost2;
+
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Aqui está seu Assistente.";
+					close;
+				}
+			}
+			break;
+		case 6:
+			if( .@rZenyCost && .@rItemReq )
+			{
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Deseja refinar algum equipamento?";
+				mes "Custa apenas " + .@rZenyCost + " Zenys, e você me precisa trazer:";
+				for( set .@i,0; .@i < GetArraySize(.@rItem); set .@i, .@i + 1 )
+					mes .@rAmount[.@i]+"x "+GetItemName(.@rItem[.@i]);
+			}
+			else
+			if( .@rZenyCost )
+			{	
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Deseja refinar algum equipamento?";
+				mes "Custa apenas " + .@rZenyCost + " Zenys.";
+			}
+			else
+			if( !.@rItemReq )
+			{
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Deseja refinar algum equipamento?";
+				mes "Você só precisa me trazer:";
+				for( set .@i,0; .@i < GetArraySize(.@rItem); set .@i, .@i + 1 )
+					mes .@rAmount[.@i]+"x "+GetItemName(.@rItem[.@i]);
+			}
+			else
+			{
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Deseja refinar algum equipamento?";
+			}
+
+			for( set .@i,0; .@i < GetArraySize(.@rMenu); set .@i, .@i + 1 )
+			{
+				set .@i2,.@i+1;
+				if( .@rMenu[.@i] && getequipisequiped(.@i2) && getequiprefinerycnt(.@i2) < .@rLevel )
+					set .@rMenu$,.@rMenu$+GetEquipName(.@i2);
+
+				set .@rMenu$,.@rMenu$+":";
+			}
+
+			next;
+
+			set .@Choose, Select(.@rMenu$);
+
+			if( .@rZenyCost && Zeny < .@rZenyCost )
+			{
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Me desculpe, mas você não tem " + .@rZenyCost + " Zenys.";
+				close;
+			}
+			else
+			if( .@rItemReq )
+			{
+				for( set .@i,0; .@i < GetArraySize(.@rItem); set .@i, .@i + 1 )
+				{
+					if( countitem(.@rItem[.@i]) < .@rAmount[.@i] )
+					{
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Me desculpe, mas você não tem " + .@rAmount[.@i] + "x " + GetItemName(.@rItem[.@i]) + ".";
+						close;
+					}
+				}
+			}
+
+			for( set .@i,0; .@i <= .@rUpLevel; set .@i, .@i + 1 )
+			{
+				if( GetEquipRefinerycnt(.@Choose) < .@rLevel )
+					successrefitem .@Choose;
+			}
+
+			if( .@rZenyCost )
+				set Zeny, Zeny - .@rZenyCost;
+
+			for( set .@i,0; .@i < GetArraySize(.@rItem); set .@i, .@i + 1 )
+				delitem .@rItem[.@i],.@rAmount[.@i];
+
+			mes "[ " + .@nPCname$ + " ]";
+			mes "Muito bem, seu item foi refinado com sucesso!";
+			next;
+			break;
+		case 7:
+			setarray .@EquipeSlotName$[1],"Cabeça","Corpo","Mão direita","Mão esquerda","Manto","Pés","Acessório 1","Acessório 2","Cabeça 2","Cabeça 3";
+
+			for( set .@num,1; .@num <= 10; set .@i, .@i + 1 )
+			{
+				if( GetBrokenID(.@num) )
+					set .@Select$,.@Select$+GetItemName(GetBrokenId(.@num));
+
+				set .@Select$, .@Select$+":";
+			}
+
+			set .@Select$, .@Select$+":Cancelar";
+
+			mes "[ ]";
+			mes "Qual item você deseja consertar?";
+			next;
+			set .@ID, Select(.@Select$);
+
+			if( .@ID > 10 )
+				break;
+			else
+			{
+				if( !GetBrokenId(.@ID) )
+				{
+					mes "[ ]";
+					Switch( .@ID )
+					{
+						case 1:
+							mes "Quer que eu conserte essa sua cabeça oca?";
+							break;
+						case 2:
+							mes "Venha! Vou conserte seu coração com o meu amor!";
+							break;
+						case 3:
+							mes "Desculpe, não há tecnologia ainda para instalar foguetes na sua mão esquerda...";
+							break;
+						case 4:
+							mes "Desculpe, não há tecnologia ainda para instalar foguetes na sua mão direita...";
+							break;
+						case 5:
+							mes "Você não está usando nenhum robe né?";
+							break;
+						case 6:
+							mes "Nossa! Que chulé!";
+							break;
+						case 7:
+						case 8:
+							mes "Sobre qual acessório você está falando?";
+							break;
+						case 9:
+						case 10:
+							mes "Sobre qual acessório você está falando das outras partes da sua cabeça, né?";
+							break;
+					}
+					close;
+				}
+
+				if( .@repZenyCost )
+				{
+					mes "[ ]";
+					mes "Para você reparar o " + GetItemName(GetBrokenId(.@ID)) + ",";
+					mes "você precisa me trazer " + .@repZenyCost + " Zenys.";
+					mes "Deseja reparar este equipamento?";
+					next;
+					if( Select("- Sim.","- Não.") == 2 )
+						break;
+					else
+					if( Zeny < .@repZenyCost )
+					{
+						mes "[ ]";
+						mes "Me desculpe, mas você não tem " + .@reZenyCost + " Zenys.";
+						close;
+					}
+					else set Zeny, Zeny - .@repZenyCost;
+
+				}
+
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Muito bem, seu equipamento foi reparado.";
+				mes "Acho que fico bom...";
+				repair(.@ID);
+			}
+			close;
+		case 8:
+			if( .@rPrice && .@rPriceCard )
+			{
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Para remover uma carta de um equipamento, eu preciso de " + .@rPrice + " Zenys, mais " + .@rPriceCard + " Zenys por carta removida.";
+				mes "Deseja remover uma carta de algum equipamento?";
+			}
+			else
+			if( .@rPrice )
+			{
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Para remover uma carta de um equipamento, eu preciso de " + .@rPrice + " Zenys.";
+				mes "Deseja remover uma carta de algum equipamento?";
+			}
+			else
+			if( .@rPriceCard )
+			{
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Para remover uma carta de um equipamento, eu preciso de " + .@rPriceCard + " Zenys por carta removida.";
+				mes "Deseja remover uma carta de algum equipamento?";
+			}
+			else
+			{
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Deseja remover uma carta de algum equipamento?";
+			}
+
+			next;
+			if( Select("- Sim.","- Não.") == 1 )
+			{
+				for( set .@i,1; .@i <= 10; set .@i,.@i+1 )
+				{
+					if( getequipisequiped(.@i) )
+						set .@Choose$, .@Choose$+"- "+getequipname(.@i);
+	
+					set .@Choose$, .@Choose$+":";
+				}
+			}
+
+			mes "[ " + .@nPCname$ + " ]";
+			mes "Por favor, escolha o equipamento que você deseja remover uma carta.";
+			next;
+			set .@Part, Select(.@Choose$);
+
+			set .@rcAmount, GetEquipCardCnt(.@Part);
+
+			if( .@rPrice && .@rPriceCard )
+			{
+				set .@rcZenyCost, (.@rPriceCard * .@rcAmount) + .@rPrice;
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Muito bem, são " + .@rPrice + " Zenys,";
+				mes "mais o custo de " + (.@rPriceCard * .@rcAmount) + " por carta equipada.";
+				mes "No total vai custar " + .@rcZenyCost + " Zenys para remover suas cartas.";
+				mes "Deseja remover suas cartas?";
+			}
+			else
+			if( .@rPrice )
+			{
+				set .@rcZenyCost, .@rPrice;
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Muito bem, são " + .@rPrice + " Zenys para remover suas cartas.";
+				mes "Deseja remover suas cartas?";
+			}
+			else
+			if( .@rPriceCard )
+			{
+				set .@rcZenyCost, .@rPriceCard * .@rcAmount;
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Muito bem, são " + .@rcZenyCost + " Zenys para remover suas cartas.";
+			}
+			else
+			{
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Muito bem, podemos remover suas cartas?";
+			}
+
+			next;
+			if( Select("- Sim.","- Não.") == 1 )
+			{
+				if( .@rcZenyCost && Zeny < .@rcZenyCost )
+				{
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Me desculpe, mas você não tem " + .@rcZenyCost + " Zenys para remover suas cartas.";
+				}
+
+				if( .@rcZenyCost )
+					set Zeny, Zeny - .@rcZenyCost;
+
+				successremovecards .@Part;
+
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Muito bem, suas cartas foram removida com sucesso!";
+				next;
+			}
+			break;
+		case 9:
+			mes "[ " + .@nPCname$ + " ]";
+			mes "Deseja enviar uma Menssagem para o Mapa ou para o Servidor todo?";
+			next;
+			set .@Type, Select("- Para o Mapa.","- Para o Servidor Todo.");
+
+			if( .@Type == 1 && .@mgZenyCostMap )
+				set .@mgZenyCost, .@mgZenyCostMap;
+			else
+				set .@mgZenyCost, .@mgZenyCostAll;
+
+			if( .@mgZenyCost )
+			{
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Para enviar uma Menssagem, custa apenas " + .@mgZenyCost + " Zenys.";
+				mes "Deseja enviar uma menssagem?";
+			}
+			else
+			{
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Deseja realmente enviar uma menssagem?";
+			}
+			next;
+			if( Select("- Sim.","- Não.") == 1 )
+			{
+				if( .@mgZenyCost && Zeny < .@mgZenyCost )
+				{
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Me desculpa, mas você não tem " + .@mgZenyCost + " Zenys para enviar uma Menssagem.";
+					close;
+				}
+
+				function DelayManagerFunc;
+				if( !DelayManagerFunc("DelayGet",GetCharId(3),.@mgDelay) )
+				{
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Me desculpe, mas você acabou de enviar um anuncio e deve esperar " + .@mgDelay + " Minutos.";
+					close;
+				}
+
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Por favor, escolha a cor da menssagem que você deseja enviar.";
+				next;
+				set .@Choose,select("- Mandar uma Menssagem em ^FFFF00Amarelo^000000","- Mandar uma Menssagem em ^0000FFAzul^000000","- Mandar uma Menssagem em ^FFFFFFBranco^000000","- Mandar uma Menssagem em ^000000Preto^000000","- Mandar uma Menssagem em ^00FF00Verde^000000","- Mandar uma Menssagem em ^FF0000Vermelho^000000");
+				setarray .@color$[1],"0xFFFF00","0x0000FF","0xFFFFFF","0x000000","0x00FF00","0xFF0000";
+
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Por favor, digite a Menssagem que você deseja enviar.";
+				next;
+				input .@Mes$;
+
+				for( set .@i,0; .@i < GetArraySize(.@anuncio_palavrao$); set .@i, .@i + 1 )
+				{
+					if( compare(.@Mes$,.@anuncio_palavrao$[.@i]) )
+					{
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Desculpa, mais não permitimos palavrões no anuncio.";
+						close;
+					}
+				}
+
+				for( set .@i,0; .@i < GetArraySize(.@anuncio_sites$); set .@i, .@i + 1 )
+				{
+					if( compare(.@Mes$,.@anuncio_sites$[.@i]) )
+					{
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Desculpa, mais não permitimos divulgação deste site aqui.";
+						close;
+					}
+				}
+
+				if( .@Mes$ == "" )
+				{
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Me desculpe, mais você não digitou nada na sua Menssagem.";
+					close;
+				}
+
+				if( .@mgZenyCost )
+					set Zeny, Zeny - 1;
+
+				if( .@Type == 1 )
+				{
+					getmapxy(.@mgmap$,.@mgx,.@mgy,0);
+					mapannounce .@mgmap$,"[" + strcharinfo(0) + "]: "+.@Mes$,bc_map,.@color$[.@Choose];
+					DelayManagerFunc("DelaySet",GetCharId(3));
+				}
+				else
+				{
+					announce "[" + strcharinfo(0) + "]: "+.@Mes$,bc_all,.@color$[.@Choose];
+					DelayManagerFunc("DelaySet",GetCharId(3));
+				}
+
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Sua Menssagem foi Enviada com Sucesso!";
+				close;
+			}
+			break;
+		case 10:
+			mes "[ " + .@nPCname$ + " ]";
+			mes "Muito bem, o que você deseja?";
+			next;
+			// Set Menu for JobType
+			if( BaseClass == Job_Merchant || BaseJob == Job_SuperNovice )
+			{
+				set .@Choose,select("- Pegar Carrinho.","- Cancelar.");
+				set .@ZenyCost,.@rtCartZenyCost;
+			}
+			else
+			if( BaseJob != Job_Archer && BaseJob != Job_Bard && BaseJob != Job_Dancer && BaseClass == Job_Archer )
+			{
+				set .@Choose,select("- Pegar Falcão.","- Cancelar.");
+				set .@ZenyCost,.@rtFalconZenyCost;
+			}
+			else
+			if( BaseJob != Job_Swordman && BaseClass == Job_Swordman )
+			{
+				set .@Choose,select("- Pegar PecoPeco.","- Cancelar.");
+				set .@ZenyCost,.@rtPecoZenyCost;
+			}
+			else set .@Choose,3;
+			// end set menu for JobType
+
+			if( .@ZenyCost )
+			{
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Muito bem, para alugar algo,";
+				mes "você precisa me trazer " + .@ZenyCost + " Zenys.";
+				mes "Deseja alugar?";
+				next;
+				if( Select("- Sim.","- Não.") == 2 )
+					break;
+			}
+
+			Switch( .@Choose )
+			{
+				case 1:
+					if( .@ZenyCost && Zeny < .@ZenyCost )
+					{
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Me desculpe, mas você não tem " + .@ZenyCost + " Zenys.";
+						close;
+					}
+					else
+					if( !checkcart() && GetSkillLv(39) )
+						setcart;
+					else
+					if( !checkfalcon() && GetSkillLv(127) )
+						setfalcon;
+					else
+					if( !checkriding() && GetSkillLv(63) )
+						setriding;
+					else
+					{
+						mes "[ " + .@nPCname$ + " ]";
+
+						if( checkcart() )
+							mes "Você já possui um Carrinho.";
+						else
+						if( checkfalcon() )
+							mes "Você já possui um Falcão.";
+						else
+						if( checkriding() )
+							mes "Você já possui um Peco-Peco.";
+						else
+							mes "Desculpe, mas você não possui as Habilidades Requerida.";
+						close;
+					}
+					break;
+				case 2:
+					break;
+				case 3:
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Sua Classe não permite ter um Carrinho, Falcão ou PecoPeco.";
+					close;
+			}
+			break;
+		case 11:
+			mes "[ " + .@nPCname$ + " ]";
+			mes "Muito bem, o que você deseja?";
+			next;
+
+			if( .@skMenu[0] )
+				set .@skMenu$[0],"- Comprar Pontos de Estatus.";
+			if( .@skMenu[1] )
+				set .@skMenu$[1],"- Vender Pontos de Estatus.";
+			if( .@skMenu[2] )
+				set .@skMenu$[2],"- Comprar Pontos de Habilidades.";
+			if( .@skMenu[3] )
+				set .@skMenu$[3],"- Vender Pontos de Habilidades.";
+			if( .@skMenu[4] )
+				set .@skMenu$[4],"- Resetar Pontos de Estatus.";
+			if( .@skMenu[5] )
+				set .@skMenu$[5],"- Resetar Pontos de Habilidade.";
+
+			Switch( Select(.@skMenu$[0],.@skMenu$[1],.@skMenu$[2],.@skMenu$[3],.@skMenu$[4],.@skMenu$[5],"- Cancelar.") )
+			{
+				case 1:
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Cada ponto de Estatus";
+					mes "custa apenas " + .@StatusBuyCost + " Zenys.";
+					mes "Deseja comprar pontos Soltos ou Acrescentar direto em um Estatus?";
+					next;
+					set .@Type, Select("- Comprar Pontos Soltos.","- Comprar Pontos Acrescentando em um Estatus.");
+
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Por favor, digite quantos pontos você deseja!";
+					next;
+					input .@Amount;
+
+					if( !.@Amount )
+					{
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Muito bem, não deseja comprar nenhum ponto?";
+						mes "Estarei aqui se precisar.";
+						close;
+					}
+
+					set .@ZenyCost, .@Amount*.@StatusBuyCost;
+
+					if( .@Type == 2 )
+					{
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Por favor, selecione o parametro que você deseja adicionar estes pontos.";
+						next;
+						set .@Slot, Select("- Força.","- Vitalidade.","- Inteligência.","- Agilidade.","- Destreza.","- Sorte.");
+					}
+
+					if( Zeny < .@ZenyCost )
+					{
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Me desculpe, mas você não tem " + .@ZenyCost + " Zenys.";
+						close;
+					}
+
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Muito bem, deseja comprar " + .@Amount + " Pontos por " + .@ZenyCost + " Zenys?";
+					next;
+					if( Select("- Sim.","- Não.") == 1 )
+					{
+						Switch( .@Slot )
+						{
+							case 0: set StatusPoint, StatusPoint + .@Amount; break;
+							case 1: statusup2 bStr,.@Amount; break;
+							case 2: statusup2 bVit,.@Amount; break;
+							case 3: statusup2 bInt,.@Amount; break;
+							case 4: statusup2 bAgi,.@Amount; break;
+							case 5: statusup2 bDex,.@Amount; break;
+							case 6:	statusup2 bLuk,.@Amount; break;
+						}						
+						set Zeny,Zeny - .@ZenyCost;
+
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Aqui estão seus Pontos, volte quando precisar dos meus serviços.";
+						close;
+					}
+					break;
+				case 2:
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Muito bem, você tem " + StatusPoint + " de Estatus sobrando,";
+					mes "eu pago por cada um " + .@StatusSellCost + " Zenys.";
+					mes "Quantos pontos você deseja vender?";
+					next;
+					input .@Amount;
+
+					if( !.@Amount )
+					{
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Muito bem, não deseja vender nenhum ponto?";
+						mes "Estarei aqui se precisar.";
+						close;
+					}
+
+					if( StatusPoint < .@Amount )
+					{
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Você não tem " + .@Amount + " Pontos de Estatus.";
+						mes "Por favor, tente digitar números de 1 á " + StatusPoint + ".";
+						close;
+					}
+
+					set .@ZenyCost, .@Amount*.@StatusSellCost;
+
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Muito bem, tem certeza que deseja vender " + .@Amount + " Pontos por " + .@ZenyCost + " Zenys?";
+					next;
+					if( Select("- Sim.","- Não.") == 1 )
+					{
+						set StatusPoint,StatusPoint - .@Amount;
+						set Zeny,Zeny + .@ZenyCost;
+
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Muito bem, a negociação foi bem sucedidada.";
+						close;
+					}
+					break;
+				case 3:
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Cada ponto de Habilidade custa " + .@SkillsBuyCost + " Zenys.";
+					mes "Por favor, digite quantos pontos você deseja comprar!";
+					next;
+					input .@Amount;
+
+					if( !.@Amount )
+					{
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Muito bem, não deseja comprar nenhum ponto?";
+						mes "Estarei aqui se precisar.";
+						close;
+					}
+
+					set .@ZenyCost,.@Amount*.@SkillsBuyCost;
+
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Deseja comprar " + .@Amount + " Pontos por " + .@ZenyCost + " Zenys?";
+					next;
+					if( Select("- Sim.","- Não.") == 1 )
+					{
+						if( Zeny < .@ZenyCost )
+						{
+							mes "[ " + .@nPCname$ + " ]";
+							mes "Você não tem " + .@ZenyCost + " Zenys.";
+							close;
+						}
+
+						set Zeny, Zeny - .@ZenyCost;
+						set SkillPoint, SkillPoint + .@Amount;
+
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Aqui estão seus Pontos, volte quando precisar dos meus serviços.";
+						close;
+					}
+					break;
+				case 4:
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Muito bem, você tem " + SkillPoint + " de Habilidade sobrando,";
+					mes "eu pago por cada um " + .@SkillSellCost + " Zenys.";
+					mes "Quantos pontos você deseja vender?";
+					next;
+					input .@Amount;
+
+					if( !.@Amount )
+					{
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Muito bem, não deseja vender nenhum ponto?";
+						mes "Estarei aqui se precisar.";
+						close;
+					}
+
+					set .@ZenyCost, .@Amount*.@SkillSellCost;
+
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Muito bem, tem certeza que deseja vender " + .@Amount + " Pontos por " + .@ZenyCost + " Zenys?";
+					next;
+					if( Select("- Sim.","- Não.") == 1 )
+					{
+						set SkillPoint,SkillPoint - .@Amount;
+						set Zeny,Zeny + .@ZenyCost;
+
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Muito bem, a negociação foi bem sucedidada.";
+						close;
+					}
+					break;
+				case 5:
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Você deseja resetar seus Estatus?";
+					mes "Custa apenas " + .@ResetStatusCost + " Zenys.";
+					next;
+					if( Select("- Resetar Estatus.","- Cancelar.") == 1 )
+					{
+						mes "[ " + .@nPCname$ + " ]";
+
+						if( Zeny < .@ResetStatusCost )
+							mes "Me desculpe, mais você não tem " + .@ResetStatusCost + ".";
+						else
+						if( .@ResetMaxLimi && SV_ResetStatus >= .@ResetMaxLimit )
+							mes "Me desculpe, mais você não pode mais resetar seus Estatus.";
+						else
+						{
+							mes "Seus Estatus foi resetado!";
+							set Zeny,Zeny - .@ResetStatusCost;
+							set SV_ResetStatus,SV_ResetStatus + 1;
+							resetstatus;
+						}
+						
+						close;
+					}
+					break;
+				case 6:
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Você deseja resetar suas Habilidades?";
+					mes "Custa apenas " + .@ResetSkillsCost + " Zenys.";
+					next;
+					if( Select("- Resetar Estatus.","- Cancelar.") == 1 )
+					{
+						mes "[ " + .@nPCname$ + " ]";
+
+						if( Zeny < .@ResetSkillsCost )
+							mes "Me desculpe, mais você não tem " + .@ResetSkillsCost + ".";
+						else
+						if( .@ResetMaxLimi && SV_ResetSkills >= .@ResetMaxLimit )
+							mes "Me desculpe, mais você não pode mais resetar suas Habilidade.";
+						else
+						{
+							mes "Seus Estatus foi resetado!";
+							set Zeny,Zeny - .@ResetSkillsCost;
+							set SV_ResetSkills,SV_ResetSkills + 1;
+							resetstatus;
+						}
+						
+						close;
+					}
+					break;
+				case 7:
+					break;
+			}
+			break;
+		case 12:
+			if( .@storageZenyCost )
+			{
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Para usar o Serviço de Armazém,";
+				mes "custa apenas " + .@storageZenyCost + " Zenys.";
+				mes "Deseja abrir seu Armazém Pessoal?";
+			}
+			else
+			{
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Deseja abrir seu Armazém Pessoal?";
+			}
+
+			next;
+			if( select("- Sim.","- Não.") == 1 )
+			{
+				if( .@storageZenyCost && Zeny < .@storageZenyCost )
+				{
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Me desculpe, mas você não tem " + .@storageZenyCost + " Zenys.";
+				}
+				else
+				if( .@storageSkills && BasicSkillCheck() && GetSkillLv("NV_BASIC") < 6 )
+				{
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Me desculpe, mas você não tem";
+					mes "as Habilidades Básicas Nível 6.";
+				}
+				else
+				{
+					query_sql "SELECT `user_pass` FROM `login` WHERE `account_id`='" + GetCharId(3) + "'", .@UserPass;
+					if( .@storagePassword )
+					{
+						while(1)
+						{
+							if( .@badpw <= 3 )
+							{
+								mes "[ " + .@nPCname$ + " ]";
+								mes "Por favor, digite sua senha de usuário!";
+								next;
+								input .@PassWord;
+
+								if( .@PassWord == .@UserPass )
+									break;
+								else
+								{
+									mes "[ " + .@nPCname$ + " ]";
+									mes "Senha Incorreta!";
+									next;
+									set .@badpw, .@badpw + 1;
+								}
+							}
+							else
+							{
+								mes "[ " + .@nPCname$ + " ]";
+								mes "Acesso negado!";
+								end; // <- Relogue Security
+							}
+						}
+					}
+
+					if( .@storageZenyCost )
+						set Zeny, Zeny - .@storageZenyCost;
+
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Muito bem, feche esta janela para abrir seu Armazém!";
+					close2;
+					openstorage();
+					end;
+				}
+				close;
+			}
+			break;
+		case 13:
+			if( !GetCharId(2) )
+			{
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Me desculpe, mas você não participa de nenhum Clãn.";
+				close;
+			}
+			else
+			if( .@gstorageZenyCost )
+			{
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Para usar o Serviço de Armazém do seu Clãn,";
+				mes "custa apenas " + .@gstorageZenyCost + " Zenys.";
+				mes "Deseja abrir o Armazém do seu Clãn?";
+			}
+			else
+			{
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Deseja abrir o Armazém do seu Clãn?";
+			}
+
+			next;
+			if( select("- Sim.","- Não.") == 1 )
+			{
+				if( .@gstorageZenyCost && Zeny < .@gstorageZenyCost )
+				{
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Me desculpe, mas você não tem " + .@gstorageZenyCost + " Zenys.";
+				}
+				else
+				if( .@gstorageSkills && BasicSkillCheck() && GetSkillLv("NV_BASIC") < 6 )
+				{
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Me desculpe, mas você não tem";
+					mes "as Habilidades Básicas Nível 6.";
+				}
+				else
+				{
+					query_sql "SELECT `user_pass` FROM `login` WHERE `account_id`='" + GetCharId(3) + "'", .@UserPass;
+					if( .@gstoragePassword )
+					{
+						while(1)
+						{
+							if( .@badpw <= 3 )
+							{
+								mes "[ " + .@nPCname$ + " ]";
+								mes "Por favor, digite sua senha de usuário!";
+								next;
+								input .@PassWord;
+
+								if( .@PassWord == .@UserPass )
+									break;
+								else
+								{
+									mes "[ " + .@nPCname$ + " ]";
+									mes "Senha Incorreta!";
+									next;
+									set .@badpw, .@badpw + 1;
+								}
+							}
+							else
+							{
+								mes "[ " + .@nPCname$ + " ]";
+								mes "Acesso negado!";
+								end; // <- Relogue Security
+							}
+						}
+					}
+
+					if( .@gstorageZenyCost )
+						set Zeny, Zeny - .@gstorageZenyCost;
+
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Muito bem, feche esta janela para abrir seu Armazém!";
+					close2;
+					guildopenstorage();
+					end;
+				}
+				close;
+			}
+			break;
+		case 14:
+			function toWarpFunc;
+			mes "[ " + .@nPCname$ + " ]";
+			mes "Por favor, selecione seu destino!";
+			next;
+			switch( Select("- Cidades.","- Calabouço.","- Cancelar.") )
+			{
+				case 1:
+					if( .@warpcityZenyCost )
+					{
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Para ír para uma Cidade, custa apenas " + .@warpcityZenyCost + " Zenys.";
+						mes "Deseja ír para qual Cidade?";
+						next;
+					}
+					else
+					{
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Deseja ír para qual Cidade?";
+						next;
+					}
+
+					set .@Choose, Select("- Alberta.","- Al De Baran.","- Amatsu.","- Ayothaya.","- Comodo.","= Einbech.","- Einbroch.","- Geffen.","- Gonryun.","- Hugel.","- Izlude.","- Jawaii.","- Lighthalzen.","- Gonryun.","- Lutie.","- Morroc.","- Moscóvia.","- Namelles.","- Niflheim.","- Payon.","- Prontera.","- Rachel.","- Umbala.","- Veins.","- Yuno");
+
+					toWarpFunc(.@warpcityZenyCost,.@nPCname$);
+
+					Switch( .@Choose )
+					{
+						case 1:
+							warp "alberta",117,56;
+							end;
+						case 2:
+							warp "aldebaran",139,124;
+							end;
+						case 3:
+							warp "amatsu",197,88;
+							end;
+						case 4:
+							warp "ayothaya",202,174;
+							end;
+						case 5:
+							warp "comodo",189,150;
+							end;
+						case 6:
+							warp "einbech",137,220;
+							end;
+						case 7:
+							warp "einbroch",64,199;
+							end;
+						case 8:
+							warp "geffen",120,66;
+							end;
+						case 9:
+							warp "gonryun",160,180;
+							end;
+						case 10:
+							warp "hugel",96,105;
+							end;
+						case 11:
+							warp "izlude",127,97;
+							end;
+						case 12:
+							warp "jawaii",214,223;
+							end;
+						case 13:
+							warp "lighthalzen",158,92;
+							end;
+						case 14:
+							warp "louyang",218,118;
+							end;
+						case 15:
+							warp "xmas",148,133;
+							end;
+						case 16:
+							warp "morocc",162,91;
+							end;
+						case 17:
+							warp "moscovia",223,184;
+							end;
+						case 18:
+							warp "namelles",NULL,NULL;
+							end;
+						case 19:
+							warp "niflheim",194,185;
+							end;
+						case 20:
+							warp "payon",159,181;
+							end;
+						case 21:
+							warp "prontera",156,175;
+							end;
+						case 22:
+							warp "rachel",137,133;
+							end;
+						case 23:
+							warp "umbala",88,153;
+							end;
+						case 24:
+							warp "veins",216,123;
+							end;
+						case 25:
+							warp "yuno",158,77;
+							end;
+					}
+				case 2:
+					if( .@warpdungZenyCost )
+					{
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Para ír para um Calabouço, custa apenas " + .@warpdungZenyCost + " Zenys.";
+						mes "Deseja ír para qual Calabouço?";
+						next;
+					}
+					else
+					{
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Deseja ír para qual Calabouço?";
+						next;
+					}
+
+					set .@Choose, Select("- Abyss Lake.","- Amatsu Dungeon.","- Ant Hell.","- Ayothaya Ancient Shrine.","- Byalan Dungeon.","- Comodo Caves.","- Clock Tower.","- Coal Mine.","- Culvert.","- Einbroch Station.","- Gefenia.","- Geffen Dungeon.","- Glast Heim.","- Gon Ryun Dungeon.","- Hidden Temple.","- Juperos.","- Kiehl Doll Factory.","- Ice Cave.","- Lighthalzen Rekkenber.","- Magma Dungeon.","- Odin Temple.","- Orc Dungeon.","- Payon Dungeon.","- Pyramid.","- Rachel Temple.","- Sphinx.","- Suken Ship.","- Thanatos Tower.","- Toy Factory.","- Turtle Island.","- Umbala Dugeon.");
+
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Escolha o nível para qual você deseja ír!";
+					next;
+					Switch( .@Choose )
+					{
+						case 1:
+							set .@Choose2, Select("- Abyss Lake Entrance.","- Abyss Lake Level 2.","- Abyss Lake Level 3."); 
+
+							toWarpFunc(.@warpdungZenyCost,.@nPCname$);
+
+							Switch( .@Choose2 )
+							{
+								case 1:
+									warp "hu_fild05",173,308;
+									end;
+								case 2:
+									warp "abyss_02",272,270;
+									end;
+								case 3:
+									warp "abyss_03",119,29;
+									end;
+							}
+						case 2:
+							set .@Choose2, Select("- Amatsu Dungeon Entrance.","- Amatsu Dungeon Level 2.","- Amatsu Dungeon Level 3.");
+
+							toWarpFunc(.@warpdungZenyCost,.@nPCname$);
+
+							Switch( .@Choose2 )
+							{
+								case 1:
+									warp "ama_in02",120,181;
+									end;
+								case 2:
+									warp "ama_dun02",34,41;
+									end;
+								case 3:
+									warp "ama_dun03",119,14;
+									end;
+							}
+						case 3:
+							set .@Choose2, Select("- Northern Ant Hell Entrance.","- Southern Ant Hell Entrance.");
+
+							toWarpFunc(.@warpdungZenyCost,.@nPCname$);
+
+							Switch( .@Choose2 )
+							{
+								case 1:
+									warp "moc_fild04",201,327;
+									end;
+								case 2:
+									warp "moc_fild15",246,251;
+									end;
+							}
+						case 4:
+							set .@Choose2, Select("- Ayothaya Ancient Shrine Entrance.","- Ayothaya Ancient Shrine Level 2.");
+
+							toWarpFunc(.@warpdungZenyCost,.@nPCname$);
+
+							Switch( .@Choose2 )
+							{
+								case 1:
+									warp "ayo_fild02",273,150;
+									end;
+								case 2:
+									warp "ayo_dun02",24,28;
+									end;
+							}
+						case 5:
+							set .@Choose2, Select("- Bylan Dungeon Entrance.","- Bylan Dungeon Level 1.","- Bylan Dungeon Level 2.","- Bylan Dungeon Level 3.","- Bylan Dungeon Level 4.");
+
+							toWarpFunc(.@warpdungZenyCost,.@nPCname$);
+
+							Switch( .@Choose2 )
+							{
+								case 1:
+									warp "izlu2dun",114,84;
+									end;
+								case 2:
+									warp "iz_dun01",253,252;
+									end;
+								case 3:
+									warp "iz_dun02",236,204;
+									end;
+								case 4:
+									warp "iz_dun03",32,63;
+									end;
+								case 5:
+									warp "iz_dun04",26,27;
+									end;
+							}
+						case 6:
+							set .@Choose2, Select("- Karu, The Western Cave.","- Ruane, The Northern Cave.","- Mao, The Eastern Cave.");
+
+							toWarpFunc(.@warpdungZenyCost,.@nPCname$);
+
+							Switch( .@Choose2 )
+							{
+								case 1:
+									warp "comodo",32,209;
+									end;
+								case 2:
+									warp "comodo",180,352;
+									end;
+								case 3:
+									warp "cmd_fild01",34,325;
+									end;
+							}
+						case 7:
+							set .@Choose2, Select("- Clock Tower Entrance.","- Clock Tower Level 2.","- Clock Tower Level 3.","- Clock Tower Level 4.","- Basement Level 1.","- Basement Level 2.","- Basement Level 3.","- Basement Level 4.");
+
+							toWarpFunc(.@warpdungZenyCost,.@nPCname$);
+
+							Switch( .@Choose2 )
+							{
+								case 1:
+									warp "aldebaran",140,130;
+									end;
+								case 2:
+									warp "c_tower2",268,26;
+									end;
+								case 3:
+									warp "c_tower3",68,146;
+									end;
+								case 4:
+									warp "c_tower4",185,44;
+									end;
+								case 5:
+									warp "alde_dun01",297,25;
+									end;
+								case 6:
+									warp "alde_dun02",43,24;
+									end;
+								case 7:
+									warp "alde_dun03",18,267;
+									end;
+								case 8:
+									warp "alde_dun04",82,267;
+									end;
+							}
+						case 8:
+							set .@Choose2, Select("- Coal Mine Entrance.","- Coal Mine Level 2.","- Coal Mine Level 3.");
+
+							toWarpFunc(.@warpdungZenyCost,.@nPCname$);
+
+							Switch( .@Choose2 )
+							{
+								case 1:
+									warp "mjolnir_02",89,358;
+									end;
+								case 2:
+									warp "mjo_dun02",376,342;
+									end;
+								case 3:
+									warp "mjo_dun03",305,260;
+									end;
+							}
+						case 9:
+							set .@Choose2, Select("- Culvert Entrance.","- Culvert Level 2.","- Culvert Level 3.","- Culvert Level 4.");
+
+							toWarpFunc(.@warpdungZenyCost,.@nPCname$);
+
+							Switch( .@Choose2 )
+							{
+								case 1:
+									warp "prt_fild05",274,208;
+									end;
+								case 2:
+									warp "prt_sewb2",19,19;
+									end;
+								case 3:
+									warp "prt_sewb3",180,169;
+									end;
+								case 4:
+									warp "prt_sewb4",100,92;
+									end;
+							}
+						case 10:
+							set .@Choose2, Select("- Einbroch Mines Entrance.","- Einbroch Mines Level 2.");
+
+							toWarpFunc(.@warpdungZenyCost,.@nPCname$);
+
+							Switch( .@Choose2 )
+							{
+								case 1:
+									warp "einbech",138,244;
+									end;
+								case 2:
+									warp "ein_dun02",290,285;
+									end;
+							}
+						case 11:
+							set .@Choose2, Select("- Gefenia Level 1.","- Gefenia Level 2.","- Gefenia Level 3.","- Gefenia Level 4.");
+
+							toWarpFunc(.@warpdungZenyCost,.@nPCname$);
+
+							Switch( .@Choose2 )
+							{
+								case 1:
+									warp "gefenia01",60,169;
+									end;
+								case 2:
+									warp "gefenia02",116,116;
+									end;
+								case 3:
+									warp "gefenia03",119,277;
+									end;
+								case 4:
+									warp "gefenia04",129,86;
+									end;
+							}
+						case 12:
+							set .@Choose2, Select("- Geffen Dungeon Entrance.","- Geffen Dungeon Level 1.","- Geffen Dungeon Level 2.","- Geffen Dungeon Level 3.");
+
+							toWarpFunc(.@warpdungZenyCost,.@nPCname$);
+
+							Switch( .@Choose2 )
+							{
+								case 1:
+									warp "gef_tower",147,35;
+									end;
+								case 2:
+									warp "gef_dun01",115,236;
+									end;
+								case 3:
+									warp "gef_dun02",106,132;
+									end;
+								case 4:
+									warp "gef_dun03",203,200;
+									end;
+							}
+						case 13:
+							set .@Choose2, Select("- Church Entrance.","- Churchyard.","- Castle Terrace.","- Staircase Entrance.","- Chivalry Entrance.","- Chivalry Level 2.","- Underground Prison 1.","- Underground Prison 2.","- Culvert Level 1.","- Culvert Level 2.","- Culvert Level 3.","- Culvert Level 4.","- Underground Cave 1.","- Underground Cave 2.");
+
+							toWarpFunc(.@warpdungZenyCost,.@nPCname$);
+
+							Switch( .@Choose2 )
+							{
+								case 1:
+									warp "glast_01",206,136;
+									end;
+								case 2:
+									warp "gl_chyard",147,15;
+									end;
+								case 3:
+									warp "glast_01",199,335;
+									end;
+								case 4:
+									warp "glast_01",62,107;
+									end;
+								case 5:
+									warp "glast_01",69,193;
+									end;
+								case 6:
+									warp "gl_knt02",157,287;
+									end;
+								case 7:
+									warp "gl_prison",14,70;
+									end;
+								case 8:
+									warp "gl_prison1",150,14;
+									end;
+								case 9:
+									warp "gl_sew01",258,255;
+									end;
+								case 10:
+									warp "gl_sew02",108,291;
+									end;
+								case 11:
+									warp "gl_sew03",171,283;
+									end;
+								case 12:
+									warp "gl_sew04",68,277;
+									end;
+								case 13:
+									warp "gl_dun01",133,271;
+									end;
+								case 14:
+									warp "gl_dun02",224,274;
+									end;
+							}
+						case 14:
+							set .@Choose2, Select("- Gon Ryun Dungeon Entrance.","- Gon Ryun Dungeon Level 2.","- Gon Ryun Dungeon Level 3.");
+
+							toWarpFunc(.@warpdungZenyCost,.@nPCname$);
+
+							Switch( .@Choose2 )
+							{
+								case 1:
+									warp "gonryun",161,195;
+									end;
+								case 2:
+									warp "gon_dun02",22,114;
+									end;
+								case 3:
+									warp "gon_dun03",68,11;
+									end;
+							}
+						case 15:
+							set .@Choose2, Select("- Hidden Temple Entranace.","- Hidden Temple Level 2.","- Hidden Temple Level 3.");
+
+							toWarpFunc(.@warpdungZenyCost,.@nPCname$);
+
+							Switch( .@Choose2 )
+							{
+								case 1:
+									warp "prt_fild01",136,361;
+									end;
+								case 2:
+									warp "prt_maze02",106,62;
+									end;
+								case 3:
+									warp "prt_maze03",23,8;
+									end;
+							}
+						case 16:
+							set .@Choose2, Select("- Juperos Entrance.","- Juperos Level 2.","- Juperos Core.");
+
+							toWarpFunc(.@warpdungZenyCost,.@nPCname$);
+
+							Switch( .@Choose2 )
+							{
+								case 1:
+									warp "jupe_cave",55,52;
+									end;
+								case 2:
+									warp "juperos_02",37,63;
+									end;
+								case 3:
+									warp "jupe_gate",-1,-1;
+									end;
+							}
+						case 17:
+							set .@Choose2, Select("- Kiehl Doll Factory Entrance.","- Kiehl Doll Factory Level 2.");
+
+							toWarpFunc(.@warpdungZenyCost,.@nPCname$);
+
+							Switch( .@Choose2 )
+							{
+								case 1:
+									warp "yuno_fild08",80,179;
+									end;
+								case 2:
+									warp "kh_dun02",41,198;
+									end;
+							}
+						case 18:
+							set .@Choose2, Select("- Ice Cave Entrance.","- Ice Cave Level 2.","- Ice Cave Level 3.");
+
+							toWarpFunc(.@warpdungZenyCost,.@nPCname$);
+
+							Switch( .@Choose2 )
+							{
+								case 1:
+									warp "ra_fild01",233,319;
+									end;
+								case 2:
+									warp "ice_dun02",151,151;
+									end;
+								case 3:
+									warp "ice_dun03",148,25;
+									end;
+							}
+						case 19:
+							set .@Choose2, Select("- Laboratory Entrance.","- Laboratory Somatology Level 2.","- Laboratory Somatology Level 3.");
+
+							toWarpFunc(.@warpdungZenyCost,.@nPCname$);
+
+							Switch( .@Choose2 )
+							{
+								case 1:
+									if( rand(1) )
+										warp "lighthalzen",74,72;
+									else
+										warp "lighthalzen",303,302;
+									end;
+								case 2:
+									warp "lhz_dun02",154,18;
+									end;
+								case 3:
+									warp "lhz_dun03",141,132;
+									end;
+							}
+						case 20:
+							set .@Choose2, Select("- Magma Dungeon. Entrance.","- Magma Dungeon. Level 2.");
+
+							toWarpFunc(.@warpdungZenyCost,.@nPCname$);
+
+							Switch( .@Choose2 )
+							{
+								case 1:
+									warp "yuno_fild03",35,135;
+									end;
+								case 2:
+									warp "mag_dun02",47,30;
+									end;
+							}
+						case 21:
+							set .@Choose2, Select("- Odin Temple Entrance.","- Odin Temple Level 2.","- Odin Temple Level 3.");
+
+							toWarpFunc(.@warpdungZenyCost,.@nPCname$);
+
+							Switch( .@Choose2 )
+							{
+								case 1:
+									warp "odin_tem01",91,145;
+									end;
+								case 2:
+									warp "odin_tem02",25,181;
+									end;
+								case 3:
+									warp "odin_tem03",120,54;
+									end;
+							}
+						case 22:
+							set .@Choose2, Select("- Orc Dungeon Front Entrance.","- Orc Dungeon Back Entrance.");
+
+							toWarpFunc(.@warpdungZenyCost,.@nPCname$);
+
+							Switch( .@Choose2 )
+							{
+								case 1:
+									warp "in_orcs01",34,165;
+									end;
+								case 2:
+									warp "in_orcs01",112,99;
+									end;
+							}
+						case 23:
+							set .@Choose2, Select("- Payon Cave Entrance.","- Payon Cave Level 1.","- Payon Cave Level 2.","- Payon Cave Level 3.","- Payon Cave Level 4.");
+
+							toWarpFunc(.@warpdungZenyCost,.@nPCname$);
+
+							Switch( .@Choose2 )
+							{
+								case 1:
+									warp "pay_arche",41,133;
+									end;
+								case 2:
+									warp "pay_dun01",19,33;
+									end;
+								case 3:
+									warp "pay_dun02",19,63;
+									end;
+								case 4:
+									warp "pay_dun03",155,159;
+									end;
+								case 5:
+									warp "pay_dun04",34,202;
+									end;
+							}
+						case 24:
+							set .@Choose2, Select("- Pyramid Entrance.","- Pyramid Level 2.","- Pyramid Level 3.","- Pyramid Level 4.","- Basement 1.","- Basement 2.");
+
+							toWarpFunc(.@warpdungZenyCost,.@nPCname$);
+
+							Switch( .@Choose2 )
+							{
+								case 1:
+									warp "moc_ruins",62,162;
+									end;
+								case 2:
+									warp "moc_pryd02",10,192;
+									end;
+								case 3:
+									warp "moc_pryd03",100,92;
+									end;
+								case 4:
+									warp "moc_pryd04",18,187;
+									end;
+								case 5:
+									warp "moc_pryd05",94,96;
+									end;
+								case 6:
+									warp "moc_pryd06",192,11;
+									end;
+							}
+						case 25:
+							set .@Choose2, Select("- Freya's Temple Entrance.","- Freya's Temple Level 2.","- Freya's Temple Level 3.","- Freya's Temple Level 4.","- Freya's Temple Level 5.");
+
+							toWarpFunc(.@warpdungZenyCost,.@nPCname$);
+
+							Switch( .@Choose2 )
+							{
+								case 1:
+									warp "ra_temin",276,318;
+									end;
+								case 2:
+									warp "ra_san02",36,21;
+									end;
+								case 3:
+									warp "ra_san03",10,150;
+									end;
+								case 4:
+									warp "ra_san04",204,216;
+									end;
+								case 5:
+									warp "ra_san05",149,16;
+									end;
+							}
+						case 26:
+							set .@Choose2, Select("- Sphinx Entrance.","- Sphinx Level 2.","- Sphinx Level 3.","- Sphinx Level 4.","- Sphinx Level 5.");
+
+							toWarpFunc(.@warpdungZenyCost,.@nPCname$);
+
+							Switch( .@Choose2 )
+							{
+								case 1:
+									warp "moc_fild19",107,100;
+									end;
+								case 2:
+									warp "in_sphinx2",149,81;
+									end;
+								case 3:
+									warp "in_sphinx3",210,54;
+									end;
+								case 4:
+									warp "in_sphinx4",10,222;
+									end;
+								case 5:
+									warp "in_sphinx5",100,99;
+									end;
+							}
+						case 27:
+							set .@Choose2, Select("- Suken Ship Entrance.","- Suken Ship Level 2.");
+
+							toWarpFunc(.@warpdungZenyCost,.@nPCname$);
+
+							Switch( .@Choose2 )
+							{
+								case 1:
+									warp "alb2trea",87,103;
+									end;
+								case 2:
+									warp "treasure02",102,27;
+									end;
+							}
+						case 28:
+							set .@Choose2, Select("- Thanatos Tower Entrance.","- Thanatos Tower Floor 2.","- Thanatos Tower Floor 3.","- Thanatos Tower Floor 4.","- Thanatos Tower Floor 5.","- Thanatos Tower Floor 6.","- Thanatos Tower Floor 7.","- Thanatos Tower Floor 8.","- Thanatos Tower Floor 9.","- Thanatos Tower Floor 10.","- Thanatos Tower Floor 11.","- Thanatos Tower Floor 12.","- Thanatos Tower Terrace.");
+
+							toWarpFunc(.@warpdungZenyCost,.@nPCname$);
+
+							Switch( .@Choose2 )
+							{
+								case 1:
+									warp "tha_scene01",139,201;
+									end;
+								case 2:
+									warp "tha_t02",149,136;
+									end;
+								case 3:
+									warp "tha_t03",220,159;
+									end;
+								case 4:
+									warp "tha_t04",59,144;
+									end;
+								case 5:
+									warp "tha_t05",62,9;
+									end;
+								case 6:
+									warp "tha_t06",120,255;
+									end;
+								case 7:
+									warp "tha_t07",32,166;
+									end;
+								case 8:
+									warp "tha_t08",108,44;
+									end;
+								case 9:
+									warp "tha_t09",87,145;
+									end;
+								case 10:
+									warp "tha_t10",166,138;
+									end;
+								case 11:
+									warp "tha_t11",88,36;
+									end;
+								case 12:
+									warp "tha_t12",132,55;
+									end;
+								case 13:
+									warp "thana_boss",135,126;
+									end;
+							}
+						case 29:
+							set .@Choose2, Select("- Toy Factory Entrance.","- Toy Factory Level 2.");
+
+							toWarpFunc(.@warpdungZenyCost,.@nPCname$);
+
+							Switch( .@Choose2 )
+							{
+								case 1:
+									warp "xmas",144,306;
+									end;
+								case 2:
+									warp "xmas_dun02",129,133;
+									end;
+							}
+						case 30:
+							set .@Choose2, Select("- Turtle Insland Entrance.","- Turtle Cave Entrance.","- Turtle Cave Level 2.","- Turtle Cave Level 3.");
+
+							toWarpFunc(.@warpdungZenyCost,.@nPCname$);
+
+							Switch( .@Choose2 )
+							{
+								case 1:
+									warp "tur_dun01",153,47;
+									end;
+								case 2:
+									warp "tur_dun01",155,234;
+									end;
+								case 3:
+									warp "tur_dun03",132,189;
+									end;
+								case 4:
+									warp "tur_dun04",100,192;
+									end;
+							}
+						case 31:
+							set .@Choose2, Select("- Umbala Dugeon Entrance.","- Umbala Dugeon Level 2.");
+
+							toWarpFunc(.@warpdungZenyCost,.@nPCname$);
+
+							Switch( .@Choose2 )
+							{
+								case 1:
+									warp "umbala",133,282;
+									end;
+								case 2:
+									warp "um_dun02",48,31;
+									end;
+							}
+					}
+					case 3:
+						break;
+				}
+		case 15:
+			function toWarpFunc;
+			if( !.@WarpGetGuild && !GetCharId(2) )
+			{
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Me desculpe, mais este";
+				mes "teletransporte está habilitado";
+				mes "somente para pessoas que fazem";
+				mes "parte de um Clãn.";
+			}
+			else
+			if( !.@WarpAgitEnd && !AgitCheck() )
+			{
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Me desculpe, mais este";
+				mes "teleporte está habilitado";
+				mes "somente no periodo de Guerra.";
+			}
+			else
+			{
+				if( .@WarpGuildCost )
+				{
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Para teletransportar a";
+					mes "um Castelo, custa apenas " + .@WarpGuildCost + " Zenys.";
+				}
+				else
+				{
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Deseja ír para qual Feudo Desejado?";
+				}
+				next;
+				Switch( Select("- Al De Baran.","- Geffen.","- Payon.","- Prontera.") )
+				{
+					case 1:
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Por favor, selecione o Castelo que você deseja ír.";
+						next;
+						set .@Choose, Select("- Neuschwanstein.","- Hohenschwangau.","- Nuenberg.","- Wuerzburg.","- Rothenburg.");
+
+						toWarpFunc(.@WapGuildCost,.@nPCname$);
+
+						Switch( .@Choose )
+						{
+							case 1:
+								warp "alde_gld",48,83;
+								end;
+							case 2:
+								warp "alde_gld",95,249;
+								end;
+							case 3:
+								warp "alde_gld",142,85;
+								end;
+							case 4:
+								warp "alde_gld",239,242;
+								end;
+							case 5:
+								warp "alde_gld",264,90;
+								end;
+						}
+					case 2:		
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Por favor, selecione o Castelo que você deseja ír.";
+						next;
+						set .@Choose, Select("- Repherion.","- Eeyolbriggar.","- Yesnelph.","- Bergel.","- Mersetzdeitz.");
+
+						toWarpFunc(.@WapGuildCost,.@nPCname$);
+
+						Switch( .@Choose )
+						{
+							case 1:
+								if( rand(1) )
+									warp "gef_fild13",214,75;
+								else
+									warp "gef_fild13",150,50;
+								end;
+							case 2:
+								warp "gef_fild13",308,240;
+								end;
+							case 3:
+								Switch( rand(3) )
+								{
+									case 0:
+										warp "gef_fild13",143,240;
+										break;
+									case 1:
+										warp "gef_fild13",117,273;
+										break;
+									case 2:
+										warp "gef_fild13",74,287;
+										break;
+									case 3:
+										warp "gef_fild13",83,181;
+										break;
+								}
+								end;
+							case 4:
+								warp "gef_fild13",193,278;
+								end;
+							case 5:
+								if( rand(1) )
+									warp "gef_fild13",252,57;
+								else
+									warp "gef_fild13",305,87;
+								end;
+						}
+					case 3:
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Por favor, selecione o Castelo que você deseja ír.";
+						next;
+						set .@Choose, Select("- Bright Arbor.","- Scarlet Palace.","- Holy Shadow.","- Sacred Altar.","- Bamboo Grove Hill.");
+
+						toWarpFunc(.@WapGuildCost,.@nPCname$);
+
+						Switch( .@Choose )
+						{
+							case 1:
+								warp "pay_gld",121,233;
+								end;
+							case 2:
+								warp "pay_gld",295,116;
+								end;
+							case 3:
+								warp "pay_gld",317,293;
+								end;
+							case 4:
+								warp "pay_gld",140,160;
+								end;
+							case 5:
+								warp "pay_gld",204,266;
+								end;
+						}
+					case 4:
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Por favor, selecione o Castelo que você deseja ír.";
+						next;
+						set .@Choose, Select("- Kriemhild.","- Swanhild.","- Fadhgridh.","- Skoegul.","- Gondul.");
+
+						toWarpFunc(.@WapGuildCost,.@nPCname$);
+
+						Switch( .@Choose )
+						{
+							case 1:
+								warp "prt_gld",134,65;
+								end;
+							case 2:
+								warp "prt_gld",240,128;
+								end;
+							case 3:
+								warp "prt_gld",153,137;
+								end;
+							case 4:
+								warp "prt_gld",111,240;
+								end;
+							case 5:
+								warp "prt_gld",17,235;
+								end;
+						}
+				}
+			}
+		case 16:
+			if( .@cloneZenyCost && .@cloneDuration )
+			{
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Você deseja invocar um Clone seu";
+				mes "por " + (.@cloneDuration/60) + " Minutos?";
+				mes "Custa apenas " + .@cloneZenyCost + " Zenys.";
+			}
+			else
+			if( .@cloneZenyCost && !.@cloneDuration )
+			{
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Você deseja invocar um Clone seu";
+				mes "por " + .@cloneZenyCost + " Zenys?";
+			}
+			else
+			if( !.@cloneZenyCost && .@cloneDuration )
+			{
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Você Deseja invocar um Clone seu";
+				mes "por " + (.@cloneDuration/60) + " Minutos?";
+			}
+			else
+			{
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Você Deseja invocar um Clone seu?";
+			}
+
+			next;
+			if( Select("- Sim.","- Não.") == 1 )
+			{
+				if( .@cloneZenyCost && Zeny < .@cloneZenyCost )
+				{
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Me desculpe, mas você não tem " + .@cloneZenyCost + " Zenys.";
+				}
+				else
+				{
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Muito bem, aqui está seu Clone.";
+
+					getmapxy(.@getmap$,.@getx,.@gety,0);
+
+					clone .@getmap$,.@getx,.@gety,"",GetCharID(0),GetCharID(0),0,0,.@cloneDuration;
+
+					if( .@cloneZenyCost )
+						set Zeny, Zeny - .@cloneZenyCost;
+				}
+				close;
+			}
+			break;
+		case 17:
+			function AtCommandFunc;
+			if( .@sizeZenyCost )
+			{
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Deseja mudar seu tamanho?";
+				mes "custa apenas " + .@sizeZenyCost + " Zenys.";
+			}
+			else
+			{
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Deseja mudar seu tamanho?";
+			}
+		
+			next;
+			set .@Size, Select("- Tamanho Pequeno.","- Tamanho Grande.","- Voltar ao Normal.","- Cancelar.") -1;
+
+			if( .@Size < 3 )
+			{
+				if( .@ZenyCost && Zeny < .@ZenyCost )
+				{
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Me desculpe, mas você não tem " + .@sizeZenyCost + " Zenys.";
+				}
+				else
+				{
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Muito bem, seu tamanho foi alterado!";
+
+					if( .@sizeZenyCost )
+						set Zeny,Zeny - .@sizeZenyCost;
+
+					AtCommandFunc StrCharInfo(0),.@Size;
+				}
+				close;
+			}
+			break;
+		case 18:
+			function QueryFunc;
+			mes "[ " + .@nPCname$ + " ]";
+			mes "Muito bem, o que deseja?";
+			next;
+			Switch( Select("- Saldo.","- Saque.","- Depósito.","- Transferências.","- Cancelar.") )
+			{
+				case 1:
+					set .@Zeny, QueryFunc("Select",(.@bankRegType+4),GetCharId(3));
+
+					if( !.@Zeny )
+					{
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Me desculpe, mas você não tem nenhum Zeny Depositado.";
+					}
+					else
+					{
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Você tem " + .@Zeny + " Zenys.";
+						mes "O Número da sua conta é: "+GetCharId(3);
+					}
+					close;
+				case 2:
+					set .@Zeny, QueryFunc("Select",(.@bankRegType+4),GetCharId(3));
+
+					if( !.@Zeny )
+					{
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Me desculpe, mas você não tem nenhum Zeny para Sacar.";
+					}
+					else
+					{
+						set .@ZenyDrawl, .@Zeny;
+
+						while(1)
+						{
+							mes "[ " + .@nPCname$ + " ]";
+							mes "Muito bem, você tem " + .@Zeny + " Zenys,";
+							mes "mais você pode retirar somente " + .@ZenyDrawl + " Zenys.";
+							mes "Por favor digite quantos Zenys você deseja retirar.";
+							next;
+							input .@Input;
+
+							if( !.@Input )
+							{
+								mes "[ " + .@nPCname$ + " ]";
+								mes "Me desculpe, mais você não deseja retirar nenhum Zeny?";
+								next;
+								if( Select("- Sim, desejo retirar.","- Não, obrigado.") == 2 )
+									break;
+							}
+							else
+							if( .@Input > .@ZenyDrawl )
+							{
+								mes "[ " + .@nPCname$ + " ]";
+								mes "Me desculpe, mais você não pode retirar mais que " + .@ZenyDrawl + " Zenys.";
+								mes "Deseja retirar outro valor?";
+								next;
+								if( Select("- Sim.","- Não.") == 1 )
+									break;
+							}
+							else
+							{
+								set .@ZenyDrawl, .@ZenyDrawl - .@Input;
+								set Zeny, Zeny + .@Input;
+
+								set .@GetReg, QueryFunc("Select",(.@bankRegType+7),GetCharId(3));
+
+								if( !.@GetReg )
+									QueryFunc("Create",(.@bankRegType+1),GetCharId(3),.@ZenyDrawl);
+								else
+									QueryFunc("Update",(.@bankRegType+4),GetCharId(3),.@ZenyDrawl);
+
+								mes "[ " + .@nPCname$ + " ]";
+								mes "Muito bem, o saque foi feito com sucesso!";
+								close;
+							}
+						}
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Volte assim que desejar retirar algum dinheiro.";
+					}
+					close;
+				case 3:
+					while(1)
+					{
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Quantos Zeny você deseja depositar?";
+						mes "Você pode depositar atualmente " + Zeny + " Zenys.";
+						next;
+						input .@Input;
+
+						if( !.@Input )
+						{
+							mes "[ " + .@nPCname$ + " ]";
+							mes "Você não deseja depositar nenhum Zeny?";
+							next;
+							if( Select("- Sim, depositar.","- Não desejo depositar.") == 2 )
+								break;
+						}
+						else
+						if( .@Input > Zeny )
+						{
+							mes "[ " + .@nPCname$ + " ]";
+							mes "Desculpe, mais você não tem " + .@Input + " Zenys.";
+							next;
+						}
+						else
+						{
+							set .@SetZeny, .@Input + QueryFunc("Select",(.@bankRegType+4),GetCharId(3));
+
+							set .@GetReg, QueryFunc("Select",(.@bankRegType+7),GetCharId(3));
+
+							if( !.@GetReg )
+								QueryFunc("Create",(.@bankRegType+1),GetCharId(3),.@SetZeny);
+							else
+								QueryFunc("Update",(.@bankRegType+4),GetCharId(3),.@SetZeny);
+
+							set Zeny, Zeny - .@Input;
+
+							mes "[ " + .@nPCname$ + " ]";
+							mes "Muito bem, o deposito foi feito com sucesso!";
+							close;
+						}
+					}
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Volte assim que desejar depositar algum dinheiro.";
+					close;
+				case 4:
+					while(1)
+					{
+						mes "[ " + .@nPCname$ + " ]";
+						mes "Muito bem, digite o nome";
+						mes "do Personagem, ou o ID da";
+						mes "Conta do Personagem";
+						next;
+						input .@Input$;
+
+						query_sql "SELECT `name`, `account_id` FROM `char` WHERE `account_id`='" + .@Input$ + "' OR `name`='" + .@Input$ + "'", .@Name$, .@AccountID;
+
+						if( !.@AccountID && .@Name$ == "" )
+						{
+							mes "[ " + .@nPCname$ + " ]";
+							mes "Me desculpe, mais esta ID/Personagem não existe.";
+							mes "Deseja tentar novamente?";
+							next;
+							if( Select("- Sim.","- Não.") == 2 )
+								break;
+						}
+						else
+						{
+							mes "[ " + .@nPCname$ + " ]";
+							mes "Muito bem, você deseja fazer transferência do seu Zeny atual,";
+							mes "ou do Zeny da sua conta?";
+							next;
+							set .@Type, Select("- Zeny Atual.","- Zeny da Conta.") - 1;
+
+							if( .@Type )
+								set .@Zeny, QueryFunc("Select",(.@bankRegType+4),GetCharId(3));
+							else
+								set .@Zeny, Zeny;
+
+							while(1)
+							{
+								mes "[ " + .@nPCname$ + " ]";
+								mes "Digite a quantidade de Zeny que você deseja transferir.";
+								mes "Você tem atualmente " + .@Zeny + " Zenys.";
+								next;
+								input .@ZenyInput;
+
+								if( .@ZenyInput > .@Zeny )
+								{
+									mes "[ " + .@nPCname$ + " ]";
+									mes "Me desculpe, mais você não tem " + .@ZenyInput + " Zenys.";
+									mes "Deseja tentar novamente?";
+									next;
+									if( Select("- Sim.","- Não.") == 2 )
+										break;
+								}
+								else
+								if( !.@ZenyInput )
+								{
+									mes "[ " + .@nPCname$ + " ]";
+									mes "Você não deseja transfeir nenhum Zeny?";
+									next;
+									if( Select("- Sim, transferir.","- Não desejo transferir.") == 2 )
+										break;
+								}
+								else
+								{
+									mes "[ " + .@nPCname$ + " ]";
+									mes "Tem certeza que deseja";
+									mes "adicionar " + .@ZenyInput + " Zenys";
+									mes "para o 'Personagem' " + .@Name$ + " Conta (" + .@AccountID + ").";
+									next;
+									if( Select("- Sim.","- Não.") == 1 )
+									{
+										set .@Zeny, .@Zeny - .@ZenyInput;
+
+										set .@GetReg, QueryFunc("Select",(.@bankRegType+7),GetCharId(3));
+
+										if( !.@GetReg )
+											QueryFunc("Create",(.@bankRegType+1),.@AccountID,.@ZenyInput);
+										else
+											QueryFunc("Update",(.@bankRegType+4),.@AccountID,.@ZenyInput);
+
+										if( .@Type )
+											QueryFunc("Update",(.@bankRegType+4),GetCharId(3),.@Zeny);
+										else
+											set Zeny, Zeny - .@Zeny;
+
+										mes "[ " + .@nPCname$ + " ]";
+										mes "A transferência foi feita com sucesso!";
+										close;
+									}
+									break;
+								}
+							}
+						}
+					}
+					mes "[ " + .@nPCname$ + " ]";
+					mes "Volte assim que desejar transferir algum Zeny.";
+					close;
+				case 5:
+					break;
+			}
+			break;
+		case 19:
+			function toWarpFunc;
+			if( .@pvpZenyCost )
+			{
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Para ír para a Arena PvP,";
+				mes "é preciso de " + .@pvpZenyCost + " Zenys.";
+				mes "Deseja ír a Arena PvP?";
+			}
+			else
+			{
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Deseja ír a Arena PvP?";
+			}
+			next;
+			if( Select("- Sim.","- Não.") == 2 )
+				break;
+			else
+			if( .@pvpBaseLevel && BaseLevel < .@pvpBaseLevel )
+			{
+				mes "[ " + .@nPCname$ + " ]";
+				mes "Me desculpe mais a arena está";
+				mes "limita somente a Jogadores com";
+				mes "Level de Base " + .@pvpBaseLevel + ".";
+			}
+			else
+			{
+				toWarpFunc(.@pvpZenyCost,.@nPCname$);
+				warp .@pvpMapName$, .@pvpMapx, .@pvpMapy;
+				end;
+			}
+			close;
+		default:
+			break;
+	}
+	mes "[ " + .@nPCname$ + " ]";
+	mes "Muito bem, volte quando precisar dos meus Serviços.";
+	close;
+
+/*=================================================================
+  =		Função do Estilista				  =
+  =================================================================*/
+	function	SetLookFunc	{
+
+		set .@SetLook,0;
+		if( GetArg(0) == 1 )
+		{
+			while(1)
+			{
+				if( .@SetLook < GetArg(3) || .@SetLook > GetArg(4) )
+					set .@SetLook, 0;
+
+				mes "[ " + GetArg(5) + " ]";
+
+				switch( GetArg(1) )
+				{
+				case 1: mes "Estilo de Cabelo n° " + .@SetLook + "."; break;
+				case 6: mes "Cor de Cabelo n° " + .@SetLook + "."; break;
+				case 7: mes "Cor de Roupa n° " + .@SetLook + "."; break;
+				}
+
+				setlook GetArg(1),.@SetLook;
+				specialeffect2 GetArg(2);
+
+				mes "Deseja mudar?";
+				next;
+				if( Select("- Próximo.","- Não, desejo este mesmo.") == 2 )
+					break;
+				else
+					set .@SetLook, .@SetLook + 1;
+			}
+		}
+		else
+		{
+			while(1)
+			{
+				mes "[ " + GetArg(5) + " ]";
+				mes "Por favor, digite o número que você deseja.";
+				next;
+				input .@SetLook;
+
+				if( .@SetLook < GetArg(3) || .@SetLook > GetArg(4) )
+				{
+					mes "[ " + GetArg(5) + " ]";
+					switch( GetArg(1) )
+					{
+					case 1: mes "Os estilos de cabelo vão de " + GetArg(3) + " à " + GetArg(4) + "."; break;
+					case 6: mes "As cores de cabelo vão de " + GetArg(3) + " à " + GetArg(4) + "."; break;
+					case 7:	mes "As cores de roupa vão de " + GetArg(3) + " à " + GetArg(4) + "."; break;
+					}
+					mes "Por favor, tente novamente.";
+					next;
+				}
+				else
+				{
+					setlook GetArg(1),.@SetLook;
+					specialeffect2 GetArg(2);
+
+					mes "[ " + GetArg(5) + " ]";
+					mes "É esta mesmo ou deseja mudar?";
+					next;
+					if( Select("- Esta mesmo.","- Desejo Mudar.") == 1 )
+						break;
+				}
+			}
+		}
+		return;
+	}
+
+/*=================================================================
+  =		Função da Menssagem Global			  =
+  =================================================================*/
+	function	DelayManagerFunc	{
+
+		if( GetArg(0) == "DelaySet" ) {
+			setd "$anndelay_"+GetArg(1),gettime(4)*24*60 + gettime(6)*60 + gettime(2);
+			return 0;
+		}
+		else if( GetArg(0) == "DelayGet" ) {
+			set .@check, gettime(4)*24*60 + gettime(6)*60 + gettime(2) - getd("$anndelay_"+GetArg(1));
+			return !(.@check >= 0 && .@check < GetArg(2) );
+		}
+		else {
+			debugmes "Erro no Anunciador.";
+			debugmes "Por favor, reporte o membro [ SoulBlaker ] do forum eAthena.";
+			return 0;
+		}
+	}
+
+/*=================================================================
+  =		Função do Teletransporte			  =
+  =================================================================*/
+	function	toWarpFunc	{
+
+		mes "[ " + GetArg(1) + " ]";
+		mes "Tem certeza que deseja ser teletransportado?";
+		next;
+		if( Select("- Sim.","- Não.") == 2 )
+		{
+			mes "[ " + GetArg(1) + " ]";
+			mes "Muito bem, volte quando precisar dos meus Serviços.";
+			close;
+		}
+		else
+		{
+			if( GetArg(0) && Zeny < GetArg(0) )
+			{
+				mes "[ " + GetArg(1) + " ]";
+				mes "Me desculpa, mas você não tem " + GetArg(0) + " Zenys.";
+				close;
+			}
+
+			if( GetArg(0) )
+				set Zeny,Zeny - GetArg(0);
+
+			mes "[ " + GetArg(1) + " ]";
+			mes "Vou te mandar para lá!";
+			close2;
+			return;
+		}
+	}
+
+/*=================================================================
+  =			Funções de Atcommand			  =
+  =================================================================*/
+	function	AtCommandFunc	{
+
+		Switch( GetArg(1) )
+		{
+			// AtCommand: @size
+			case 0:
+				Atcommand GetArg(0)+":@size 1";
+				break;
+			case 1:
+				Atcommand GetArg(0)+":@size 2";
+				break;
+			case 2:
+				Atcommand GetArg(0)+":@size 3";
+				break;
+			// AtCommand: @makehomun
+			case 3:
+				Atcommand GetArg(0)+":@makehomun "+GetArg(2);
+				break;
+			// AtCommand: @useskill
+			case 4:
+				Atcommand "@useskill "+ GetArg(2)+" "+ GetArg(3)+" "+GetArg(0);
+				break;
+		}
+		return;
+	}
+
+/*=================================================================
+  =		Função das Qurys SQL				  =
+  =================================================================*/
+	function	QueryFunc	{
+
+		if( GetArg(0) == "Select" )
+		{
+			Switch( GetArg(1) )
+			{
+			case 0:
+				query_sql("SELECT `account_id` FROM `clock_vip` WHERE `account_id`='" + GetArg(2) + "'", .@Return);
+				break;
+			case 1:
+				query_sql("SELECT `expire_timer` FROM `clock_vip` WHERE `account_id`='" + Getarg(2) + "'", .@Return);
+				break;
+			case 2:
+				query_sql("SELECT `level` FROM `clock_vip` WHERE `account_id`='" + GetArg(2) + "'", .@Return);
+				break;
+			case 3:
+				query_sql("SELECT `flag` FROM `clock_vip` WHERE `account_id`='" + GetArg(2) + "'", .@Return);
+				break;
+			case 4:
+				query_sql("SELECT `zeny` FROM `sbank` WHERE `account_id`='" + GetArg(2) + "'", .@Return);
+				break;
+			case 5:
+				query_sql("SELECT `value` FROM `global_reg_value` WHERE `str`='#bankstorage' AND `account_id`='" + GetArg(2) + "'", .@Return);
+				break;
+			case 6:
+				query_sql("SELECT `value` FROM `global_reg_value` WHERE `str`='#kafrabank' AND `account_id`='" + GetArg(2) + "'", .@Return);
+				break;
+			case 7:
+				query_sql("SELECT `account_id` FROM `sbank` WHERE `account_id`='" + GetArg(2) + "'", .@Return);
+				break;
+			case 8:
+				query_sql("SELECT `account_id` FROM `global_reg_value` WHERE `str`='#bankstorage' AND `account_id`='" + GetArg(2) + " OR `char_id`='" + GetArg(2) + "'", .@Return);
+				break;
+			case 9:
+				query_sql("SELECT `account_id` FROM `global_reg_value` WHERE `str`='#kafrabank' AND `account_id`='" + GetArg(2) + " OR `char_id`='" + GetArg(2) + "'", .@Return);
+				break;
+			default:
+				debugmes "Arg("+ GetArg(1) + ") Não encontrada! Retornando com o valor 0 ou FALSE!";
+				set .@Return,0;
+				break;
+			}
+			return .@Return;
+		}
+		else
+		if( GetArg(0) == "Login" )
+		{
+			Switch( GetArg(1) )
+			{
+			case 0:
+				query_sql("SELECT `account_id` FROM `login` WHERE `account_id`='" + GetArg(2) + "' OR `userid`='" + GetArg(2) + "'", .@Return);
+				break;
+			case 1:
+				query_sql("SELECT `level` FROM `login` WHERE `account_id`='"+ GetArg(2) + "'", .@Return);
+				break;
+			default:
+				debugmes "Arg("+ GetArg(1) + ") Não encontrada! Retornando com o valor 0 ou FALSE!";
+				set .@Return,0;
+				break;
+			}
+			return .@Return;
+		}
+		else
+		if( GetArg(0) == "Create" )
+		{
+			Switch( GetArg(1) )
+			{
+			case 0:
+				query_sql("INSERT INTO `clock_vip` VALUES (GetArg(2),0,0,0)");
+				break;
+			case 1:
+				query_sql("INSERT INTO `sbank` VALUES (" + GetArg(2) + "," + GetArg(3) + ")");
+				debugmes "Aqui?";
+				break;
+			case 2:
+				query_sql("INSER INTO `global_reg_value` VALUES (0,'#bankstorage',GetArg(3),2,GetArg(2))");
+				debugmes "Aqui2?";
+				break;
+			case 3:
+				query_sql("INSER INTO `global_reg_value` VALUES (0,'#kafrabank',GetArg(3),2,GetArg(2))");
+				break;
+			default:
+				debugmes "Arg("+ GetArg(1) + ") Não encontrada! Nenhuma operação foi efetuada, continuando o script...";
+			}
+			return;
+		}
+		else
+		if( GetArg(0) == "Update" )
+		{
+			Switch( GetArg(1) )
+			{
+			case 0:
+				query_sql("UPDATE `login` SET `level`='" + GetArg(3) + "' WHERE `account_id`='" + GetArg(2) + "'");
+				break;
+			case 1:
+				query_sql("UPDATE `clock_vip` SET `level`='" + GetArg(3) + "' WHERE `account_id`='"+ GetArg(2) +"'");
+				break;
+			case 2:
+				query_sql("UPDATE `clock_vip` SET `flag`='" + GetArg(3) + "' WHERE `account_id`='" + GetArg(2) + "'");
+				break;
+			case 3:
+				query_sql("UPDATE `clock_vip` SET `expire_timer`='" + GetArg(3) + "' WHERE `account_id`=" + GetArg(2) + "'");
+				break;
+			case 4:
+				query_sql("UPDATE `sbank` SET `zeny`='" + GetArg(3) + "' WHERE `account_id`='" + GetArg(2) + "'");
+				break;
+			case 5:
+				query_sql("UPDATE `global_reg_value` SET `value`='" + GetArg(3) + "' WHERE `str`='#bankstorage' AND `account_id`='" + GetArg(2) + "'");
+				break;
+			case 6:
+				query_sql("UPDATE `global_reg_value` SET `value`='" + GetArg(3) + "' WHERE `str`='#kafrabank' AND `account_id`='" + GetArg(2) + "'");
+				break;
+			default:
+				debugmes "Arg("+ GetArg(1) + ") Não encontrada! Nenhuma operação foi efetuada, continuando o script...";
+				break;
+			}
+			return;
+		}
+		else
+		{
+			debugmes "Tipo da função não encontrada. Tipo (" + GetArg(0) + ") Flag(" + GetArg(1) + ").";
+			return;
+		} 	
+	}
+
+//endscript
+}
+
+/*=================================================================
+  =		Controlador de Tempo VIP			  =
+  =================================================================*/
+
+-	script	Super VIP#expire_timer	-1,{
+
+OnMinute00:	OnMinute01:	OnMinute02:	OnMinute03:	OnMinute04:
+OnMinute05:	OnMinute06:	OnMinute07:	OnMinute08:	OnMinute09:
+OnMinute10:	OnMinute11:	OnMinute12:	OnMinute13:	OnMinute14:
+OnMinute15:	OnMinute16:	OnMinute17:	OnMinute18:	OnMinute19:
+OnMinute20:	OnMinute21:	OnMinute22:	OnMinute23:	OnMinute24:
+OnMinute25:	OnMinute26:	OnMinute27:	OnMinute28:	OnMinute29:
+OnMinute30:	OnMinute31:	OnMinute32:	OnMinute33:	OnMinute34:
+OnMinute35:	OnMinute36:	OnMinute37:	OnMinute38:	OnMinute39:
+OnMinute40:	OnMinute41:	OnMinute42:	OnMinute43:	OnMinute44:
+OnMinute45:	OnMinute46:	OnMinute47:	OnMinute48:	OnMinute49:
+OnMinute50:	OnMinute51:	OnMinute52:	OnMinute53:	OnMinute54:
+OnMinute55:	OnMinute56:	OnMinute57:	OnMinute58:	OnMinute59:
+
+	// UPDATE -> expire_timer
+	query_sql("SELECT `account_id`, `expire_timer` FROM `clock_vip` WHERE `level`='1' AND `flag`='1'", $@AccountID, $@ExpireTimer);
+
+	for( set $@i,0; $@i < GetArraySize($@AccountID); set $@i, $@i + 1 )
+	{
+		set $@ExpireTimer[$@i], $@ExpireTimer[$@i] - 1;
+		query_sql("UPDATE `clock_vip` SET `expire_timer`='" + $@ExPireTimer[$@i] + "' WHERE `account_id`='" + $@AccountID[$@i] + "'");
+	}
+
+	// UPDATE -> level
+	query_sql("SELECT `account_id`, `expire_timer` FROM `clock_vip` WHERE `level`='1' AND `flag`='1'", $@AccountID, $@ExpireTimer);
+
+	for( set $@i,0; $@i < GetArraySize($@AccountID); set $@i, $@i + 1 )
+	{
+		if( $@ExpireTimer[$@i] < 1 )
+		{
+			query_sql("UPDATE `clock_vip` SET `level`='0', `flag`='0' WHERE `account_id`='" + $@AccountID[$@i] + "'");
+			query_sql("UPDATE `login` SET `level`='0' WHERE `account_id`='" + $@AccountID[$@i] + "'");
+		}
+	}
+
+	// End Script
+	end;
+}
+
+
+/*=================================================================
+  =		Duplicatas em outras Cidades			  =
+  =================================================================*/
+payon,162,222,4	duplicate(SuperVIP)	Super VIP#npc02	97
+morocc,171,94,4	duplicate(SuperVIP)	Super VIP#npc03	97
+geffen,106,49,4	duplicate(SuperVIP)	Super VIP#npc04	97
+yuno,165,84,4	duplicate(SuperVIP)	Super VIP#npc05	97
+alberta,195,137,4	duplicate(SuperVIP)	Super VIP#npc06	97
+izlude,133,109,4	duplicate(SuperVIP)	Super VIP#npc07	97

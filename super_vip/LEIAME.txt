@@ -1,0 +1,585 @@
+
+	   	SoulBlaker Scripts Apresenta:
+	 	    ___________________
+	 	   /   _____/\______   \
+	 	   \_____  \  |    |  _/
+		   /        \ |    |   \
+		  /_______  / |______  /
+			  \/         \/	
+	        [ eAthena Advanced Scripts ]
+						v1.0
+
+	====================================================
+	=		LEIA-ME COM ATENÇÃO!		   =
+	====================================================
+	Este Sistema VIP é completo, super editável, favor
+	NUNCA remova os créditos ou hospedem em algum lugar
+	diferente sem a autorização do autor.
+	- Como me encontrar?
+	  Fórum de Suporte eAthena:
+		http://www.eathena.ws
+	  Perfil do SoulBlaker:
+		http://www.eathena.ws/board/SoulBlaker-m271867.html
+
+	Obrigado pela Atenção!
+
+	Logo abaixo estarão todas explicações de como configurar
+	o Script para o seu Uso!
+	====================================================
+	= SoulBlaker Scripts - DATA: 23 de Janeiro de 2009 =
+	====================================================
+
+
+	====================================================
+	=	Configurações dos Level de Acesso	   =
+	====================================================
+
+	.@gLevel: Level de GM para Menus de Administração.
+                  Ponha de 0~99 para um Level determinado de Acesso
+		  ou 100 para Desabilitar esta Opção.
+
+	.@vLevel: Level de GM para Menus de Usuário VIP.
+
+	====================================================
+	=	Configurações dos NPCs			   =
+	====================================================
+
+	.@nPCname$: Nome de Exibição do NPC.
+		    Ponha o nome entre as aspas para o nome de
+		    exibição do npc.
+
+	.@WebSite$: Site Oficial do seu Servidor.
+		    Ponha a URL do site oficial do servidor.
+
+	====================================================
+	=	Configurações do Menu da Sala VIP	   =
+	====================================================
+
+	.@vMap$: Mapa da Sala VIP.
+		 Ponha o mapa entre as aspas da Sala VIP.
+
+	.@xCoX: Coordenada 'X' para Teleporte a Sala VIP.
+		Ponha a Coordenada 'x' que vai ser utilizada
+		ao teleportar a Sala VIP.
+
+	.@xCoY: Coordenada 'Y' para Teleporte a Sala VIP.
+		Ponha a Coordenada 'y' que vai ser utilizada
+		ao teleportar a Sala VIP.
+
+	====================================================
+	=	Configurações do Menu da Cura		   =
+	====================================================
+
+	.@cZenyCost: Quanto irá custar de Zeny para se Curar?
+		     Ponha 0 para Desabilitar a Cobrança de Zeny.
+
+	.@cHealHP: Porcentagem de HP ganho ao se Curar.
+		   Ponha a porcentagem de HP que vai ser ganho
+		   ao sí curar.
+		   Exemplo:
+			 0 = Não haverá uma porcentagem de Cura, ou seja 0 de HP
+			 1 = 1% de HP
+			10 = 10% de HP
+			50 = 50% de HP
+
+	.@cHealSP: Porcentagem de SP ganho ao se Curar.
+		   Ponha a porcentagem de SP que vai ser ganho
+		   ao sí curar.
+		   Exemplo:
+			 0 = Não haverá uma porcentagem de Cura, ou seja 0 de SP
+			 1 = 1% de SP
+			10 = 10% de SP
+			50 = 50% de SP
+
+	====================================================
+	=	Configurações do Menu do Estilista	   =
+	====================================================
+
+	.@MinHairStyle: Minimo de Estilo de Cabelo.
+			Esta opção está configurada atualmente para puchar
+			informações da sua battlecofing client.conf, ou seja,
+			configurado nas suas configurações, ou ponha um valor
+			para o Minimo de Estilo de Cabelo.
+
+	.@MaxHairStyle: Máximo de Estilo de Cabelo.
+			Esta opção está configurada atualmente para puchar
+			informações da sua battlecofing client.conf, ou seja,
+			configurado nas suas configurações, ou ponha um valor
+			para o Máximo de Estilo de Cabelo.
+
+	.@MinHairClolor: Minimo da Cor de Cabelo.
+			 Esta opção está configurada atualmente para puchar
+			 informações da sua battlecofing client.conf, ou seja,
+			 configurado nas suas configurações, ou ponha um valor
+			 para o Minimo de Cor de Cabelo.
+
+	.@MaxHairColor: Máximo da Cor de Cabelo.
+			Esta opção está configurada atualmente para puchar
+			informações da sua battlecofing client.conf, ou seja,
+			configurado nas suas configurações, ou ponha um valor
+			para o Máximo de Cor de Cabelo.
+
+	.@MinClotColor: Minimo da Cor de Roupa.
+			Esta opção está configurada atualmente para puchar
+			informações da sua battlecofing client.conf, ou seja,
+			configurado nas suas configurações, ou ponha um valor
+			para o Minimo de Cor de Roupa.
+
+	.@MaxClotColor: Máximo da Cor de Roupa.
+			Esta opção está configurada atualmente para puchar
+			informações da sua battlecofing client.conf, ou seja,
+			configurado nas suas configurações, ou ponha um valor
+			para o Máximo de Cor de Roupa.
+
+	====================================================
+	=	Configurações do Menu dos Homunculus	   =
+	====================================================
+
+	.@homZenyCost: Quanto irá custar para criar um Homunculu?
+		       Ponha um valor de custo para criar um homunculu
+		       ou ponha 0 para desabilitar esta opção.
+
+	.@homModeChoose: Qual o tipo de Menu de Seleção dos Homunculus?
+			 Este sistema, permite você escolher entre 3 formas
+			 de criar um Homunculu, veja os valores abaixo com as
+			 formas de menu.
+
+			 Tabela de Modo:
+				0: Cria um Homunculu Não envoluido randomicamente
+				1: Mostra um Menu para Escolher Homunculus Não envoluidos
+				2: MOstra um Menu para Escolher todos Homunculus
+
+	.@homClass: Qualquer Classe pode Criar um Homunculu?
+		    Ponha 1 para qualquer classe criar um homunculu,
+		    ou ponha 0 para somente Alquimisita (Alchem) e Criador (Creator)
+		    pode criar um Homunculu.
+
+	.@homAliveCost: Quanto irá custar para Ressucitar um Homunculu?
+			Ponha o valor de custo para ressucitar um homunculu
+			ou ponha 0 para desabilitar esta opção.
+
+	.@homEvolCost: Quanto irá custar para Envoluir um Homunculu?
+		       Ponha o valor de custo para envoluir um homunculu
+		       ou ponha 0 para desabilitar esta opção.
+
+	====================================================
+	=	Configurações do Menu dos Assistentes	   =
+	====================================================
+
+	.@mLevel: Nível Máximo do Assistente que pode ser vendido.
+		  Ponha o Nível Máximo de Assistente entre 1 à 10
+		  que pode ser vendido neste Menu.
+
+	.@mZenyCost: Valor de um Assistente.
+		     Este valor é múltiplicado pelo nível do Assistente,
+		     exemplo, se o npc estiver configuraddo por padrão
+		     por 10.000 Zenys e o jogador comprar um Assistente
+		     Nível 3, irá pagar 30.000 de Zenys.
+		     Sistema contra exploração (exploit).
+
+	.@mTimer: Tempo de Dduração do Assistente.
+		  Ponha o Tempo que o Assistente vai durar em Milisegundos.
+
+	====================================================
+	=	Configurações do Menu do Reparamento	   =
+	====================================================
+
+	.@repZenyCost: Quanto irá custar para reparar um item?
+		       Ponha o valor de custo para reparar um item
+		       ou ponha 0 para desabilitar esta opção.
+
+	====================================================
+	=	Configurações do Menu do Refinamento	   =
+	====================================================
+
+	.@rZenyCost: Preço para Refinar um Item.
+		     Ponha o preço que o Refinador vai cobrar para
+		     refinar um item, ou ponha 0 para desabilitar esta opção.
+
+	.@rLevel: Level Máximo de Refinamento.
+		  Ponha o Nível máximo de refinamento que um equipamento em
+		  geral pode chegar.
+
+	.@rUpLevel: Level de Refinamento por vez.
+		    Ponha o Level de Refinamento que o Refinador vai fazer por
+		    vez, exemplo, se você por 2, o refinador irá refinar desta maneira:
+			0 -> 2
+			2 -> 4
+			4 -> 6
+			6 -> 8
+			8 -> 10
+			(...)
+
+	.@rItemReq: Habilitar cobrança de itens para refinar algum equipamento em geral?
+		    Ponha 1 para habilitar ou 0 para desabilitar esta Opção.
+		    Se você habilitar, você deve configurar os itens e quantidades requeridas
+		    em arrays.
+
+	.@rItem[<array>]
+	.@rAmount[<array>]: Estas duas Opções funciona em conjunto, por exemplo:
+			    set .@rItem[0], 985;
+			    set .@rAmount[0], 10;
+
+			    Isto quer dizer, você estará cobrando 10 Elunium para refinar um Item.
+			    Veja um outro exemplo:
+
+			    set .@rItem[0], 985;
+			    set .@rAmount[0], 10;
+			    set .@rItem[1], 501;
+			    set .@rAmount[0], 1;
+
+			    Isto quer dizer, você estará cobrando 10 Elunium e 1 Red Potion para refinar um Item.
+
+	< -- Configurações de Menus em Array -- >
+
+	.@rMenu[0]: Habilitar refinamemnto do Topo da Cabeça?
+		    Ponha 1 para habilitar e 0 para desabilitar.
+
+	.@rMenu[1]: Habilitar refinamento em Armaduras?
+		    Ponha 1 para habilitar e 0 para desabilitar.
+
+	.@rMenu[2]: Habilitar refinamento na Mão Esquerda? (Weapons)
+		    Ponha 1 para habilitar e 0 para desabilitar.
+
+	.@rMenu[3]: Habilitar refinamento na MMão Direita? (Weapons)
+		    Ponha 1 para habilitar e 0 para desabilitar.
+
+	.@rMenu[4]: Habilitar refinamento em Vestimentos?
+		    Ponha 1 para habilitar e 0 para desabilitar.
+
+	.@rMenu[5]: Habilitar refinamento nos Sapatos?
+		    Ponha 1 para habilitar e 0 para desabilitar.
+
+	.@rMenu[6]: Habilitar refinamento nos Acessórios Esquerdo?
+		    Ponha 1 para habilitar e 0 para desabilitar.
+
+	.@rMenu[7]: Habilitar refinamento nos Acessórios Direito?
+		    Ponha 1 para habilitar e 0 para desabilitar.
+
+	.@rMenu[8]: Habilitar refinamento na Cabeça? (Meio)
+		    Ponha 1 para habilitar e 0 para desabilitar.
+
+	.@rMenu[9]: Habilitar refinamento na Cabeça? (Baixo)
+		    Ponha 1 para habilitar e 0 para desabilitar.
+
+	====================================================
+	=	Configurações do Menu de Remover Cartas	   =
+	====================================================
+
+	.@rPrice: Preço do Serviço de Remoção de Cartas.
+		  Ponha o preço para o serviço de remoção de
+		  cartas ou ponha 0 para desabilitar.
+
+	.@rPriceCard: Preço para cada Carta removido.
+		      Ponha o preço que vai custar mais o
+		      serviço por cada carta removida.
+
+	====================================================
+	=	Configurações do Menu de Remover Cartas	   =
+	====================================================
+
+	.@mgZenyCostMap: Preço para Enviar uma Menssagem Global para todo o Mapa Local.
+			 Ponha o preço para enviar uma Menssagem para o Mapa ou
+			 0 para desabilitar a cobrança.
+
+	.@mgZenyCostAll: Preço para Enviar uma Menssagem Globa para todo o Servidor.
+			 Ponha o preço para enviar uma Menssagem para o Servidor ou
+			 0 para desabilitar a cobrança.
+
+	.@mgDelay: Tempo de espera para Enviar uma Menssagem após a outra. (Delay)
+		   Ponha o tempo de Delay em minutos, 0~59 minutos, exemplo:
+
+		   Formato:
+		   1: 1 minuto.
+		   2: 2 minutos.
+		   (...)
+
+	< -- Restrições de Palavrões -- >
+
+	.@anuncio_palavrao$[<array>],"<Palavrão>"
+
+	Exemplos:
+		set .@anuncio_palavrao$[0],"puta";
+		set .@anuncio_palavrao$[1],"gay";
+		set .@anuncio_palavrao$[2],"viadinho";
+		set .@anuncio_palavrao$[3],"prostituta";
+		set .@anuncio_palavrao$[4],"cuzão";
+
+	Todas Menssagens contendo as palavras que você citar não serão enviada!
+
+	< -- Restrições de Sites -- >
+
+	.@anuncio_sites$[<array>],"<Site>"
+
+	Exemplos
+		set .@anuncio_sites$[0],"eathena.ws";
+		set .@anuncio_sites$[1],"orkut.com";
+		set .@anuncio_sites$[2],"cronus-emulator.com";
+		set .@anuncio_sites$[3],"venus-emulator.net";
+		set .@anuncio_sites$[4],"amazon-project.org";
+
+	Todas Menssagens contendo os sites que você citar não serão enviada!
+	Lembramos, ponha sem 'www' e 'http' por conter case sensitive.
+
+	====================================================
+	=	Configurações do Menu de Aluguel	   =
+	====================================================
+
+	.@rtCartZenyCost: Preço para Alugar um Carrinho.
+			  Ponha o valor que vai ser cobrado para alugar um carrinho
+			  ou ponha 0 para desabilitar esta opção.
+
+	.@rtPecoZenyCost: Preço para Alugar um PecoPeco.
+			  Ponha o valor que vai ser cobrado para alugar um Peco Peco
+			  ou ponha 0 para desabilitar esta opção.
+
+	.@rtFalconZenyCost: Preço para Alugar um Falcão.
+			    Ponha o valor que vai ser cobrado para alugar um Peco Peco
+			    ou ponha 0 para desabilitar esta opção.
+
+	====================================================
+	=	Configurações do Menu de Armazém Pessoal   =
+	====================================================
+
+	.@storageSkills: Habilitar Requerimento de Habilidades Básicas Nível 6?
+			 As Habilidades Básicas é a primeira habilidade ganha no
+			 jogo ainda quando se é um Aprendiz.
+			 Ponha 1 para habilitar esta opção (altamente recomendável)
+			 ou 0 para desabilitar.
+
+	.@storagePassword: Habilitar Requerimento da Senha do Jogador para abrir o Armazém?
+			   Esta opção pede a senha do jogador para abrir seu Armazém Pessoal (SQL).
+			   Ponha 1 para habilitar esta opção (altamente recomendável)
+			   ou 0 para desabilitar.
+
+	.@storageZenyCost: Quanto irá custar para abrir o Armazém Pessoal?
+			   Ponha o valor de custo para abrir o armazém pessoal,
+			   ou 0 para desabilitar.
+
+	====================================================
+	=	Configurações do Menu do Editor de Pontos  =
+	====================================================
+
+	.@skMenu[0]: Habiltiar Menu de Compra de Pontos de Estatus?
+		     Ponha 1 para habilitar e 0 para desablitar.
+
+	.@skMenu[1]: Habilitar Menu de Compra de Pontos de Habilidades?
+		     Ponha 1 para habilitar e 0 para desablitar.
+
+	.@skMenu[2]: Habilitar Menu de Venda de Pontos de Estatus Sobrando?
+		     Ponha 1 para habilitar e 0 para desablitar.
+
+	.@skMenu[3]: Habilitar Menu de Venda de Pontos de Habilidades Sobrando?
+		     Ponha 1 para habilitar e 0 para desablitar.
+
+	.@skMenu[4]: Habilitar Menu de Resetar Estatus?
+		     Ponha 1 para habilitar e 0 para desablitar.
+
+	.@skMenu[5]: Habilitar Menu de Resetar Habilidades?
+		     Ponha 1 para habilitar e 0 para desablitar.
+
+	.@StatusBuyCost: Quanto irá custar cada Ponto de Estatus comprado?
+		         Ponha o preço que irá custar cada ponto de estatus
+			 ou 0 para desabilitar, quando o jogador comprar pontos
+			 de estatus, o valor defenido aqui será múltiplicado pela
+			 quantidade de pontos que ele digitar.
+
+	.@StatusSellCost: Quanto irá custar cada Ponto de Estatus vendido?
+			  Ponha o preço de venda de cada ponto de estatus sobrando
+			  ou 0 para desabilitar, quando o jogador vender pontos
+			  de estatus, o valor defenido aqui será múltiplicado pela
+			  quantidade de pontos que ele digitar.
+
+	.@SkillsBuyCost: Quanto irá custar cada Ponto de Habilidade comprado?
+			 Ponha o preço que irá custar cada ponto de habilidade
+			 ou 0 para desabilitar, quando o jogador comprar pontos
+			 de habilidades, o valor defenido aqui será múltiplicado pela
+			 quantidade de pontos que ele digitar.
+
+	.@SkillsSellCost: Quanto irá custar cada Ponto de Habilidade vendido?
+			  Ponha o preço de venda de cada ponto de habilidade sobrando
+			  ou 0 para desabilitar, quando o jogador vender pontos
+			  de habilidade, o valor defenido aqui será múltiplicado pela
+			  quantidade de pontos que ele digitar.
+
+	.@ResetStatusCost: Quanto irá custar para resetar os Estatus?
+			   Ponha o preço que será cobrado para resetar os estatus
+			   ou 0 para desabilitar.
+
+	.@ResetSkillsCost: Quanto irá custar para resetar as Habilidades?
+			   Ponha o preço que será cobrado para resetar as habilidades
+			   ou 0 para desabilitar.
+
+	.@ResetMaxLimit: Quantas vezes pode se resetar os Estaus e Habilidade?
+			 Ponha a quantidade de vezes que pode se resetar os estatus
+			 e habilidades, ou 0 para resetar infinitamente.
+
+	====================================================
+	=     Configurações do Menu de Armazém do Clãn     =
+	====================================================
+			
+	.@gstorageSkills: Habilitar Requerimento de Habilidades Básicas Nível 6?
+			  As Habilidades Básicas é a primeira habilidade ganha no
+			  jogo ainda quando se é um Aprendiz.
+			  Ponha 1 para habilitar esta opção (altamente recomendável)
+			  ou 0 para desabilitar.
+
+	.@gstoragePassword: Habilitar Requerimento da Senha do Jogador para abrir o Armazém?
+			    Esta opção pede a senha do jogador para abrir seu Armazém do Clãn (SQL).
+			    Ponha 1 para habilitar esta opção (altamente recomendável)
+			    ou 0 para desabilitar.
+
+	.@gstorageZenyCost: Quanto irá custar para abrir o Armazém do Clãn?
+			    Ponha o valor de custo para abrir o armazém do clãn,
+			    ou 0 para desabilitar.
+	
+	====================================================
+	=	Configurações do Menu de Teleporte         =
+	====================================================
+
+	.@warpcityZenyCost: Quanto irá custar para Teletransportar a uma Cidade?
+			    Ponha o valor de custo para o teleporte ou 0 para desabilitar esta opção.
+
+	.@warpdungZenyCost: Quanto irá custar para Teletransportar a um Calabouço?
+			    Ponha o valor de custo para o teleporte ou 0 para desabilitar esta opção.
+
+	====================================================
+	=     Configurações do Menu de Teleporte GDE       =
+	====================================================
+
+	.@warpGuildCost: Quanto irá custar para Teletransportar a um Castelo?
+			 Ponha o valor de custo para o teleporte ou 0 para desabilitar esta opção.
+
+	.@warpGetGuild: Habilitar Teleporte da Guerra para os Jogadores que não possue um Clãn?
+			Ponha 1 para habilitar o Teleporte aos Castelos para Jogadores que não possuem
+			ou não fazem parte de um Clãn, ou ponha 0 para desabilitar esta opção.
+
+	.@warpAgitEnd: Habilitar Teleporte da Guerra até quando a Woe (War Of Emperium) estiver desligada?
+		       Ponha 1 para habilitar o Teleporte aos Castelos fora do horário de Guerra,
+		       ou ponha 0 para desabilitar esta opção.
+
+	====================================================
+	=   Configurações do Menu do Sistema de Clonagem   =
+	====================================================
+
+	.@cloneZenyCost: Quanto irá custar para Invocar um Clone?
+			 Ponha o valor do custo para criação de um clone, ou ponha 0 para desabilitar
+			 esta opção.
+
+	.@cloneDuration: Qual a duração de um Clone em segundos?
+			 Ponha o valor de duração em segundos ou 0 para ilimitar a duração do clone.
+			 Exemplo: 0~59 seg, 0 há 59 segundos.
+
+	====================================================
+	=     	Configurações do Banco               	   =
+	====================================================
+
+	.@bankRegType: Qual o tipo de registro de contas do banco?
+		       Os registros são os seguintes:
+				0: SQL Tables Super Bank VIP
+				1: eAthena Script Bank (npc/custom/banks/bank.txt)
+				2: eAthena Kafra Bank  (npc/custom/banks/kafra_bank.txt)
+		       É da sua importancia escolher um desses valores
+		       para que este banco interaja com o servidor todo!
+
+	====================================================
+	=     Configurações do Menu da Arena PvP           =
+	====================================================
+
+	.@pvpZenyCost: Quanto irá custar para ír a Arena PvP?
+		       Ponha o valor de custo para o teleporte ou 0 para desabilitar esta opção.
+
+	.@pvpBaseLevel: Qual o Level de Base que pode acessar a Arena PvP?
+			Ponha o Level de Base que pode acessar a arena ou 0 para desabilitar.
+			Se o Level de Base do Personagem for menor do que você definir aqui,
+			ele não podera acessar a Arena PvP.
+
+	.@pvpMapName$: Mapa da Arena PvP.
+		       Ponha o mapa entre as aspas da Arena PvP.
+
+	.@pvpMapx: Coordenada 'X' para Teleporte a Arena PvP.
+		   Ponha a Coordenada 'x' que vai ser utilizada
+		   ao teleportar a Arena PvP.
+
+	.@pvpMapy: Coordenada 'Y' para Teleporte a Arena PvP.
+		   Ponha a Coordenada 'y' que vai ser utilizada
+		   ao teleportar a Arena PvP.
+
+	====================================================
+	=	Configurações dos Menus de Seleção	   =
+	====================================================
+
+	.@Menu[0]: Habilitar Sala VIP?
+		   Esta opção, habilita o Menu para ír a Sala VIP.
+		   Ponha 1 para habilitar esta opção ou 0 para desabilitar.
+
+	.@Menu[1]: Habilitar Cura?
+		   Esta opção, habilita o Menu para Cura de HP e SP.
+		   Ponha 1 para habilitar esta opção ou 0 para desabilitar.
+
+	.@Menu[2]: Habilitar Estilista?
+		   Esta opção, habilita o Menu para mudar o estilo do cabelo ou a cor da roupa ou do cabelo.
+		   Ponha 1 para habilitar esta opção ou 0 para desabilitar.
+
+	.@Menu[3]: Habilitar Criação de Homunculus?
+		   Ponha 1 para habilitar esta opção ou 0 para desabilitar.
+
+	.@Menu[4]: Habilitar Criação de Assistentes?
+		   Esta opção, habilita o Menu da criação de Assistentes. (Mercenary System)
+		   Ponha 1 para habilitar esta opção ou 0 para desabilitar.
+
+	.@Menu[5]: Habilitar Refinamento de Itens?
+		   Esta opção, habilita o Menu para refinar equipamentos.
+		   Ponha 1 para habilitar esta opção ou 0 para desabilitar.
+
+	.@Menu[6]: Habilitar Reparamento de Itens?
+		   Ponha 1 para habilitar esta opção ou 0 para desabilitar.
+		   (Este sistema não está pronto mais está em Desenvolvimento)
+
+	.@Menu[7]: Habilitar Removedora de Cartas?
+		   Esta opção, habilita o Menu para remover cartas de equipamentos.
+		   Ponha 1 para habilitar esta opção ou 0 para desabilitar.
+
+	.@Menu[8]: Habilitar Menssagem Global?
+		   Esta opção, habilita o Menu para enviar Menssagens para o Mapa atual ou para o Servidor.
+		   Ponha 1 para habilitar esta opção ou 0 para desabilitar.
+
+	.@Menu[9]: Habilitar Aluguel de Carrinhos, PecoPeco e Falcão?
+		   Esta opção, habilita o Menu de Alugar Carrinho, PecoPeco ou Falcão dependendo da Classe.
+		   Ponha 1 para habilitar esta opção ou 0 para desabilitar.
+
+	.@Menu[10]: Habilitar Editor de Pontos de Estatus e Habilidades?
+		    Esta opção, habilita o Menu para Comprar/Vender Pontos de Estatus ou Habilidade e resetar os mesmo.
+		    Ponha 1 para habilitar esta opção ou 0 para desabilitar.
+
+	.@Menu[11]: Habilitar o Uso do Armazém Pessoal?
+		    Esta opção, habilita o Menu do Uso do Armazém Pessoal do Personagem.
+		    Ponha 1 para habilitar esta opção ou 0 para desabilitar.
+
+	.@Menu[12]: Habilitar o Uso do Armzém do Clãn?
+		    Esta opção, habilita o Menu do Uso do Armazém do Clãn do Personagem.
+		    Ponha 1 para habilitar esta opção ou 0 para desabilitar.
+
+	.@Menu[13]: Habilitar o Teletransporte a Cidade e Calabouços?
+		    Esta opção, habilita o Menu de Uso de Teleporter à Cidades e Calabouços.
+		    Ponha 1 para habilitar esta opção ou 0 para desabilitar.
+
+	.@Menu[14]: Habilitar o Teletransporte aos Castelos?
+		    Esta opção, habilita o Menu de Uso de Teleporte aos Castelos.
+		    Ponha 1 para habilitar esta opção ou 0 para desabilitar.
+
+	.@Menu[15]: Habilitar o Sistema de Clonagem?
+		    Esta opção, habilita o Menu para Clonagem do Personagem, cria um Clone Escravo.
+		    Ponha 1 para habilitar esta opção ou 0 para desabilitar.
+
+	.@Menu[16]: Habilitar a Alteração de Tamanho?
+		    Esta opção, habilita o Menu para mudar o tamanho do Personage, pequeno, médio e grande.
+		    Ponha 1 para habilitar esta opção ou 0 para desabilitar.
+
+	.@Menu[17]: Habilitar o Banco Super VIP?
+		    Esta opção, habilita o Menu do Sistema de Banco, aonde pode fazer transferências, depósitos e saques.
+		    Ponha 1 para habilitar esta opção ou 0 para desabilitar.
+
+	.@Menu[18]: Habilitar a Arena PvP?
+		    Esta opção, habilita o Menu da Arena PvP, aonde os jogadores pode lutar um contra o outro.
+		    Ponha 1 para habilitar esta opção ou 0 para desabilitar.

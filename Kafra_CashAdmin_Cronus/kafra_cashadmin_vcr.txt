@@ -1,0 +1,392 @@
+// .----------------------------------------------------------.
+// .  		    SoulBlaker Scripts Apresenta:             .
+// .		    ___________________ 		      .
+// .		   /   _____/\______   \                      .
+// .		   \_____  \  |    |  _/		      .
+// .		   /        \ |    |   \		      .
+// .		  /_______  / |______  /		      .
+// .			  \/         \/		              .
+// .           	[ Cronus Advanced Scripts ]                   .
+// .							v1.0  .
+// .----------------------------------------------------------.
+// ; http://cronus-emulator.com/forum/index.php?showuser=3261 ;
+// .----------------------------------------------------------.
+// . Script:                                                  .
+// .  Funcionária Kafra de CashAdmin                          .
+// .----------------------------------------------------------.
+// . Por: SoulBlaker   Compátivel: Cronus SQL	 versão: 1.0  .
+// .----------------------------------------------------------.
+// . Descrição:                                               .
+// .  Adiciona/Remove Pontos dos Jogadores InGame, sem preci- .
+// .  do Jogador estiver Online.                              .
+// .                                                          .
+// .  Se o Registro de váriavel não existir, o npc mesmo cria,.
+// .  OBS: Recomendável utilizar sempre primeiramente o       .
+// .       Comando de Cash no Jogador antes de manusear no    .
+// .       NPC.                                               .
+// .							      .
+// . Adiciona/Remove ou Muda Preços dos Itens do CashShop.    .
+// .----------------------------------------------------------.
+// . Changelog da Versão:                                     .
+// .   - 1.0 Iniciado o NPC. [SoulBlaker]                     .
+// *----------------------------------------------------------*
+
+prontera,168,187,4	script	Funcionária Kafra#cashs1	117,{
+
+	function Query;
+	function RelodDataBase;
+	cutin "kafra_01",2;
+	if( GetGmLevel() < 99 )
+	{
+		mes "^0000CD[ Funcionária Kafra ]^000000";
+		mes "Olá ^FF0000" + StrCharInfo(0) + "^000000,";
+		mes "O que deseja?";
+		next;
+		Switch( Select("- Consultar Pontos.","- Abrir o CashShop.","- Cancelar." ) )
+		{
+			case 1:
+				set .@Result, Query("Select",GetCharId(3));
+				mes "^0000CD[ Funcionária Kafra ]^000000";
+				mes "Você tem no total de: ^FF0000" + .@Result + " Pontos^000000.";
+				break;
+			case 2:
+				mes "^0000CD[ Funcionária Kafra ]^000000";
+				mes "Boas Compras!";
+				close2;
+				callcashshop "Funcionária Kafra#cashs2";
+				cutin "",255;
+				end;
+			case 3:
+				mes "^0000CD[ Funcionária Kafra ]^000000";
+				mes "Muito bem, estarei aqui se precisar.";
+				break;
+		}
+	}
+	else {
+		mes "^0000CD[ Funcionária Kafra ]^000000";
+		mes "Bem-vindo Administrador,";
+		mes "o que deseja?";
+		next;
+		Switch( Select("- Checar Pontos.","- Adicionar ou Remover Pontos.","- Adicionar ou Remover Itens do CashShop.","- Abri o CashShop.","- Cancelar.") )
+		{
+			case 1:
+				mes "^0000CD[ Funcionária Kafra ]^000000";
+				mes "Por favor, digite o ID da Conta que deseja saber as informações.";
+				next;
+				input .@AccountID;
+				set .@Consult$, Query("Check",.@AccountID);
+				if( .@Consult$ == "" )
+				{
+					mes "^0000CD[ Funcionária Kafra ]^000000";
+					mes "Me desculpe, mais esta conta é inexistente.";
+				}
+				else {
+					set .@Result,Query("Select",.@AccountID);
+					mes "^0000CD[ Funcionária Kafra ]^000000";
+					mes "^FF0000Conta:^000000 "+.@AccountID;
+					mes " ";
+					mes "^FF0000Total de Pontos:^000000 "+.@Result;
+				}
+				break;
+			case 2:
+				mes "^0000CD[ Funcionária Kafra ]^000000";
+				mes "Por favor, digite o Id da Conta do Jogador.";
+				next;
+				input .@AccountID;
+				set .@Consult$, Query("Check",.@AccountID);
+				if( .@Consult$ == "" )
+				{
+					mes "^0000CD[ Funcionária Kafra ]^000000";
+					mes "Me desculpe, mais esta conta é inexistente.";
+					mes " ";
+					mes "^FF0000Certifique-se que esta conta possue um Registro de Cash.";
+					mes "Você pode Registrar agora mesmo um Registro para esta conta,";
+					mes "mais é altamente recomendável saír e adicionar o Cash Manualmente";
+					mes "antes de utilizar nossos recursos.^000000";
+					mes " ";
+					mes "Deseja criar um Registro para esta conta?";
+					next;
+					if( Select("- Registra Conta.","- Cancelar") == 1 )
+					{
+						Query("Create",.@AccountID);
+						set .@Again,Query("Select",.@AccountID);
+						if( .@Again )
+						{
+							mes "^0000CD[ Funcionária Kafra ]^000000";
+							mes "Houve algum erro ao Registrar a Conta " + .@AccountID + ".";
+							mes " ";
+							mes "Por favor, reporte ao criador do Script 'SoulBlaker'.";
+							debugmes "Erro ao Registrar a Conta " + .@AccountID + " na tabela de registro de váriaveis global, reporte ao membro '[SoulBlaker]' do fórum eAthena.";
+						}
+						else {
+							mes "^0000CD[ Funcionária Kafra ]^000000";
+							mes "Muito bem, Conta ^FF0000" + .@AccountID + "^000000 foi Registrada com sucesso.";
+						}
+					}
+					else {
+						mes "^0000CD[ Funcionária Kafra ]^000000";
+						mes "Muito bem, é ^FF0000ALTAMENTE^000000 recomendável cancelar o auto-registro.";
+					}
+				}
+				else {
+					set .@Result, Query("Select",.@AccountID);
+					mes "^0000CD[ Funcionária Kafra ]^000000";
+					mes "Muito bem, digite quantos Pontos você deseja Adicionar ou Remover na Conta.";
+					mes " ";
+					mes "^FF0000Pontos Continuos: " + .@Result + "^000000.";
+					mes " ";
+					next;
+					input .@Amount;
+					if( .@Amount == 0 )
+					{
+						mes "^0000CD[ Funcionária Kafra ]^000000";
+						mes "Me desculpe, mais você deve digitar um valor positivo.";
+						
+					}
+					else {
+						mes "^0000CD[ Funcionária Kafra ]^000000";
+						mes "Você deseja remover ou adicionar Créditos na Conta?";
+						next;
+						set .@Type,Select("- Adicionar.","- Remover.");
+
+						mes "^0000CD[ Funcionária Kafra ]^000000";
+
+						if( .@Type == 1 )
+							mes "Gostária de Adicionar ^FF0000" + .@Amount + "^000000 Pontos desta Conta?";
+						else
+							mes "Gostária de Remover ^FF0000" + .@Amount + "^000000 Pontos desta Conta?";
+
+						mes " ";
+						mes "^FF0000Saldo Atual:^000000 " + .@Result + ".";
+						mes " ";
+						if( .@Type == 1 )
+						{
+							set .@Amount, .@Result + .@Amount;
+							mes "^FF0000Saldo com Débito:^000000 " + .@Amount + ".";
+						}
+						else {
+							set .@Amount, .@Result - .@Amount;
+							mes "^FF0000Saldo com Remoção:^000000 " + .@Amount + ".";
+						}
+						next;
+						if( Select("- Sim.","- Não") == 1 )
+						{
+							Query("Update",.@AccountID,.@Amount);
+							set .@Status,Query("Select",.@AccountID);
+							if( .@Type == 1 && .@Status != .@Amount )
+							{
+								mes "^0000CD[ Funcionária Kafra ]^000000";
+								mes "Me desculpe, mais não foi possível creditar desta conta.";
+							}
+							else if( .@Type == 2 && .@Status != .@Amount )
+							{
+								mes "^0000CD[ Funcionária Kafra ]^000000";
+								mes "Me desculpe, mais não foi possível remover créditos desta conta.";
+							}
+							else {
+								mes "^0000CD[ Funcionária Kafra ]^000000";
+								if( .@Type == 1 )
+									mes "Muito bem, a conta foi creditada com sucesso.";
+								else
+									mes "Muito bem, foi removido os créditos da conta com sucesso.";
+							}
+						}
+						else {
+							mes "^0000CD[ Funcionária Kafra ]^000000";
+							mes "Muito bem, estarei aqui se precisar.";
+						}
+					}
+				}
+				break;
+			case 3:
+				mes "^0000CD[ Funcionária Kafra ]^000000";
+				mes "Muito bem, o que deseja fazer?";
+				next;
+				set .@Choose, Select("- Adicionar Itens no CashShop.","- Remover Itens no CashShop.","- Mudar Preço de um Item.","- Ver Informações de Itens no CashShop.");
+				if( .@Choose == 4 )
+				{
+					Query_SQL("SELECT `id`, `name`, `price` FROM `kafra_cashadmin`", .@Consult, .@Name$, .@Price);
+					for( set .@i,0; .@i < GetArraySize(.@Consult); set .@i, .@i + 1 )
+					{
+						mes "^0000FFID:^000000 " + .@Consult[.@i];
+						mes "^0000FFNome:^000000 " + .@Name$[.@i];
+						mes "^0000FFPreço:^000000 " + .@Price[.@i];
+						mes "------------------";
+						mes " ";
+					}
+				}
+				else {
+					mes "^0000CD[ Funcionária Kafra ]^000000";
+					mes "Muito bem, digite o id do item";
+					if( .@Choose == 1 )
+						mes "Que deseja Adicionar.";
+					else if( .@Choose == 2 )
+						mes "Que deseja Remover.";
+					else if( .@Choose == 3 )
+						mes "Que deseja Mudar o Preço.";
+					next;
+					input .@ID;
+					if( .@Choose == 1 || .@Choose == 3 )
+					{
+						mes "^0000CD[ Funcionária Kafra ]^000000";
+						mes "Muito bem, digite o preço do Item.";
+						next;
+						input .@Price;
+					}
+					if( .@Choose == 1 && Query("GetItem",.@ID) )
+					{
+						mes "^0000CD[ Funcionária Kafra ]^000000";
+						mes "Me desculpe, mais existe um item com";
+						mes "esta ID no CashShop, você deve remover";
+						mes "ou editar seus preços para continuar.";
+					}
+					else if( ( .@Choose == 2 || .@Choose == 3 ) && !Query("GetItem",.@ID) )
+					{
+						mes "^0000CD[ Funcionária Kafra ]^000000";
+						mes "Me desculpe, mais não existe um item";
+						mes "com esta ID no CashShop.";
+					}
+					else {
+						mes "^0000CD[ Funcionária Kafra ]^000000";
+						if( .@Choose == 1 )
+							mes "Tem certeza que Deseja Adicionar este item do CashShop?";
+						else if( .@Choose == 2 )
+							mes "Tem certeza que Deseja Remover este item do CashShop?";
+						else if( .@Choose == 3 )
+							mes "Tem certeza que Deseja Mudaro Preço deste item do CashShop?";
+						next;
+						if( Select("- Sim.","- Não") == 1 )
+							RelodDataBase(.@Choose,.@ID,.@Price);
+					}
+				}
+				break;
+			case 4:
+				mes "^0000CD[ Funcionária Kafra ]^000000";
+				mes "Boas Compras!";
+				close2;
+				callcashshop "Funcionária Kafra#cashs2";
+				cutin "",255;
+				end;				
+			case 5:
+				mes "^0000CD[ Funcionária Kafra ]^000000";
+				mes "Muito bem, estarei aqui se precisar.";
+				break;
+		}
+	}
+	close2;
+	cutin "",255;
+	end;
+
+OnInit:
+// InitWaitingRoom Event
+	waitingroom "Assistente do CashShop",0;
+// InitDB Merchant
+	npccashshopdelitem "Funcionária Kafra#cashs2",501;
+	Query_SQL("SELECT `id`, `price` FROM `kafra_cashadmin`",.@ID,.@Price);
+	for( set .@i,0; .@i < GetArraySize(.@ID); set .@i, .@i + 1 )
+		npccashshopadditem "Funcionária Kafra#cashs2",.@ID[.@i],.@Price[.@i];
+	end;
+
+// ReloadDB Merchant
+	function	RelodDataBase	{
+
+		if( GetArg(0) == 1 )
+		{
+			Query("SetItem",GetArg(1),GetArg(2));
+			if( Query("GetItem",GetArg(1)) )
+			{
+				debugmes "AID: " + GetCharID(3) + ", CID: " + GetCharID(0) + ", adicionou o item ID " + GetArg(1) + " pelo preço " + GetArg(2) + " no Kafra CashShop Admin.";
+				npccashshopadditem "Funcionária Kafra#cashs2",GetArg(1),GetArg(2);
+				dispbottom "Adicionado com sucesso!";
+			}
+			else {
+				debugmes "AID: " + GetCharID(3) + ", CID: " + GetCharID(0) + ", tentou adicionar o item ID " + GetArg(1) + " pelo preço " + GetArg(2) + " no Kafra CashShop Admin, mais sua tentativa falhou.";
+				dispbottom "Erro ao Adicionar!";
+			}
+		}
+		else if( GetArg(0) == 2 )
+		{
+			Query("DelItem",GetArg(1));
+			if( !Query("GetItem",GetArg(1)) )
+			{
+				debugmes "AID: " + GetCharID(3) + ", CID: " + GetCharID(0) + ", removeu o item ID " + GetArg(1) + " do Kafra CashShop Admin.";
+				npccashshopdelitem "Funcionária Kafra#cashs2",GetArg(1);
+				dispbottom "Removido com sucesso!";
+			}
+			else {
+				debugmes "AID: " + GetCharID(3) + ", CID: " + GetCharID(0) + ", removeu o item ID " + GetArg(1) + " do Kafra CashShop Admin, mais sua tentativa falhou.";
+				dispbottom "Erro ao Remover!";
+			}
+		}
+		else if( GetArg(0) == 3 )
+		{
+			Query("ReplacePrice",GetArg(1),GetArg(2));
+			if( Query("GetPriceInfo",GetArg(1)) == GetArg(2) )
+			{
+				debugmes "AID: " + GetCharID(3) + ", CID: " + GetCharID(0) + ", mudou o preço do Item ID " + GetArg(1) + " para " + GetArg(2) + " no Kafra CashShop Admin.";
+				npccashshopdelitem "Funcionária Kafra#cashs2",GetArg(1);
+				npccashshopadditem "Funcionária Kafra#cashs2",GetArg(1),GetArg(2);
+				dispbottom "Editado com sucesso, reiniciando item... posto no final da lista de compras.";
+			}
+			else {
+				debugmes "AID: " + GetCharID(3) + ", CID: " + GetCharID(0) + ", tentou mudar o preço do Item ID " + GetArg(1) + " para " + GetArg(2) + " no Kafra CashShop Admin, mais sua tentativa falhou.";
+				dispbottom "Erro ao Editar o Item.";
+			}
+		}
+		return;
+	}
+
+// Query Result
+	function	Query	{
+
+		if( GetArg(0) == "Select" )
+		{
+			Query_SQL "SELECT `value` FROM `global_reg_value` WHERE `str`='#CASHPOINTS' AND `account_id`='"+ GetArg(1) +"'", .@Consult;
+			return (.@Consult);
+		}
+		else if( GetArg(0) == "Update" )
+		{
+			Query_SQL "UPDATE `global_reg_value` SET `value`="+ GetArg(2) +" WHERE `str`='#CASHPOINTS' AND `account_id`='"+ GetArg(1) +"'";
+			return;
+		}
+		else if( GetArg(0) == "Create" )
+		{
+			Query_Sql "INSERT INTO `global_reg_value` VALUES (0, '#CASHPOINTS', 0, 2, " + GetArg(1) + ")";
+			return;
+		}
+		else if( GetArg(0) == "Check" )
+		{
+			Query_SQL "SELECT `str` FROM `global_reg_value` WHERE `account_id`='" + GetArg(1) + "'", .@Return$;
+			return .@Return$;
+		}
+		else if( GetArg(0) == "SetItem" )
+		{
+			Query_SQL "INSERT INTO `kafra_cashadmin` VALUES (" + GetArg(1) + ", '" + GetItemName(GetArg(1)) + "', " + GetArg(2) + ")";
+			return;
+		}
+		else if( GetArg(0) == "ReplacePrice" )
+		{
+			Query_SQL "UPDATE `kafra_cashadmin` SET `price`="+ GetArg(2) +" WHERE `id`='"+ GetArg(1) +"'";
+			return;
+		}
+		else if( GetArg(0) == "DelItem" )
+		{
+			Query_SQL "DELETE FROM `kafra_cashadmin` WHERE `id`='"+ GetArg(1) +"'";
+			return;
+		}
+		else if( GetArg(0) == "GetItem" )
+		{
+			Query_SQL "SELECT `id` FROM `kafra_cashadmin` WHERE `id`='"+ GetArg(1) +"'",.@Consult;
+			return (.@Consult);
+		}
+		else if( GetArg(0) == "GetPriceInfo" )
+		{
+			Query_SQL("SELECT `price` FROM `kafra_cashadmin` WHERE `id`='" + GetArg(1) +"'",.@Consult);
+			return (.@Consult);
+		}
+		else return 0;
+	}
+}
+
+// Floating CashShop
+-	cashshop	Funcionária Kafra#cashs2	-1,501:10

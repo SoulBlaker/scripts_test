@@ -1,0 +1,313 @@
+// .----------------------------------------------------------.
+// .  		    SoulBlaker Scripts Apresenta:             .
+// .		    ___________________ 		      .
+// .		   /   _____/\______   \                      .
+// .		   \_____  \  |    |  _/		      .
+// .		   /        \ |    |   \		      .
+// .		  /_______  / |______  /		      .
+// .			  \/         \/		              .
+// .           	[ eAthena Advanced Scripts ]                  .
+// .							v1.0  .
+// .----------------------------------------------------------.
+// ;   http://www.eathena.ws/board/SoulBlaker-m271867.html    ;
+// .----------------------------------------------------------.
+// . Script:                                                  .
+// .  Funcionária Kafra de CashAdmin                          .
+// .----------------------------------------------------------.
+// . Por: SoulBlaker   Compátivel: eAthena SQL	 versão: 1.8  .
+// .----------------------------------------------------------.
+// . Descrição:                                               .
+// .  Adiciona/Remove Pontos dos Jogadores InGame, sem preci- .
+// .  do Jogador estiver Online.                              .
+// .                                                          .
+// .  Se o Registro de váriavel não existir, o npc mesmo cria,.
+// .  OBS: Recomendável utilizar sempre primeiramente o       .
+// .       Comando de Cash no Jogador antes de manusear no    .
+// .       NPC.                                               .
+// .----------------------------------------------------------.
+// . Changelog da Versão:                                     .
+// .   - 1.0 Iniciado o NPC. [SoulBlaker]                     .
+// .   - 1.1 Corrigido uma Query que estava faltando no script.
+// .         report do Punk. [SoulBlaker]                     .
+// .   - 1.2 Corrigido erro da somagem de cash. [SoulBlalker] .
+// .   - 1.3 Corrigido Consulta de Cash. [SoulBlaker]         .
+// .   - 1.4 Simplicado e otmizado o script. [SoulBlaker]     .
+// .   - 1.5 Corrigido sintaxe da func de query.	      .
+// .         bugreport(206658) by 'En3rgy' [SoulBlaker]	      .
+// .   - 1.6 Corrigido GetArg do Update. [SoulBlaker]         .
+// .         relação com o VarType.                           .
+// .   - 1.7 Corrigido Somagem dos Pontos. [SoulBlaker]       .
+// .   - 1.8 Corrigido um pequeno erro. [SoulBlaker]          .
+// *----------------------------------------------------------*
+prontera,168,187,4	script	Funcionária Kafra#cashsh	117,{
+
+	function Query;
+	cutin "kafra_01",2;
+	if( GetGmLevel() < 99 )
+	{
+		set .@CashPoints,Query("Select",GetCharId(3),1);
+		set .@KafraPoints,Query("Select",GetCharId(3),2);
+		mes "^0000CD[ Funcionária Kafra ]^000000";
+		mes "CashPoints: ^FF0000" + .@CashPoints + "^000000.";
+		mes "KafraPoints: ^FF0000" + .@KafraPoints + "^000000.";
+	}
+	else {
+		mes "^0000CD[ Funcionária Kafra ]^000000";
+		mes "Bem-vindo Administrador,";
+		mes "o que deseja?";
+		next;
+		Switch( Select("- Checar Pontos.","- Adicionar ou Remover Pontos.","- Cancelar.") )
+		{
+			case 1:
+				mes "^0000CD[ Funcionária Kafra ]^000000";
+				mes "Por favor, digite o UserID/AccountID da Conta que deseja saber as informações.";
+				next;
+				input .@InputAccount$;
+				set .@AccountID, Query("Login",.@InputAccount$);
+				if( !.@AccountID )
+				{
+					mes "^0000CD[ Funcionária Kafra ]^000000";
+					mes "Me desculpe, mais esta conta é inexistente.";
+				}
+				else {
+					set .@CashPoints,Query("Select",.@AccountID,1);
+					set .@KafraPoints,Query("Select",.@AccountID,2);
+					mes "^0000CD[ Funcionária Kafra ]^000000";
+					mes "^FF0000Conta:^000000 "+.@AccountID;
+					mes " ";
+					mes "^FF0000CashPoints:^000000 "+.@CashPoints;
+					mes "^FF0000KafraPoints:^000000 "+.@KafraPoints;
+				}
+				break;
+			case 2:
+				mes "^0000CD[ Funcionária Kafra ]^000000";
+				mes "Por favor, digite a ID da Conta do Jogador ou o UserID!";
+				next;
+				input .@InputAccount$;
+
+				set .@AccountID, Query("Login",.@InputAccount$);
+				if( !.@AccountID )
+				{
+					mes "^0000CD[ Funcionária Kafra ]^000000";
+					mes "Não existe nenhum usuário registrado com esta UID/AID!";
+					break;
+				}
+
+				mes "^0000CD[ Funcionária Kafra ]^000000";
+				mes "Você deseja adicionar ^FF0000CashPoints^000000 ou ^FF0000KafraPoints^000000 nesta conta?";
+				next;
+				set .@VarType, Select("- ^FF0000CashPoints^000000","- ^FF0000KafraPoints^000000");
+
+				set .@Consult$, Query("Check",.@AccountID,.@VarType);
+				if( .@Consult$ == "" )
+				{
+					if( .@VarType == 1 )
+					{
+						mes "^0000CD[ Funcionária Kafra ]^000000";
+						mes "Me desculpe, mais a variavel de ^FF0000CashPoints^000000 não possue registro nesta conta.";
+						mes "Deseja Registra ela agora?";
+					}
+					else
+					{
+						mes "^0000CD[ Funcionária Kafra ]^000000";
+						mes "Me desculpe, mais a variavel de ^FF0000KafraPoints^000000 não possue registro nesta conta.";
+						mes "Deseja Registra ela agora?";
+					}
+					next;
+					if( Select("- Registra.","- Cancelar") == 1 )
+					{
+						Query("Create",.@AccountID,.@VarType);
+						set .@Again$, Query("Check",.@AccountID,.@VarType);
+						if( .@Again$ == "" )
+						{
+							mes "^0000CD[ Funcionária Kafra ]^000000";
+							mes "Houve algum erro ao Registrar a váriavel na UID/AID " + .@InputAccount$ + ".";
+							mes " ";
+							mes "Por favor, reporte ao criador do Script 'SoulBlaker'.";
+							debugmes "Erro ao Registrar a Váriavel na UID/AID " + .@InputAccoun$ + " na tabela de registro de váriaveis global, reporte ao membro '[SoulBlaker]' do fórum eAthena.";
+						}
+						else
+						{
+							mes "^0000CD[ Funcionária Kafra ]^000000";
+							mes "Muito bem, UID/AID ^FF0000" + .@InputAccount$ + "^000000 foi efetuado registro com sucesso!";
+						}
+					}
+					else
+					{
+						mes "^0000CD[ Funcionária Kafra ]^000000";
+						mes "Muito bem, UID/AID ^FF0000" + .@InputAccount$ + "^000000 foi efetuado nenhum registro na conta!";
+					}
+				}
+				else {
+					set .@Result, Query("Select",.@AccountID,.@VarType);
+
+					if( .@VarType == 1 )
+					{
+						mes "^0000CD[ Funcionária Kafra ]^000000";
+						mes "Muito bem, digite quantos ^FF0000CashPoints^000000 você deseja Adicionar/Remover desta Conta!";
+					}
+					else
+					{
+						mes "^0000CD[ Funcionária Kafra ]^000000";
+						mes "Muito bem, digite quantos ^FF0000KafraPoints^000000 você deseja Adicionar/Remover desta Conta!";
+					}
+					mes " ";
+					mes "^FF0000Pontos Continuos: " + .@Result + "^000000.";
+					mes " ";
+					next;
+					input .@Amount;
+					if( !.@Amount )
+					{
+						mes "^0000CD[ Funcionária Kafra ]^000000";
+						mes "Me desculpe, mais você deve digitar um valor positivo.";
+						
+					}
+					else {
+						if( .@VarType == 1 )
+						{
+							mes "^0000CD[ Funcionária Kafra ]^000000";
+							mes "Você deseja Adicionar ou Remover ^FF0000CashPoints^000000 desta Conta?";
+						}
+						else
+						{
+							mes "^0000CD[ Funcionária Kafra ]^000000";
+							mes "Você deseja Adicionar ou Remover ^FF0000KafraPoints^000000 desta Conta?";
+						}
+						next;
+						set .@Type,Select("- Adicionar.","- Remover.");
+
+						mes "^0000CD[ Funcionária Kafra ]^000000";
+
+						if( .@Type == 1 && .@VarType == 1 )
+						{
+							set .@Amount2, .@Result + .@Amount;
+							mes "^0000CD[ Funcionária Kafra ]^000000";
+							mes "Gostária de Adiconar ^FF0000" + .@Amount + " CashPoints^000000 nesta Conta?";
+							mes " ";
+							mes "^FF0000Saldo Atual:^000000 " + .@Result + " CashPoints.";
+							mes "^FF0000Saldo com Débito:^000000 " + .@Amount2 + " CashPoints.";
+						}
+						else
+						if( .@Type == 1 && .@VarType == 2 )
+						{
+							set .@Amount2, .@Result + .@Amount;
+							mes "^0000CD[ Funcionária Kafra ]^000000";
+							mes "Gostária de Adiconar ^FF0000" + .@Amount + " KafraPoints^000000 nesta Conta?";
+							mes " ";
+							mes "^FF0000Saldo Atual:^000000 " + .@Result + " KafraPoints.";
+							mes "^FF0000Saldo com Débito:^000000 " + .@Amount2 + " KafraPoints.";
+						
+						}
+						else
+						if( .@Type == 2 && .@VarType == 1 )
+						{
+							set .@Amount2, .@Result - .@Amount;
+							mes "^0000CD[ Funcionária Kafra ]^000000";
+							mes "Gostária de Remover ^FF0000" + .@Amount + " CashPoints^000000 desta Conta?";
+							mes " ";
+							mes "^FF0000Saldo Atual:^000000 " + .@Result + " CashPoints.";
+							mes "^FF0000Saldo com Remoção:^000000 " + .@Amount2 + " CashPoints.";
+						}
+						else {
+							set .@Amount2, .@Result - .@Amount;
+							mes "^0000CD[ Funcionária Kafra ]^000000";
+							mes "Gostária de Remover ^FF0000" + .@Amount + " KafraPoints^000000 desta Conta?";
+							mes " ";
+							mes "^FF0000Saldo Atual:^000000 " + .@Result + " KafraPoints.";
+							mes "^FF0000Saldo com Remoção:^000000 " + .@Amount2 + " KafraPoints.";
+						}
+						next;
+						if( Select("- Sim.","- Não") == 1 )
+						{
+							Query("Update",.@AccountID,.@Amount2,.@VarType);
+							set .@Status,Query("Select",.@AccountID,.@VarType);
+							if( .@Type == 1 && .@Status != .@Amount2 )
+							{
+								mes "^0000CD[ Funcionária Kafra ]^000000";
+								mes "Me desculpe, mais não foi possível creditar esta conta.";
+							}
+							else if( .@Type == 2 && .@Status != .@Amount2 )
+							{
+								mes "^0000CD[ Funcionária Kafra ]^000000";
+								mes "Me desculpe, mais não foi possível remover créditos desta conta.";
+							}
+							else if( .@Type == 1 )
+							{
+								mes "^0000CD[ Funcionária Kafra ]^000000";
+								mes "Muito bem, a conta foi creditada com sucesso.";
+							}
+							else
+							{
+								mes "^0000CD[ Funcionária Kafra ]^000000";
+								mes "Muito bem, foi removido os créditos da conta com sucesso.";
+							}
+						}
+						else {
+							mes "^0000CD[ Funcionária Kafra ]^000000";
+							mes "Muito bem, estarei aqui se precisar.";
+						}
+					}
+				}
+				break;
+			case 3:
+				mes "^0000CD[ Funcionária Kafra ]^000000";
+				mes "Muito bem, estarei aqui se precisar.";
+				break;
+		}
+	}
+	close2;
+	cutin "",255;
+	end;
+
+OnInit:
+	waitingroom "Assistente do CashShop",0;
+	end;
+
+// Query Result
+	function	Query	{
+
+		if( GetArg(0) == "Login" )
+		{
+			Query_Sql "SELECT `account_id` FROM `login` WHERE `account_id`='" + GetArg(1) + "' OR `userid`='" + Getarg(1) + "'", .@Consult;
+			return (.@Consult);
+		}
+		else
+		if( GetArg(0) == "Select" )
+		{
+			if( GetArg(2) == 1 )
+				Query_SQL "SELECT `value` FROM `global_reg_value` WHERE `str`='#CASHPOINTS' AND `account_id`='"+ GetArg(1) +"'", .@Consult;
+			else
+				Query_SQL "SELECT `value` FROM `global_reg_value` WHERE `str`='#KAFRAPOINTS' AND `account_id`='"+ GetArg(1) +"'", .@Consult;
+
+			return (.@Consult);
+		}
+		else if( GetArg(0) == "Update" )
+		{
+			if( GetArg(3) == 1 )
+				Query_SQL "UPDATE `global_reg_value` SET `value`="+ GetArg(2) +" WHERE `str`='#CASHPOINTS' AND `account_id`='"+ GetArg(1) +"'";
+			else
+				Query_SQL "UPDATE `global_reg_value` SET `value`="+ GetArg(2) +" WHERE `str`='#KAFRAPOINTS' AND `account_id`='"+ GetArg(1) +"'";
+
+			return;
+		}
+		else if( GetArg(0) == "Create" )
+		{
+			if( GetArg(2) == 1 )
+				Query_Sql "INSERT INTO `global_reg_value` VALUES (0, '#CASHPOINTS', 0, 2, " + GetArg(1) + ")";
+			else
+				Query_Sql "INSERT INTO `global_reg_value` VALUES (0, '#KAFRAPOINTS', 0, 2, " + GetArg(1) + ")";
+
+			return;
+		}
+		else if( GetArg(0) == "Check" )
+		{
+			if( GetArg(2) ==  1 )
+				Query_SQL "SELECT `str` FROM `global_reg_value` WHERE `account_id`='" + GetArg(1) + "' AND `str`='#CASHPOINTS'", .@Return$;
+			else
+				Query_SQL "SELECT `str` FROM `global_reg_value` WHERE `account_id`='" + GetArg(1) + "' AND `str`='#KAFRAPOINTS'", .@Return$;
+
+			return .@Return$;
+		}
+		else return 0;
+	}
+}
