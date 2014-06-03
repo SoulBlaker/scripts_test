@@ -25,7 +25,7 @@
 // .   [0%] - Editar uma categoria.                           .
 // . [100%] - Adicionar quests.                               .
 // .   [0%] - Remover quests.                                 .
-// .   [0%] - Configurar quests. (Edição com base nisso)      .
+// .  [60%] - Configurar quests. (Edição com base nisso)      .
 // .   [0%] - Funções de quests para os jogadores.            .
 // .   [0%] - Banco de Dados (SQL).                           .
 // .   [0%] - Suporte a WebSite.                              .
@@ -280,7 +280,7 @@ prontera,148,183,4	script	Master of Quests#mofq_01	811,{
 					mes "^00BFFF[Master of Quests]^000000";
 					mes "Em que posso ajudar com as quests?";
 					next;
-					switch( select("- Adicionar uma Quest.", "- Remover uma Quest.", "- Editar uma Quest.", "- Voltar.", "- Cancelar.") )
+					switch( select("- Adicionar uma Quest.", "- Remover uma Quest.", "- Configurar uma Quest.", "- Voltar.", "- Cancelar.") )
 					{
 						case 1: // Adicionar uma quest.
 							query_sql "SELECT * FROM `moq_category` WHERE `status`='1' ORDER BY `name` DESC", .@cAID, .@cName$, .@cDesc$;
@@ -372,6 +372,468 @@ prontera,148,183,4	script	Master of Quests#mofq_01	811,{
 							}
 							break;
 						case 2: // Remover uma quest.
+							query_sql "SELECT * FROM `moq_category` WHERE `status`='1' ORDER BY `name` DESC", .@cAID, .@cName$, .@cDesc$;
+							if( !getarraysize(.@cAID) )
+							{
+								mes "^00BFFF[Master of Quests]^000000";
+								mes "Não há categorias a ser exibida!";
+								next;
+								break;
+							}
+
+							mes "^00BFFF[Master of Quests]^000000";
+							mes "Muito bem, selecione uma categoria aonde se encontra a quest.";
+							next;
+							set .@CategoryMenu$, "";
+							for( set .@c, 0; .@c < getarraysize(.@cAID); set .@c, .@c + 1 )
+								set .@CategoryMenu$, "- " + .@CategoryMenu$ + .@cName$[.@c] + ":";
+
+							set .@CategoryMenu$, .@CategoryMenu$ + "- Voltar.:- Cancelar.";
+							set .@Category, select(.@CategoryMenu$)-1;
+
+							if( .@Category == getarraysize(.@cAID) )
+								break;
+							else if( .@Category > getarraysize(.@cAID) )
+							{
+								set .@loop_1, 0;
+								break;
+							}
+
+							query_sql "SELECT auto_id, name FROM `moq_quests` WHERE `subjection`='" + .@cAID[.@Category] + "' AND `status`='1' ORDER BY `name`", .@qAID, .@qName$;
+							if( !getarraysize(.@qAID) )
+							{
+								mes "^00BFFF[Master of Quests]^000000";
+								mes "Não há quests a ser exibida nessa categoria!";
+								next;
+								break;
+							}
+
+							mes "^00BFFF[Master of Quests]^000000";
+							mes "Selecione a quest que deseja remover!";
+							next;
+							set .@QuestMenu$, "";
+							for( set .@q, 0; .@q < getarraysize(.@qAID); set .@q, .@q + 1 )
+								set .@QuestMenu$, "- " + .@QuestMenu$ + .@qName$[.@q] + ":";
+
+							set .@QuestMenu$, .@QuestMenu$ + "- Voltar.:- Cancelar.";
+							set .@Quest, select(.@QuestMenu$)-1;
+
+							if( .@Quest == getarraysize(.@qAID) )
+								break;
+							else if( .@Quest > getarraysize(.@qAID) )
+							{
+								set .@loop_1, 0;
+								break;
+							}
+
+							mes "^00BFFF[Master of Quests]^000000";
+							mes "Tem certeza que deseja remover a quest " + .@qName$[.@Quest] + " da categoria " + .@cAID$[.@Category] + "?";
+							next;
+							if( select("- Sim, por favor.", "- Não, obrigado.") == 1 )
+							{
+								query_sql "DELETE FROM `moq_quests` WHERE `auto_id`='" + .@qAID[.@Quest] + "'";
+								query_sql "DELETE FROM `moq_itens` WHERE `subjection`='" + .@qAID[.@Quest] + "'";
+								query_sql "DELETE FROM `moq_zenys` WHERE `subjection`='" + .@qAID[.@Quest] + "'";
+
+								mes "^00BFFF[Master of Quests]^000000";
+								mes "Quest removida com sucesso!";
+								next;
+							}
+							break;
+						case 3: // Configurar uma quest.
+							query_sql "SELECT * FROM `moq_category` WHERE `status`='1' ORDER BY `name` DESC", .@cAID, .@cName$, .@cDesc$;
+							if( !getarraysize(.@cAID) )
+							{
+								mes "^00BFFF[Master of Quests]^000000";
+								mes "Não há categorias a ser exibida!";
+								next;
+								break;
+							}
+
+							mes "^00BFFF[Master of Quests]^000000";
+							mes "Muito bem, selecione uma categoria aonde se encontra a quest.";
+							next;
+							set .@CategoryMenu$, "";
+							for( set .@c, 0; .@c < getarraysize(.@cAID); set .@c, .@c + 1 )
+								set .@CategoryMenu$, "- " + .@CategoryMenu$ + .@cName$[.@c] + ":";
+
+							set .@CategoryMenu$, .@CategoryMenu$ + "- Voltar.:- Cancelar.";
+							set .@Category, select(.@CategoryMenu$)-1;
+
+							if( .@Category == getarraysize(.@cAID) )
+								break;
+							else if( .@Category > getarraysize(.@cAID) )
+							{
+								set .@loop_1, 0;
+								break;
+							}
+
+							query_sql "SELECT auto_id, name FROM `moq_quests` WHERE `subjection`='" + .@cAID[.@Category] + "' AND `status`='1' ORDER BY `name`", .@qAID, .@qName$;
+							if( !getarraysize(.@qAID) )
+							{
+								mes "^00BFFF[Master of Quests]^000000";
+								mes "Não há quests a ser exibida nessa categoria!";
+								next;
+								break;
+							}
+
+							mes "^00BFFF[Master of Quests]^000000";
+							mes "Selecione a quest que deseja configurar!";
+							next;
+							set .@QuestMenu$, "";
+							for( set .@q, 0; .@q < getarraysize(.@qAID); set .@q, .@q + 1 )
+								set .@QuestMenu$, "- " + .@QuestMenu$ + .@qName$[.@q] + ":";
+
+							set .@QuestMenu$, .@QuestMenu$ + "- Voltar.:- Cancelar.";
+							set .@Quest, select(.@QuestMenu$)-1;
+
+							if( .@Quest == getarraysize(.@qAID) )
+								break;
+							else if( .@Quest > getarraysize(.@qAID) )
+							{
+								set .@loop_1, 0;
+								break;
+							}
+
+							mes "^00BFFF[Master of Quests]^000000";
+							mes "O que você gostaria de configurar na quest " + .@qName$[.@Quest] + "?";
+							next;
+							switch( select("- Alterar o nome.", "- Alterar a categoria.", "- Adicionar itens.", "- Alterar Itens.", "- Adicionar Zeny.", "- Alterar a descrição.", "- Voltar.", "- Cancelar.") )
+							{
+								case 1: // Alterar o nome.
+										set .@loop_2, 1;
+										while(.@loop_2)
+										{
+											mes "^00BFFF[Master of Quests]^000000";
+											mes "Por favor, digite o nome que desejo trocar pelo da quest " + .@qName$[.@Quest] + "!";
+											next;
+											input .@nqName$;
+											if( !.@nqName$ )
+											{
+												mes "^00BFFF[Master of Quests]^000000";
+												mes "Você tem que digitar um novo nome para quest.";
+												mes "Deseja tentar novamente?";
+												next;
+												if( select("- Sim, por favor.", "- Não, obrigado.") == 2 )
+													set .@loop_2, 0;
+											}
+											else {
+												mes "^00BFFF[Master of Quests]^000000";
+												mes "Você tem certeza que deseja mudar o nome da quest " + .@qName$[.@Quest] + " para " + .@nqName$ + "?";
+												next;
+												if( select("- Sim, por favor.", "- Não, obrigado.") == 1 )
+												{
+													query_sql "UPDATE `moq_quests` SET `name`='" + .@nqName$[.@Quest] + "' WHERE `auto_id`='" + .@qAID[.@Quest] + "'";
+													mes "^00BFFF[Master of Quests]^000000";
+													mes "A ques foi renomeada com sucesso!";
+													next;
+													set .@loop_2, 0;
+												}
+												else {
+													mes "^00BFFF[Master of Quests]^000000";
+													mes "Deseja tentar novamente?";
+													next;
+													if( select("- Sim, por favor.", "- Não, obrigado.") == 2 )
+														set .@loop_2, 0;
+												}
+											}
+										}
+								case 2: // Alterar a categoria.
+										set.@loop_2, 1;
+										while(.@loop_2)
+										{
+											mes "^00BFFF[Master of Quests]^000000";
+											mes "Por favor, selecione a categoria que deseja mover a quest " + .@qName$[.@Quest] + "!";
+											next;
+											set .@toCategory, select(.@CategoryMenu$)-1;
+											
+											if( .@toCategory == getarraysize(.@cAID) )
+											{
+												set .@loop_2, 0;
+												break;
+											}
+											else if( .@toCategory > getarraysize(.@cAID) )
+											{
+												set .@loop_1, 0;
+												set .@loop_2, 0;
+												break;
+											}
+											
+											mes "^00BFFF[Master of Quests]^000000";
+											mes "Deseja mover a quest " + .@qName$[.@Quest] + " para categoria " + .@cName$[.@toCategory] + "?";
+											next;
+											if( select("- Sim, por favor.", "- Não, obrigado.") )
+											{
+												query_sql "UPDATE `moq_quests` SET `subjection`='" + .@cAID[.@toCategory] + "' WHERE `auto_id`='" + .@qAID[.@Quest] + "'";
+												mes "^00BFFF[Master of Quests]^000000";
+												mes "Muito bem, a quest foi movida com sucesso!";
+												next;
+												set .@loop_2, 0;
+											}
+											else {
+												mes "^00BFFF[Master of Quests]^000000";
+												mes "Deseja mover para outra categoria?";
+												next;
+												if( select("- Sim, por favor.", "- Não, obrigado.") == 2 )
+													set .@loop_2, 0;
+											}
+										}
+										break;
+								case 3: // Adicionar itens.
+									set .@loop_2, 1;
+									while(.@loop_2)
+									{
+										mes "^00BFFF[Master of Quests]^000000";
+										mes "Digite o ID do item que deseja adicionar a quest.";
+										next;
+										input .@itemID;
+
+										if( !.@itemID )
+										{
+											mes "^00BFFF[Master of Quests]^000000";
+											mes "Você tem que digitar o id do item.";
+											mes "Deseja tentar novamente?";
+											next;
+											if( select("- Sim, por favor.", "- Não, obrigado.") == 2 )
+												set .@loop_2, 0;
+										}
+										else if( !getitemname(.@itemID) )
+										{
+											mes "^00BFFF[Master of Quests]^000000";
+											mes "O item não foi encontrado no banco de dados.";
+											mes "Deseja tentar novamente?";
+											next;
+											if( select("- Sim, por favor.", "- Não, obrigado.") == 2 )
+												set .@loop_2, 0;
+										}
+										else {
+											mes "^00BFFF[Master of Quests]^000000";
+											mes "Você escolheu o item " + getitemname(.@itemID) + "?";
+											next;
+											if( select("- Sim, continue.", "- Não, está incorreto!") == 2 )
+											{
+												mes "^00BFFF[Master of Quests]^000000";
+												mes "Deseja tentar novamente?";
+												next;
+												if( select("- Sim, por favor.", "- Não, obrigado") == 2 )
+													set .@loop_2, 0;
+											}
+											else {
+												set .@loop_3, 1;
+												while(.@loop_3)
+												{
+													mes "^00BFFF[Master of Quests]^000000";
+													mes "Digite a quantidade de item " + getitemname(.@itemID) + " que deseja adicionar a quest.";
+													next;
+													input .@itemAmount;
+
+													if( !.@itemAmount )
+													{
+														mes "^00BFFF[Master of Quests]^000000";
+														mes "Você tem que digitar a quantidade do item.";
+														mes "Deseja tentar novamente?";
+														next;
+														if( select("- Sim, por favor.", "- Não, obrigado.") == 2)
+														{
+															set .@loop_2, 0;
+															set .@loop_3, 0;
+														}
+														else {
+															mes "^00BFFF[Master of Quests]^000000";
+															mes "Este item será entregue ao jogador ou servirá de requisito para completar a quest?";
+															next;
+															set .@type, select("- Será entregue ao jogador.", "- Requisito para quest.")-1;
+
+															mes "^00BFFF[Master of Quests]^000000";
+															mes "Por favor, confirme as informações antes de concluír o cadastro do item.";
+															mes " ";
+															mes "Quest: " + .@qName$[.@Quest];
+															mes "item_id: " + .@itemID;
+															mes "Item: " + getitemname(.@itemID);
+															mes "Quantidade: " + .@itemAmount;
+															mes "Tipo: " + (!.@type?"Recompensa":"Requisito");
+															next;
+															if( select("- Está tudo correto.", "- Não há erros nas informações.") == 1 )
+															{
+																query_sql "INSERT INTO `moq_itens` (item_id, amount, type, subjection, status) VALUES (" + .@itemID + ", " + .@itemAmount + ", " + .@qAID[.@Quest] + ", 1)";
+																mes "^00BFFF[Master of Quests]^000000";
+																mes "O item foi adicionado com sucesso!";
+																mes "Deseja adicionar mais itens a quest?";
+																next;
+																if( select("- Sim, por favor.", "- Não, obrigado.") == 1 )
+																	set .@loop_2, 0;
+																else {
+																	set .@loop_2, 0;
+																	set .@loop_3, 0;
+																} 
+															}
+															else {
+																mes "^00BFFF[Master of Quests]^000000";
+																mes "Deseja recomeçar as configurações?";
+																next;
+																if( select("Sim, por favor.", "- Não, obrigado.") == 2 )
+																{
+																	set .@loop_2, 0;
+																	set .@loop_3, 0;
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+									break;
+								case 4: // Alterar item
+									set .@loop_2, 1;
+									while(.@loop_2)
+									{
+										mes "^00BFFF[Master of Quests]^000000";
+										mes "Por favor, selecione o item que deseja alterar da quest " + .@qName$[.@Quest] + ".";
+										next;
+										query_sql "SELECT * FROM `mobq_itens` WHERE `subjection`='" + .@qAID[.@Quest] + "' ORDER BY `name` DESC", .@iAID ,.@iID, .@iAmount, .@iType, .@iSubjection, .@iStatus;
+										
+										if( !getarraysize(.@iAID) )
+										{
+											mes "^00BFFF[Master of Quests]^000000";
+											mes "Não há itens para ser exibidos!";
+											next;
+											set .@loop_2, 0;
+											break;
+										}
+										
+										set .@itemMenu$, "";
+										for( set .@i, 0; .@i < getarraysize(.@iAID); set .@i, .@i + 1 )
+											set .@itemMenu$, .@itemMenu$ + "[" + .@iAmount[.@i] + "]x " + getitemname(.@iAID[.@i]) + " de " + (!.@iType?"Recompensa":"Requisito") + ".:";
+											
+										set .@itemMenu$, .@itemMenu$ + "- Voltar.":"- Cancelar.";
+										set .@itemMenu, select(.@itemMenu$);
+										
+										if( .@itemMenu == getarraysize(.@iAID) )
+										{
+											set .@loop_2, 0;
+											break;
+										}
+										else if( .@itemMenu > getarraysize(.@iAID) )
+										{
+											set .@loop_1, 0;
+											set .@loop_2, 0;
+											break;
+										}
+										
+										set .@loop_3, 1;
+										while( .@loop_3 )
+										{
+											mes "^00BFFF[Master of Quests]^000000";
+											mes "O que deseja editar no item " + getitemname(.@iAID[.@itemMenu]) + "?";
+											next;
+											switch( select("- Alterar o item.", "- Alterar a quantidade.", "- Alterar o tipo.", "- Mover para outra quest.", "- Ativar ou Desativar o item.", "- Voltar.", "- Cancelar.") )
+											{
+												case 1: // Alterar o item.
+													set .@loop_4, 1;
+													while(.@loop_4)
+													{
+														mes "^00BFFF[Master of Quests]^000000";
+														mes "Por favor, digite o id do item para qual deseja mudar!";
+														next;
+														input .@niID;
+														if( .@niID$ )
+														{
+															mes "^00BFFF[Master of Quests]^000000";
+															mes "Você tem que digitar o id do item para o qual deseja mudar!";
+															mes "Deseja tentar novamente?";
+															next;
+															if( select("- Sim, por favor.", "- Não, obrigado.") == 2 )
+																set .@loop_4, 0;
+														}
+														else if( !getitemname(.@niID) )
+														{
+															mes "^00BFFF[Master of Quests]^000000";
+															mes "O item não foi encontrado no banco de dados!";
+															mes "Deseja tentar novamente?";
+															next;
+															if( select("- Sim, por favor.", "- Não, obrigado.") == 2 )
+																set .@loop_4, 0;
+														}
+														else {
+															mes "^00BFFF[Master of Quests]^000000";
+															mes "Deseja mudar o item " + getitemname(.@iAID[.@itemMenu]) + " para " + getitemname(.@niID) + "?";
+															next;
+															if( select("- Sim, por favor.", "- Não, obrigado.") == 1 )
+															{
+																query_sql "UPDATE `mobq_itens` SET `item_id`='" + .@niID + "' WHERE `auto_id`='" + .@iAID[.@itemMenu] + "'";
+																mes "^00BFFF[Master of Quests]^000000";
+																mes "Item alterado com sucesso!";
+																next;
+																set .@loop_4, 0;
+															}
+															else {
+																mes "^00BFFF[Master of Quests]^000000";
+																mes "Deseja tentar novamente?";
+																next;
+																if( select("- Sim, por favor.", "- Não, obrigado.") == 2 )
+																	set .@loop_4, 0;
+															}
+														}
+													}
+													break;
+												case 2: // Alterar a quantidade
+													set .@loop_4, 1;
+													while(.@loop_4)
+													{
+														mes "^00BFFF[Master of Quests]^000000";
+														mes "Por favor, digite uma quantidade para o item!";
+														next;
+														input .@niAmount;
+														if( .@niAmount$ )
+														{
+															mes "^00BFFF[Master of Quests]^000000";
+															mes "Você tem que digitar uma quantidade que deseja mudar para o item!";
+															mes "Deseja tentar novamente?";
+															next;
+															if( select("- Sim, por favor.", "- Não, obrigado.") == 2 )
+																set .@loop_4, 0;
+														}
+														else {
+															mes "^00BFFF[Master of Quests]^000000";
+															mes "Deseja mudar a quantidade " + .@iAmount[.@itemMenu] + " do " + getitemname(.@iAID[.@itemMenu]) + " para " + .@niAmount + "?";
+															next;
+															if( select("- Sim, por favor.", "- Não, obrigado.") == 1 )
+															{
+																query_sql "UPDATE `mobq_itens` SET `amount`='" + .@niAmount + "' WHERE `auto_id`='" + .@iAID[.@itemMenu] + "'";
+																mes "^00BFFF[Master of Quests]^000000";
+																mes "Quantidade alterada com sucesso!";
+																next;
+																set .@loop_4, 0;
+															}
+															else {
+																mes "^00BFFF[Master of Quests]^000000";
+																mes "Deseja tentar novamente?";
+																next;
+																if( select("- Sim, por favor.", "- Não, obrigado.") == 2 )
+																	set .@loop_4, 0;
+															}
+														}
+													}
+													break;
+												case 3: // Alterar tipo.
+													set .@type, (!.@type?1:0);
+													mes "^00BFFF[Master of Quests]^000000";
+													mes "Deseja alterar o tipo do item " + getitemname(.@iAID[.@itemMenu]) + " para " + (!.@type?"Recompensa":"Requisito") + "?";
+													next;
+													if( select("- Sim, por favor.", "- Não, obrigado.") == 1 )
+													{
+														query_sql "UPDATE `mobq_itens` SET `type`='" + .@type + "' WHERE `auto_id`='" + .@iAID[.@itemMenu] + "'";
+														mes "^00BFFF[Master of Quests]^000000";
+														mes "Tipo do item alterado com sucesso!";
+														next;
+													}
+													break;
+											}
+										}
+									}
+									break;
+							}
 					}
 				}
 				break;
