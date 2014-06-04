@@ -151,7 +151,7 @@ OnStart:
 	set $@bb_clock, 4;
 	set $@bb_flag, 1;
 	// Matando monstros que se encontra no mapa.
-	killmonster $@event_bb_config$[1];
+	killmonsterall $@event_bb_config$[1];
 	// Adicionando mapflags.
 	setmapflag $@event_bb_config$[1], mf_nomemo;
         setmapflag $@event_bb_config$[1], mf_noteleport;
