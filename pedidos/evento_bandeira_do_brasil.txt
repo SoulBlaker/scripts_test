@@ -86,10 +86,10 @@ prontera,149,189,5	script	Bandeira do Brasil#b_01::BFlagEvent	733,{
 			mes "^483D8B[Recepcionista]^000000";
 			mes "O evento é aberto nos seguintes horários:";
 			mes " ";
-			fort( set .@i, 0; .@i < getarraysize($@event_bb_hour); set .@i, .@i + 1 )
+			for( set .@i, 0; .@i < getarraysize($@event_bb_hour); set .@i, .@i + 1 )
 			{
 				set .@tmp, $@event_bb_hour[.@i]+1;
-				mes "^0000FF" + ($@event_bb_hour[.@i]<9?"0":"")+""+$@event_bb_hour[.@i]:00H^000000 - ^0000FF" + (.@tmp<9?"0":"")+""+.@tmp:00H^000000";
+				mes "^0000FF" + ($@event_bb_hour[.@i]<9?"0":"")+""+$@event_bb_hour[.@i]+":00H^000000 - ^0000FF" + (.@tmp<9?"0":"")+""+.@tmp+":00H^000000";
 			}
 			close;
 		case 4:
