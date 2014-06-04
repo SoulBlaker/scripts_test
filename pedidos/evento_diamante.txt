@@ -1,0 +1,229 @@
+// .----------------------------------------------------------.
+// .            SoulBlaker Scripts Apresenta:                 .
+// .                ___________________                       .
+// .               /   _____/\______   \                      .
+// .               \_____  \  |    |  _/                      .
+// .               /        \ |    |   \                      .
+// .              /_______  / |______  /                      .
+// .                      \/         \/                       .
+// .            [ Cronus Advanced Scripts ]                   .
+// .                                                    v1.1  .
+// .----------------------------------------------------------.
+// ;  http://forum.cronus-emulator.com/user/20800-soulblaker  ;
+// .----------------------------------------------------------.
+// . Script:                                                  .
+// .  Evento Diamante                                         .
+// .----------------------------------------------------------.
+// . Por: SoulBlaker   Compátivel: Cronus       versão: 1.0   .
+// .----------------------------------------------------------.
+// . Descrição:                                               .
+// .  Evento para os jogadores receberem uma diamante.        .
+// .----------------------------------------------------------.
+// . Changelog da Versão:                                     .
+// .  * 1.0 [SoulBlaker]                                      .
+// .	- - Iniciado NPC, idéia original de [xKazin].         .
+// *----------------------------------------------------------*
+prontera,149,189,5	script	Evento Diamanete#b_01::DiamondEvent	733,{
+
+	set .@adm_lvl, 99;
+
+	mes "^483D8B[Recepcionista]^000000";
+	mes "Bem-vindo ao ^0000FFEvento Diamante^000000.";
+
+	if( !$@dmt_flag )
+		mes "No momemento nosso portal está fechado, por não estár no horário do evento.";
+	else if( $@dmt_flag == 2 )
+		mes "No momemento nosso portal está fechado por estar ocorrendo o evento.";
+
+	mes "Em que posso ajudar?";
+	next;
+	switch( select((getgmlevel()>=.@adm_lvl?($@dmt_flag?"^0000FF- Desligar o Evento.^000000":"^0000FF- Ligar o Evento.^000000"):""), ($@dmt_flag==1?"^0000FF- Entrar no Evento.^000000":""), "- Informações.", "^FF0000- Saír.^000000") )
+	{
+		case 1:
+			mes "^483D8B[Recepcionista]^000000";
+
+			if( $@dmt_flag )
+				mes "Deseja desligar o ^0000FFEvento^000000?";
+			else
+				mes "Deseja ligar o ^0000FFEvento^000000?";
+
+			next;
+			if( select("- Sim", "- Não.") == 1 )
+			{
+				if( !$@bb_flag )
+					donpcevent "DiamondEvent::OnStart";
+				else
+					donpcevent "DiamondEvent::OnEnd";
+			}
+			break;
+		case 2:
+			if( $@dmt_flag != 1 )
+			{
+				mes "^483D8B[Recepcionista]^000000";
+                                mes "Me desculpe, mais o evento não está aberto.";
+                                mes "Volte mais tarde!";
+				close;
+			}
+			else {
+				mes "^483D8B[Recepcionista]^000000";
+				mes "Realmente deseja entrar no evento?";
+				next;
+				if( select("- Sim.", "- Não.") == 1 )
+				{
+					mes "^483D8B[Recepcionista]^000000";
+					mes "Tudo bem, vou te mandar para lá!";
+					close2;
+					warp $@event_dmt_config$[1], $@event_dmt_config$[2], $@event_dmt_config$[3];
+					end;
+				}
+			}
+			break;
+		case 3:
+			mes "^483D8B[Recepcionista]^000000";
+			mes "Nesse ^0000FFEvento^000000 é possível você conquistar o item ^0000FF" + getitemname($@event_bb_config$[4]) + "^000000.";
+			next;
+			mes "^483D8B[Recepcionista]^000000";
+			mes "O evento é aberto nos seguintes horários:";
+			mes " ";
+			for( set .@i, 0; .@i < getarraysize($@event_dmt_hour); set .@i, .@i + 1 )
+			{
+				set .@tmp, $@event_dmt_hour[.@i]+1;
+				mes "^0000FF" + ($@event_dmt_hour[.@i]<9?"0":"")+""+$@event_dmt_hour[.@i]+":00H^000000 - ^0000FF" + (.@tmp<9?"0":"")+""+.@tmp+":00H^000000";
+			}
+			close;
+		case 4:
+			break;
+
+	}
+
+	mes "^483D8B[Recepcionista]^000000";
+        mes "Muito bem, volte quando desejar entrar no ^0000FFEvento^000000!";
+        close;
+
+
+
+// Configurações
+OnInit:
+	// Configurações do Evento
+	//
+	// Exemplo:
+	// setarray $@event_dmt_config$[0], <enable_event>, "<map_event>", <coord_x>, <coord_y>, <mob_loot>, <mvp_loot>;
+	//	enable_event: Ativar evento? (1:ativado/1:desativado)
+	//	map_event: Mapa aonde será o evento.
+	//	coord_x: Coordenada X para aonde os jogadores serão teleportado. (0: random)
+	//	coord_y: Coordenada Y para aonde os jogadores serão teleportado. (0: random)
+	//	mob_loot: Monstros podem dropar seus itens comuns? (1:ativado/0:desativado)
+	//	mvp_loot: Monstros MvP pode dropar seus itens comuns? (1:ativado/0:desativado)
+	//
+	setarray $@event_dmt_config$[0], 1, "ordeal_1-1", 0, 0, 501, 1, 0, 0;
+
+	// Configurações de Monstros
+	//
+	// Exemplo:
+	// setarray $@event_dmt_mob[0], <mob_id>, <amount>, <mob_id>, <amount>{,...};
+	//	mob_id: Id do monstro.
+	//	amount: Quantidade do monstro.
+	setarray $@event_dmt_mob[0], 1002, 1, 1004, 1;
+
+	// Configurações de Horário
+	//
+	// Exemplo:
+	// setarray $@event_dmt_hour[0], <hour>, <hour>{,...};
+	//	hour: Horá que o evento pode se iniciar, formato 0hrs~23hrs.
+	setarray $@event_dmt_hour[0], 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22;
+	end;
+
+// Horário do Evento
+OnMinute00:
+	if( !$@dmt_flag && $@event_dmt_config$[0] == 1 )
+	{
+		for( set .@i, 0; .@i < getarraysize($@event_dmt_hour); set .@i, .@i + 1 )
+		{
+			if( gettime(3) == $@event_dmt_hour[.@i] )
+				donpcevent "DiamondEvent::OnStart";
+		}
+	}
+	end;
+
+OnStart:
+	// Iniciando Variáveis nescessária.
+	set $@dmt_clock, 4;
+	set $@dmt_flag, 1;
+	// Matando monstros que se encontra no mapa.
+	killmonster $@event_dmt_config$[1];
+	// Adicionando mapflags.
+	setmapflag $@event_dmt_config$[1], mf_nomemo;
+        setmapflag $@event_dmt_config$[1], mf_noteleport;
+        setmapflag $@event_dmt_config$[1], mf_nowarp;
+        setmapflag $@event_dmt_config$[1], mf_nowarpto;
+	setmapflag $@event_dmt_config$[1], mf_noskill;
+	if( $@event_dmt_config$[6] ) setmapflag $@event_dmt_config$[1], mf_nomobloot;
+	if( $@event_dmt_config$[7] ) setmapflag $@event_dmt_config$[1], mf_nomvploot;
+	// Iniciando contagem de tempo do npc.
+	initnpctimer;
+	waitingroom "Aberto o Evento", 0;
+	announce "[Evento Diamante]: O Portal está aberto e será fechado em 5 minutos, corram para a arena!",bc_all,"0x00FF00";
+	end;
+
+OnTimer60000:
+	if( !$@dmt_clock )
+	{
+		// Inicia o Evento
+		if( getmapusers($@event_dmt_config$[1]) )
+		{
+			set $@dmt_flag, 2;
+			announce "[Evento Diamante]: O Portal está fechado, aqueles que não tiveram oportunidade podem tentar na próxima vez!",bc_all,"0x00FF00";
+
+			set $@event_dmt_mobcount, 0;
+			for( set .@i, 0; .@i < getarraysize($@event_dmt_mob); set .@i, .@i + 2 )
+			{
+				monster $@event_dmt_config$[1], 0, 0, "[Evento Diamante]" + getmonsterinfo($@event_dmt_mob[.@i], 0), $@event_dmt_mob[.@i], $@event_dmt_mob[(.@i+1)], "DiamondEvent::OnMobDead";
+				set $@event_dmt_mobcount, $@event_dmt_mobcount + $@event_dmt_mob[(.@i+1)];
+				delwaitingroom;
+			}
+		}
+		else
+		{
+			announce "[Evento Diamante]: O Evento foi cancelada por não haver jogadores na arena!",bc_all,"0x00FF00";
+			donpcevent "DiamondEvent::OnEnd";
+		}
+	}
+	else {
+		announce "[Evento Diamante]: O Portal está aberto e será fechado em " + $@dmt_clock + " minuto" + (($@dmt_clock-1)?"s":"") + "!",bc_all,"0x00FF00";
+		setnpctimer 0;
+		set $@dmt_clock, $@dmt_clock - 1;
+	}
+	end;
+
+OnTimer3540000:
+	announce "[Evento Diamante]: O Evento terminou, parabéns para os participantes!",bc_all,"0x00FF00";
+	donpcevent: "DiamondEvent::OnEnd";
+	end;
+
+OnMobDead:
+	set $@event_dmt_mobcount, $@event_dmt_mobcount - 1;
+	getitem $@event_dmt_config$[4], $@event_dmt_config[5];
+	if( mobcount($@event_dmt_config$[1], "all") > 0 )
+		mapannounce $@event_dmt_config$[1], "[Evento Diamante]: Faltam " + mobcount($@event_dmt_config$[1], "all") + " monstros.",bc_all,"0x00FF00";
+	else {
+		announce "[Evento Diamante]: Todos os monstros foram mortos e o Evento terminou, parabéns para os participantes!",bc_all,"0x00FF00";
+		donpcevent "DiamondEvent::OnEnd";
+	}
+	end;
+
+OnEnd:
+	delwaitingroom;
+	killmonsterall $@event_dmt_config$[1];
+	// Removendo MapFlags
+	removemapflag $@event_dmt_config$[1], mf_nomemo;
+        removemapflag $@event_dmt_config$[1], mf_noteleport;
+        removemapflag $@event_dmt_config$[1], mf_nowarp;
+        removemapflag $@event_dmt_config$[1], mf_nowarpto;
+        removemapflag $@event_dmt_config$[1], mf_nomemo;
+	removemapflag $@event_dmt_config$[1], mf_nomobloot;
+	removemapflag $@event_dmt_config$[1], mf_nomvploot;
+	removemapflag $@event_dmt_config$[1], mf_noskill;
+	set $@dmt_flag, 0;
+	stopnpctimer;
+	end;
+}
