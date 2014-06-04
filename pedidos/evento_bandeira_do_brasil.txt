@@ -198,7 +198,7 @@ OnTimer60000:
 
 OnTimer3540000:
 	announce "[Evento Bandeira do Brasil]: O Evento terminou, parabéns para os participantes!",bc_all,"0x00FF00";
-	donpcevent: "BFlagEvent::OnEnd";
+	donpcevent "BFlagEvent::OnEnd";
 	end;
 
 OnMobDead:

@@ -197,7 +197,7 @@ OnTimer60000:
 
 OnTimer3540000:
 	announce "[Evento Diamante]: O Evento terminou, parabéns para os participantes!",bc_all,"0x00FF00";
-	donpcevent: "DiamondEvent::OnEnd";
+	donpcevent "DiamondEvent::OnEnd";
 	end;
 
 OnMobDead:
