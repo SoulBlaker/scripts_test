@@ -50,7 +50,7 @@ prontera,149,189,5	script	Evento Diamanete#b_01::DiamondEvent	733,{
 			next;
 			if( select("- Sim", "- Não.") == 1 )
 			{
-				if( !$@bb_flag )
+				if( !$@dmt_flag )
 					donpcevent "DiamondEvent::OnStart";
 				else
 					donpcevent "DiamondEvent::OnEnd";
@@ -73,14 +73,14 @@ prontera,149,189,5	script	Evento Diamanete#b_01::DiamondEvent	733,{
 					mes "^483D8B[Recepcionista]^000000";
 					mes "Tudo bem, vou te mandar para lá!";
 					close2;
-					warp $@event_dmt_config$[1], $@event_dmt_config$[2], $@event_dmt_config$[3];
+					warp $@event_dmt_config$[1], atoi($@event_dmt_config$[2]), atoi($@event_dmt_config$[3]);
 					end;
 				}
 			}
 			break;
 		case 3:
 			mes "^483D8B[Recepcionista]^000000";
-			mes "Nesse ^0000FFEvento^000000 é possível você conquistar o item ^0000FF" + getitemname($@event_bb_config$[4]) + "^000000.";
+			mes "Nesse ^0000FFEvento^000000 é possível você conquistar o item ^0000FF" + getitemname($@event_dmt_config$[4]) + "^000000.";
 			next;
 			mes "^483D8B[Recepcionista]^000000";
 			mes "O evento é aberto nos seguintes horários:";
@@ -115,7 +115,7 @@ OnInit:
 	//	mob_loot: Monstros podem dropar seus itens comuns? (1:ativado/0:desativado)
 	//	mvp_loot: Monstros MvP pode dropar seus itens comuns? (1:ativado/0:desativado)
 	//
-	setarray $@event_dmt_config$[0], 1, "ordeal_1-1", 0, 0, 501, 1, 0, 0;
+	setarray $@event_dmt_config$[0], 1, "pvp_n_1-2", 0, 0, 7549, 1, 1, 1;
 
 	// Configurações de Monstros
 	//
@@ -123,7 +123,7 @@ OnInit:
 	// setarray $@event_dmt_mob[0], <mob_id>, <amount>, <mob_id>, <amount>{,...};
 	//	mob_id: Id do monstro.
 	//	amount: Quantidade do monstro.
-	setarray $@event_dmt_mob[0], 1002, 1, 1004, 1;
+	setarray $@event_dmt_mob[0], 1002, 50, 1031, 50, 1245, 50, 1113, 50;
 
 	// Configurações de Horário
 	//
@@ -157,8 +157,8 @@ OnStart:
         setmapflag $@event_dmt_config$[1], mf_nowarp;
         setmapflag $@event_dmt_config$[1], mf_nowarpto;
 	setmapflag $@event_dmt_config$[1], mf_noskill;
-	if( $@event_dmt_config$[6] ) setmapflag $@event_dmt_config$[1], mf_nomobloot;
-	if( $@event_dmt_config$[7] ) setmapflag $@event_dmt_config$[1], mf_nomvploot;
+	if( atoi($@event_dmt_config$[6]) ) setmapflag $@event_dmt_config$[1], mf_nomobloot;
+	if( atoi($@event_dmt_config$[7]) ) setmapflag $@event_dmt_config$[1], mf_nomvploot;
 	// Iniciando contagem de tempo do npc.
 	initnpctimer;
 	waitingroom "Aberto o Evento", 0;
@@ -178,7 +178,7 @@ OnTimer60000:
 			for( set .@i, 0; .@i < getarraysize($@event_dmt_mob); set .@i, .@i + 2 )
 			{
 				monster $@event_dmt_config$[1], 0, 0, "[Evento Diamante]" + getmonsterinfo($@event_dmt_mob[.@i], 0), $@event_dmt_mob[.@i], $@event_dmt_mob[(.@i+1)], "DiamondEvent::OnMobDead";
-				set $@event_dmt_mobcount, $@event_dmt_mobcount + $@event_dmt_mob[(.@i+1)];
+				//set $@event_dmt_mobcount, $@event_dmt_mobcount + $@event_dmt_mob[(.@i+1)];
 				delwaitingroom;
 			}
 		}
@@ -201,8 +201,10 @@ OnTimer3540000:
 	end;
 
 OnMobDead:
-	set $@event_dmt_mobcount, $@event_dmt_mobcount - 1;
-	getitem $@event_dmt_config$[4], $@event_dmt_config[5];
+	set .@rand, rand(0, 100);
+	if( .@rand < 49 )
+		getitem atoi($@event_dmt_config$[4]), atoi($@event_dmt_config$[5]);
+
 	if( mobcount($@event_dmt_config$[1], "all") > 0 )
 		mapannounce $@event_dmt_config$[1], "[Evento Diamante]: Faltam " + mobcount($@event_dmt_config$[1], "all") + " monstros.",bc_all,"0x00FF00";
 	else {
