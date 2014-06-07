@@ -104,13 +104,13 @@ jupe_ele,49,50,5	script	Evento Sobrevivênça#main::EventSurvivor	705,{
 					mes "Me desculpe, mais você deve ter o Nv. Base equivalente à " + .@BaseLvl + ".";
 				else if( .@ZenyCost && Zeny < .@ZenyCost )
 					mes "Me desculpe, mais você deve ter " + .@ZenyCost + " Zeny(s).";
-				else if( .@UserWarp && getmapusers("job3_guild03") >= .@UserWarp )
+				else if( .@UserWarp && getmapusers("job3_guil03") >= .@UserWarp )
 					mes "Me desculpe, mais o evento está com a quantidade máxima de jogadores!";
 				else {
 					mes "Vou te mandar agora para o evento!";
 					close2;
 					if( .@ZenyCost ) set Zeny, Zeny - .@ZenyCost;
-					warp "job3_guild03", 23, 67;
+					warp "job3_guil03", 23, 67;
 					end;
 				}
 
@@ -136,26 +136,26 @@ jupe_ele,49,50,5	script	Evento Sobrevivênça#main::EventSurvivor	705,{
 	}
 
 // Horário do Evento.
-OnMinute01;
+OnMinute01:
 	if( !$@ev_pagesurvival_flag )
 		donpcevent "EventSurvivor::OnStartArena";
 	end;
 
 OnStartArena:
 	// Matando todos monstro do mapa.
-	killmonsterall "job3_guild03";
+	killmonsterall "job3_guil03";
 
 	// Retirando todos jogadores do mapa.
-	mapwarp "job3_guild03", "jupe_ele", 49, 52;
+	mapwarp "job3_guil03", "jupe_ele", 49, 52;
 
 	// Mapflags
-	setmapflag "job3_guild03", mf_noteleport;
-	setmapflag "job3_guild03", mf_nomemo;
-	setmapflag "job3_guild03", mf_nosave;
-	setmapflag "job3_guild03", mf_nowarp;
-	setmapflag "job3_guild03", mf_nowarpto;
-	setmapflag "job3_guild03", mf_nomobloot;
-	setmapflag "job3_guild03", mf_nomvploot;
+	setmapflag "job3_guil03", mf_noteleport;
+	setmapflag "job3_guil03", mf_nomemo;
+	setmapflag "job3_guil03", mf_nosave;
+	setmapflag "job3_guil03", mf_nowarp;
+	setmapflag "job3_guil03", mf_nowarpto;
+	setmapflag "job3_guil03", mf_nomobloot;
+	setmapflag "job3_guil03", mf_nomvploot;
 
 	waitingroom "Aberto o Evento", 0;
 
@@ -191,7 +191,7 @@ OnTimer300000:
 	if( getarraysize($@ev_ps_monster) )
 	{
 		for( set .@i, 0; .@i < getarraysize($@ev_ps_monster); set .@i, .@i + 2 )
-			monster "job3_guild03", 0, 0, "[EvPS]: "+getmonsterinfo($@ev_ps_monster[.@i], 0), $@ev_ps_monster[.@i], $@ev_ps_monster[(.@i+1)], "EventSurvivor::OnMobDead";
+			monster "job3_guil03", 0, 0, "[EvPS]: "+getmonsterinfo($@ev_ps_monster[.@i], 0), $@ev_ps_monster[.@i], $@ev_ps_monster[(.@i+1)], "EventSurvivor::OnMobDead";
 	}
 
 	set $@ev_pagesurvival_count, $@ev_pagesurvival;
@@ -207,19 +207,19 @@ OnMobDead:
 
 OnEnd:
 	// Matando todos monstro do mapa.
-	killmonsterall "job3_guild03";
+	killmonsterall "job3_guil03";
 
 	// Retirando todos jogadores do mapa.
-	mapwarp "job3_guild03", "jupe_ele", 49, 52;
+	mapwarp "job3_guil03", "jupe_ele", 49, 52;
 
 	// Mapflags
-	removemapflag "job3_guild03", mf_noteleport;
-	removemapflag "job3_guild03", mf_nomemo;
-	removemapflag "job3_guild03", mf_nosave;
-	removemapflag "job3_guild03", mf_nowarp;
-	removemapflag "job3_guild03", mf_nowarpto;
-	removemapflag "job3_guild03", mf_nomobloot;
-	removemapflag "job3_guild03", mf_nomvploot;
+	removemapflag "job3_guil03", mf_noteleport;
+	removemapflag "job3_guil03", mf_nomemo;
+	removemapflag "job3_guil03", mf_nosave;
+	removemapflag "job3_guil03", mf_nowarp;
+	removemapflag "job3_guil03", mf_nowarpto;
+	removemapflag "job3_guil03", mf_nomobloot;
+	removemapflag "job3_guil03", mf_nomvploot;
 
 	set $@ev_pagesurival_flag, 0;
 	delwaitingroom;
@@ -227,7 +227,7 @@ OnEnd:
 	end;
 
 OnPCDieEvent:
-	if( strcharinfo(3) == "job3_guild03" && (getmapusers("job3_guild03")-1) <= 0 )
+	if( strcharinfo(3) == "job3_guil03" && (getmapusers("job3_guil03")-1) <= 0 )
 	{
 		announce "[Evento Sobrevivênça]: Todos jogadores foram mortos no evento!", 8;
 		donpcenvet "EventSurvivor::OnEnd";
@@ -237,7 +237,7 @@ OnPCDieEvent:
 }
 
 // Páginas do Evento
-job3_guild03,0,0,5	script	Página#01::PageSurvival	HIDDEN_NPC,{
+job3_guil03,0,0,5	script	Página#01::PageSurvival	HIDDEN_NPC,{
 
 	if( $@ev_ps_premium_mode == 1 && $@ev_ps_premium_mode == 3 )
 		callfunc "EV_PS_Premium";
@@ -250,19 +250,19 @@ job3_guild03,0,0,5	script	Página#01::PageSurvival	HIDDEN_NPC,{
 	}
 	else if( $@ev_pagesurvival_count > 1 ) {
 		set $@ev_pagesurival_count, $@ev_pagesurvival_count - 1;
-		mapannounce "job3_guild03", "Falta apenas encontrar " + $@ev_pagesurival_count + " Páginas para se salvarem!",0;
+		mapannounce "job3_guil03", "Falta apenas encontrar " + $@ev_pagesurival_count + " Páginas para se salvarem!",0;
 		hideoffnpc strnpcinfo(0);
 	}
 	end;
 }
 
-job3_guild03,0,0,5	duplicate(PageSurvival)	Página#02	HIDDEN_NPC
-job3_guild03,0,0,5	duplicate(PageSurvival)	Página#03	HIDDEN_NPC
-job3_guild03,0,0,5	duplicate(PageSurvival)	Página#04	HIDDEN_NPC
-job3_guild03,0,0,5	duplicate(PageSurvival)	Página#05	HIDDEN_NPC
-job3_guild03,0,0,5	duplicate(PageSurvival)	Página#06	HIDDEN_NPC
-job3_guild03,0,0,5	duplicate(PageSurvival)	Página#07	HIDDEN_NPC
-job3_guild03,0,0,5	duplicate(PageSurvival)	Página#08	HIDDEN_NPC
+job3_guil03,0,0,5	duplicate(PageSurvival)	Página#02	HIDDEN_NPC
+job3_guil03,0,0,5	duplicate(PageSurvival)	Página#03	HIDDEN_NPC
+job3_guil03,0,0,5	duplicate(PageSurvival)	Página#04	HIDDEN_NPC
+job3_guil03,0,0,5	duplicate(PageSurvival)	Página#05	HIDDEN_NPC
+job3_guil03,0,0,5	duplicate(PageSurvival)	Página#06	HIDDEN_NPC
+job3_guil03,0,0,5	duplicate(PageSurvival)	Página#07	HIDDEN_NPC
+job3_guil03,0,0,5	duplicate(PageSurvival)	Página#08	HIDDEN_NPC
 
 // Função para dar o premio ao jogador.
 function	script	EV_PS_Premium	{
