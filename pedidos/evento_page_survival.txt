@@ -41,7 +41,7 @@
 // .              matar o monstro.                            .
 // *----------------------------------------------------------*
 // Configurações Globais
--	script	Evento Sobrevivênça#Config	-1,{
+-	script	EvSobrevivenca#Config	-1,{
 OnInit:
 	// Configurações
 	set $@ev_pagesurvival, 8;		// Quantidade de Páginas. [Nota 2]
@@ -249,7 +249,7 @@ job3_guil03,0,0,5	script	Página#01::PageSurvival	HIDDEN_NPC,{
 		donpcevent "EventSurvivor::OnEnd";
 	}
 	else if( $@ev_pagesurvival_count > 1 ) {
-		set $@ev_pagesurival_count, $@ev_pagesurvival_count - 1;
+		set $@ev_pagesurvival_count, $@ev_pagesurvival_count - 1;
 		mapannounce "job3_guil03", "Falta apenas encontrar " + $@ev_pagesurival_count + " Páginas para se salvarem!",0;
 		hideoffnpc strnpcinfo(0);
 	}
