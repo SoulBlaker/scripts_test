@@ -267,7 +267,7 @@ job3_guil03,0,0,5	duplicate(PageSurvival)	Página#08	HIDDEN_NPC
 // Função para dar o premio ao jogador.
 function	script	EV_PS_Premium	{
 
-	for( set .@i, 0; .@i < getarraysize($@ev_ps_item); .@i, .@i + 2 )
+	for( set .@i, 0; .@i < getarraysize($@ev_ps_item); set .@i, .@i + 2 )
 	{
 		set .@tmp_itemid[getarraysize(.@tmp_itemid)], $@ev_ps_item[.@i];
 		set .@tmp_itemqt[getarraysize(.@tmp_itemqt)], $@ev_ps_item[(.@i+1)];
