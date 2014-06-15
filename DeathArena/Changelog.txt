@@ -1,4 +1,7 @@
 [2014/06/15] - SoulBlaker
+	++ Completado módulo de gerenciamento de grupos e regras de restrições.
+	Correções nas tabelas sql.
+	++ Adicionado label de eventos para armar e desarmar mapflags das arenas.
 	++ Adicionado funções de gerenciamento de grupos.
 	++ Adicionado menu de gerenciamento de grupos e regras de restrições.
 	Adicionado configurações básicas, menus básicos.

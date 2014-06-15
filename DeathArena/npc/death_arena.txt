@@ -1,4 +1,4 @@
-// [Nota 1]: Ponha 0 para desabilitar esta opção.
+﻿// [Nota 1]: Ponha 0 para desabilitar esta opção.
 // [Nota 2]: Sistema de configurações de avisos na arena.
 //			 [0]: Desabilita avisos na arena.
 //			 [1]: Habilita somente mensagem global no mapa da arena ao matar um jogador.
@@ -11,30 +11,84 @@ OnInit:
 	// *               Configurações                 *
 	// *---------------------------------------------*
 	setarray $@da_BasicSettings$[0],
-						99,								// Nível de GM para Configurações.
-						3,								// Sistema de eventos de avisos na arena. [Nota 2]
-						1,								// Habilitar janela de chat em cima do npc? [Nota 1]
-						"Death Arena",					// Mensagem a ser exibida na janela de chat do npc ou referência sobre o npc. [Requer BasicSettings[2] habilitado]
-						"^E066FF[Death Arena]^000000"	// Nome do npc que será exibido nas janelas de dialogo do npc.
+						99,					// Nível de GM para Configurações.
+						3,					// Sistema de eventos de avisos na arena. [Nota 2]
+						1,					// Habilitar janela de chat em cima do npc? [Nota 1]
+						"Death Arena",				// Mensagem a ser exibida na janela de chat do npc ou referência sobre o npc.
+						"^E066FF[Death Arena]^000000",		// Nome do npc que será exibido nas janelas de dialogo do npc.
+						1					// Checar se caso um item na restrição seja carta se ele está equipado em um equipamento?
 	;
 	
 	setarray $@da_Color$[0],
-						"FF0000",								// Cor hexadecimal para opções de menus com a função de Cancelar.
-						"FFA500",								// Cor hexadecimal para opções de menus com a função de Voltar.
-						"FFA500",								// Cor hexadecimal para opções de menus com a função de Próximo.
-						"0000FF",								// Cor hexadecimal para uma referência um objeto para função.
-						"0000FF",								// Cor hexadecimal para opção do menu de administrador.
-						"0000FF"								// Cor hexadecimal para referência sobre o npc.
+						"FF0000",				// Cor hexadecimal para opções de menus com a função de Cancelar.
+						"FFA500",				// Cor hexadecimal para opções de menus com a função de Voltar.
+						"FFA500",				// Cor hexadecimal para opções de menus com a função de Próximo.
+						"0000FF",				// Cor hexadecimal para uma referência um objeto para função.
+						"0000FF",				// Cor hexadecimal para opção do menu de administrador.
+						"0000FF"				// Cor hexadecimal para referência sobre o npc.
 	;							
 	setarray $@da_DataBase$[0],
-						"da_arena",								// Banco de Dados de arenas.
-						"da_group",								// Banco de Dados do Grupo de restrições.
-						"da_restrictions",						// Banco de Dados das restrições.
-						"da_ranking"							// Banco de Dados do Ranking.
+						"da_arena",				// Banco de Dados de arenas.
+						"da_group",				// Banco de Dados do Grupo de restrições.
+						"da_restrictions",			// Banco de Dados das restrições.
+						"da_ranking"				// Banco de Dados do Ranking.
 	;
 
 
 	bind_atcmd "daconfig", "da_arena::OnManagerScript", atoi($@da_BasicSettings$[0]), atoi($@da_BasicSettings$[0]);
+	doevent "DeathArena::OnLoadMapFlags";
+	end;
+	
+OnLoadMapFlags:
+	for( set .@type, 0; .@type < 2; set .@type, .@type + 1 )
+	{
+		query_sql "SELECT `mapindex`, `group_id` FROM `" + $@da_BasicSettings$[0] + "`", .@mapindex$, .@group_id;
+		
+		for( set .@i, 0; .@i < getarraysize(.@mapindex); set .@i, .@i + 1 )
+		{
+			setmapflag .@mapindex[.@i], mf_nosave;
+			setmapflag .@mapindex[.@i], mf_nomemo;
+			setmapflag .@mapindex[.@i], mf_noteleport;
+			setmapflag .@mapindex[.@i], mf_nowarp;
+			setmapflag .@mapindex[.@i], mf_nowarpto;
+			
+			if( .@type == 1 )
+				setmapflag .@mapindex[.@i], mf_pvp_noguild;
+			else if( .@type == 2 )
+				setmapflag .@mapindex[.@i], mf_pvp_noparty;
+			else
+				setmapflag .@mapindex[.@i], mf_pvp;
+				
+			if( callfunc("GetGroupInfo", 2, .@group_id[.@i]) )
+				setmapflag .@mapindex[.@i], mf_nocommand;
+		}
+	}
+	end;
+	
+OnUnLoadMapFlags:
+	for( set .@type, 0; .@type < 2; set .@type, .@type + 1 )
+	{
+		query_sql "SELECT `mapindex`, `group_id` FROM `" + $@da_BasicSettings$[0] + "`", .@mapindex$, .@group_id;
+		
+		for( set .@i, 0; .@i < getarraysize(.@mapindex); set .@i, .@i + 1 )
+		{
+			removemapflag .@mapindex[.@i], mf_nosave;
+			removemapflag .@mapindex[.@i], mf_nomemo;
+			removemapflag .@mapindex[.@i], mf_noteleport;
+			removemapflag .@mapindex[.@i], mf_nowarp;
+			removemapflag .@mapindex[.@i], mf_nowarpto;
+			
+			if( .@type == 1 )
+				removemapflag .@mapindex[.@i], mf_pvp_noguild;
+			else if( .@type == 2 )
+				removemapflag .@mapindex[.@i], mf_pvp_noparty;
+			else
+				removemapflag .@mapindex[.@i], mf_pvp;
+				
+			if( callfunc("GetGroupInfo", 2, .@group_id[.@i]) )
+				removemapflag .@mapindex[.@i], mf_nocommand;
+		}
+	}
 	end;
 }
 
@@ -317,57 +371,567 @@ OnInit:
 												set .@loop_2, 0;
 												set .@loop_1, 0;
 											}
-											
-											set .@loop_5, 1;
-											while(.@loop_5)
+											else
 											{
-												mes $@da_BasicSettings$[4];
-												mes "Por favor, digite um novo nome para o Grupo ^'" + $@da_Color$[3] + $@groups_name$[.@chooseGroup] + "'^000000.";
-												next;
-												input .@GroupName$;
-											
-												if( !.@GroupName$ || .@GroupName$ == .@goups_name[.@chooseGroup] )
+												set .@loop_5, 1;
+												while(.@loop_5)
 												{
 													mes $@da_BasicSettings$[4];
-													mes "Você deve digitar um novo nome para o Grupo ^'" + $@da_Color$[3] + $@groups_name$[.@chooseGroup] + "'^000000.";
-													mes "Deseja tentar novamente?";
+													mes "Por favor, digite um novo nome para o Grupo ^'" + $@da_Color$[3] + $@groups_name$[.@chooseGroup] + "'^000000.";
 													next;
-													switch( select("- Sim, por favor.", "^" + $@da_Color$[1] + "- Voltar.^000000", ^" + $@da_Color$[0] + "- Cancelar^000000") )
+													input .@GroupName$;
+											
+													if( !.@GroupName$ || .@GroupName$ == .@goups_name[.@chooseGroup] )
+													{
+														mes $@da_BasicSettings$[4];
+														mes "Você deve digitar um novo nome para o Grupo ^'" + $@da_Color$[3] + $@groups_name$[.@chooseGroup] + "'^000000.";
+														mes "Deseja tentar novamente?";
+														next;
+														switch( select("- Sim, por favor.", "^" + $@da_Color$[1] + "- Voltar.^000000", ^" + $@da_Color$[0] + "- Cancelar^000000") )
+														{
+															case 1:
+																break;
+															case 2:
+																set .@loop_5, 0;
+																break;
+															case 3:
+																set .@loop_5, 0;
+																set .@loop_4, 0;
+																set .@loop_3, 0;
+																set .@loop_2, 0;
+																set .@loop_1, 0;
+																break;
+														}
+													}
+													else {
+														mes $@da_BasicSettings$[4];
+														mes "Tem certeza que deseja mudar o nome do Grupo ^'" + $@da_Color$[3] + $@groups_name$[.@chooseGroup] + "'^000000 para ^'" + $@da_Color$[3] + .@GroupName$ + "'^000000?";
+														next;
+														switch( select("- Sim, por favor.", "- Não, digitar outro.", "^" + $@da_Color$[1] + "- Voltar.^000000", ^" + $@da_Color$[0] + "- Cancelar^000000") )
+														{
+															case 1:
+																// Alterar nome do grupo.
+																query_sql "UPDATE `" + $@da_DataBase$[1] + "` SET `name`='" + .@GroupName$ + "' WHERE `auto_id`='" + .@groups_id[.@chooseGroup] + "'";
+																mes $@da_BasicSettings$[4];
+																mes "Nome do Grupo ^'" + $@da_Color$[3] + $@groups_name$[.@chooseGroup] + "'^000000 foi alterado para ^'" + $@da_Color$[3] + .@GroupName$ + "'^000000?";
+																next;
+																set .@loop_5, 0;
+																break;
+															case 2:
+																break;
+															case 4:
+																set .@loop_5, 0;
+																break;
+															case 5:
+																set .@loop_5, 0;
+																set .@loop_4, 0;
+																set .@loop_3, 0;
+																set .@loop_2, 0;
+																set .@loop_1, 0;
+																break;
+														}
+													}
+												}
+											}
+										}
+										break;
+									case 4:
+										// Gerenciar Regras de Restrições.
+										set .@loop_4, 1;
+										while(.@loop_4)
+										{
+											mes $@da_BasicSettings$[4];
+											mes "Selecione o ^" + $@da_Color$[3] + "Grupo de Restrições^000000 que deseja gerenciar.";
+											next;
+											set .@BuildGroupMenu$, "";
+											query_sql "SELECT `auto_id`, `name` FROM `" + $@da_DataBase[1] + "` ORDER BY `name` DESC", .@groups_id, .@groups_name$;
+											
+											for( set .@i, 0; .@i < getarraysize(.@groups_id); set .@i, .@i + 1 )
+												set .@BuildGroupMenu$, .@BuildGroupMenu$ + "- " + .@groups_name$ + ".:";
+												
+											set .@chooseGroup, select(.@BuildGroupMenu$+"^" + $@da_Color$[1] + "- Voltar.^000000":^" + $@da_Color$[0] + "- Cancelar^000000")-1;
+											
+											if( .@chooseGroup == getarraysize(.@groups_id) )
+												set .@loop_4, 0;
+											else if( .@chooseGroup > getarraysize(.@groups_id) )
+											{
+												set .@loop_4, 0;
+												set .@loop_3, 0;
+												set .@loop_2, 0;
+												set .@loop_1, 0;
+											}
+											else
+											{
+												set .@loop_5, 1;												
+												while(.@loop_5)
+												{
+													mes $@da_BasicSettings$[4];
+													mes "O que deseja gerenciar nas Regras do Grupo ^" + $@da_Color$[3] + .@groups_name$[.@chooseGroup] + "^000000?";
+													next;
+													switch( select("- Gerenciar Classes ou Itens.", "- Copiar restrições para outro Grupo.", "^" + $@da_Color$[1] + "- Voltar.^000000", ^" + $@da_Color$[0] + "- Cancelar^000000") )
 													{
 														case 1:
+															// Gerenciar Classes ou Itens.
+															set .@loop_6, 1;
+															while(.@loop_6)
+															{
+																mes $@da_BasicSettings$[4];
+																mes "O que deseja gerenciar de classes e itens nas Regras do Grupo ^'" + $@da_Color$[3] + .@groups_name$[.@chooseGroup] + "'^000000?";
+																next;
+																set .@countItem, callfunc("GetGroupInfo", 2, .@groups_id[.@chooseGroup]);
+																set .@countClass, callfunc("GetGroupInfo", 3, .@groups_id[.@chooseGroup]);
+																switch( select((.@countItem<120?"- Adicionar Itens as Regras de Restrições.":""), (.@countItem?"- Remover Itens das Regras de Restrições.":""), (.@countClass<120?"- Adicionar Classes as Regras de Restrições.":""), (.@countClass?"- Remover Itens das Regras de Restrições.":""), "^" + $@da_Color$[1] + "- Voltar.^000000", ^" + $@da_Color$[0] + "- Cancelar^000000") )
+																{
+																	case 1:
+																		// Adicionar Itens as Regras de Restrições.
+																		set .@loop_7, 1;
+																		while(.@loop_7)
+																		{
+																			mes $@da_BasicSettings$[4];
+																			mes "Por favor, digite o ^" + $@da_Color$[3] + "id do item^000000 que deseja adicionar ao Grupo ^'" + $@da_Color$[3] + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições.";
+																			next;
+																			input .@item_id;
+																			if( !.@item_id || !getitemname(.@item_id) )
+																			{
+																				mes $@da_BasicSettings$[4];
+																				mes "Você deve digitar o ^" + $@da_Color$[3] + "id do item válido^000000 que deseja adicionar ao Grupo ^'" + $@da_Color$[3] + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições.";
+																				mes "Deseja tentar novamente?";
+																				next;
+																				switch( select("- Sim, por favor.", "^" + $@da_Color$[1] + "- Voltar.^000000", ^" + $@da_Color$[0] + "- Cancelar^000000") )
+																				{
+																					case 1:
+																						break;
+																					case 2:
+																						set .@loop_7, 0;
+																						break;
+																					case 3:
+																						set .@loop_7, 0;
+																						set .@loop_6, 0;
+																						set .@loop_5, 0;
+																						set .@loop_4, 0;
+																						set .@loop_3, 0;
+																						set .@loop_2, 0;
+																						set .@loop_1, 0;
+																						break;
+																				}
+																			}
+																			else if( checkRestriction(.@groups_id[.@chooseGroup], .@item_id) )
+																			{
+																				mes $@da_BasicSettings$[4];
+																				mes "O item ^" + $@da_Color$[3] + getitemname(.@item_id) + "^000000 já existe no Grupo ^'" + $@da_Color$[3] + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições.";
+																				mes "Deseja tentar novamente?";
+																				next;
+																				switch( select("- Sim, por favor.", "^" + $@da_Color$[1] + "- Voltar.^000000", ^" + $@da_Color$[0] + "- Cancelar^000000") )
+																				{
+																					case 1:
+																						break;
+																					case 2:
+																						set .@loop_7, 0;
+																						break;
+																					case 3:
+																						set .@loop_7, 0;
+																						set .@loop_6, 0;
+																						set .@loop_5, 0;
+																						set .@loop_4, 0;
+																						set .@loop_3, 0;
+																						set .@loop_2, 0;
+																						set .@loop_1, 0;
+																						break;
+																				}
+																			}
+																			else {
+																				mes $@da_BasicSettings$[4];
+																				mes "Tem certeza que deseja adicionar o item ^'" + $@da_Color$[3] + getitemname(.@item_id) + "'^000000 no Grupo ^'" + $@da_Color$[3] + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições?";
+																				next;
+																				switch( select("- Sim, por favor.", "- Não, desejo adicionar outro item.", "^" + $@da_Color$[1] + "- Voltar.^000000", ^" + $@da_Color$[0] + "- Cancelar^000000") )
+																				{
+																					case 1:
+																						// Adicionar item no grupo de restrição.
+																						query_sql "INSERT INTO `" + $@da_DataBase$[2] + "` (group_id, value, type) VALUES (" + .@goups_id[.@chooseGroup] + ", " + .@item_id + ", 0)";
+																						mes $@da_BasicSettings$[4];
+																						mes "O item ^'" + $@da_Color$[3] + getitemname(.@item_id) + "'^000000 foi adicionado ao Grupo ^'" + $@da_Color$[3] + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições?";
+																						next;
+																						set .@loop_7, 0;
+																						break;
+																					case 2:
+																						break;
+																					case 3:
+																						set .@loop_7, 0;
+																						break;
+																					csae 4:
+																						set .@loop_7, 0;
+																						set .@loop_6, 0;
+																						set .@loop_5, 0;
+																						set .@loop_4, 0;
+																						set .@loop_3, 0;
+																						set .@loop_2, 0;
+																						set .@loop_1, 0;
+																						break;
+																				}
+																			}
+																		}
+																		break;
+																	case 2:
+																		// Remover Itens das Regras de Restrições.
+																		set .@loop_7, 1;
+																		while(.@loop_7)
+																		{
+																			mes $@da_BasicSettings$[4];
+																			mes "Por favor, selecione o item que deseja remover do Grupo '^" .@da_Color$[3] + .@group_name$[.@chooseGroup] + "'^000000 de Restrições.";
+																			next;
+																			query_sql "SELECT `auto_id`, `value` FROM `" + $@da_DataBase$[2] + "` WHERE `type`='0' AND `group_id`='" + .@group_id + "' ORDER BY `value` DESC", .@i_auto_id, .@i_value;
+																		
+																			set .@BuildItemMenu$, "";
+																			for( set .@i, 0; .@i < getarraysize(.@i_auto_id); set .@i, .@i + 1 )
+																				set .@BuildItemMenu$, .@BuildItemMenu$ + "- " + getitemname(.@i_value[.@i]) + ".:";
+																			
+																			set .@chooseItem, select(.@BuildItemMenu$+"^" + $@da_Color$[1] + "- Voltar.^000000":^" + $@da_Color$[0] + "- Cancelar^000000")-1;
+											
+																			if( .@chooseItem == getarraysize(.@i_auto_id) )
+																				set .@loop_7, 0;
+																			else if( .@chooseItem > getarraysize(.@i_auto_id) )
+																			{
+																				set .@loop_7, 0;
+																				set .@loop_6, 0;
+																				set .@loop_5, 0;
+																				set .@loop_4, 0;
+																				set .@loop_3, 0;
+																				set .@loop_2, 0;
+																				set .@loop_1, 0;
+																			}
+																			else {
+																				mes $@da_BasicSettings$[4];
+																				mes "Tem certeza que deseja remover o item ^" + $@da_Color$[3] + getitemname(.@i_value[.@chooseItem]) + "^000000 do Grupo ^'" + $@da_Color$[3] + .@groups_name$[.@chooseItem] + "'^000000 de Restrições?";
+																				next;
+																				switch( select("- Sim, por favor.", "- Não, desejo remover outro item.", "^" + $@da_Color$[1] + "- Voltar.^000000", ^" + $@da_Color$[0] + "- Cancelar^000000") )
+																				{
+																					case 1:
+																						// Remover o item do Grupo de Restrição
+																						query_sql "DELETE FROM `" + $@da_DataBase$[2] + "` WHERE `auto_id`='" + .@i_auto_id[.@chooseItem] + "'";
+																						
+																						mes $@da_BasicSettings$[4];
+																						mes "O item ^" + $@da_Color$[3] + getitemname(.@i_value[.@chooseItem]) + "^000000 foi removido do Grupo ^'" + $@da_Color$[3] + .@groups_name$[.@chooseItem] + "'^000000 de Restrições?";
+																						next;
+																						set .@loop_7, 0;
+																						break;
+																					case 2:
+																						break;
+																					case 3:
+																						set .@loop_7, 0;
+																						break;
+																					case 4:
+																						set .@loop_7, 0;
+																						set .@loop_6, 0;
+																						set .@loop_5, 0;
+																						set .@loop_4, 0;
+																						set .@loop_3, 0;
+																						set .@loop_2, 0;
+																						set .@loop_1, 0;
+																						break;
+																				}
+																			}
+																		}
+																		break;
+																	case 3:
+																		// Adicionar Classes as Regras de Restrições.
+																		set .@loop_7, 1;
+																		while(.@loop_7)
+																		{
+																			mes $@da_BasicSettings$[4];
+																			mes "Por favor, digite o ^" + $@da_Color$[3] + "id da classe^000000 que deseja adicionar ao Grupo ^'" + $@da_Color$[3] + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições.";
+																			next;
+																			input .@class_id;
+																			if( !.@class_id || !jobname(.@class_id) )
+																			{
+																				mes $@da_BasicSettings$[4];
+																				mes "Você deve digitar o ^" + $@da_Color$[3] + "id do classe válido^000000 que deseja adicionar ao Grupo ^'" + $@da_Color$[3] + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições.";
+																				mes "Deseja tentar novamente?";
+																				next;
+																				switch( select("- Sim, por favor.", "^" + $@da_Color$[1] + "- Voltar.^000000", ^" + $@da_Color$[0] + "- Cancelar^000000") )
+																				{
+																					case 1:
+																						break;
+																					case 2:
+																						set .@loop_7, 0;
+																						break;
+																					case 3:
+																						set .@loop_7, 0;
+																						set .@loop_6, 0;
+																						set .@loop_5, 0;
+																						set .@loop_4, 0;
+																						set .@loop_3, 0;
+																						set .@loop_2, 0;
+																						set .@loop_1, 0;
+																						break;
+																				}
+																			}
+																			else if( checkRestriction(.@groups_id[.@chooseGroup], .@class_id) )
+																			{
+																				mes $@da_BasicSettings$[4];
+																				mes "A classe ^" + $@da_Color$[3] + jobname(.@class_id) + "^000000 já existe no Grupo ^'" + $@da_Color$[3] + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições.";
+																				mes "Deseja tentar novamente?";
+																				next;
+																				switch( select("- Sim, por favor.", "^" + $@da_Color$[1] + "- Voltar.^000000", ^" + $@da_Color$[0] + "- Cancelar^000000") )
+																				{
+																					case 1:
+																						break;
+																					case 2:
+																						set .@loop_7, 0;
+																						break;
+																					case 3:
+																						set .@loop_7, 0;
+																						set .@loop_6, 0;
+																						set .@loop_5, 0;
+																						set .@loop_4, 0;
+																						set .@loop_3, 0;
+																						set .@loop_2, 0;
+																						set .@loop_1, 0;
+																						break;
+																				}
+																			}
+																			else {
+																				mes $@da_BasicSettings$[4];
+																				mes "Tem certeza que deseja adicionar a classe ^'" + $@da_Color$[3] + jobname(.@class_id) + "'^000000 no Grupo ^'" + $@da_Color$[3] + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições?";
+																				next;
+																				switch( select("- Sim, por favor.", "- Não, desejo adicionar outra classe.", "^" + $@da_Color$[1] + "- Voltar.^000000", ^" + $@da_Color$[0] + "- Cancelar^000000") )
+																				{
+																					case 1:
+																						// Adicionar classe no grupo de restrição.
+																						query_sql "INSERT INTO `" + $@da_DataBase$[2] + "` (group_id, value, type) VALUES (" + .@goups_id[.@chooseGroup] + ", " + .@class_id + ", 1)";
+																						mes $@da_BasicSettings$[4];
+																						mes "A classe ^'" + $@da_Color$[3] + jobname(.@class_id) + "'^000000 foi adicionada ao Grupo ^'" + $@da_Color$[3] + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições?";
+																						next;
+																						set .@loop_7, 0;
+																						break;
+																					case 2:
+																						break;
+																					case 3:
+																						set .@loop_7, 0;
+																						break;
+																					csae 4:
+																						set .@loop_7, 0;
+																						set .@loop_6, 0;
+																						set .@loop_5, 0;
+																						set .@loop_4, 0;
+																						set .@loop_3, 0;
+																						set .@loop_2, 0;
+																						set .@loop_1, 0;
+																						break;
+																				}
+																			}
+																		}
+																		break;
+																	case 4:
+																		// Remover Classes as Regras de Restrições.
+																		set .@loop_7, 1;
+																		while(.@loop_7)
+																		{
+																			mes $@da_BasicSettings$[4];
+																			mes "Por favor, selecione a classe que deseja remover do Grupo '^" .@da_Color$[3] + .@group_name$[.@chooseGroup] + "'^000000 de Restrições.";
+																			next;
+																			query_sql "SELECT `auto_id`, `value` FROM `" + $@da_DataBase$[2] + "` WHERE `type`='0' AND `group_id`='" + .@group_id + "' ORDER BY `value` DESC", .@c_auto_id, .@c_value;
+																		
+																			set .@BuildItemMenu$, "";
+																			for( set .@i, 0; .@i < getarraysize(.@c_auto_id); set .@i, .@i + 1 )
+																				set .@BuildClassMenu$, .@BuildClassMenu$ + "- " + getitemname(.@c_value[.@i]) + ".:";
+																			
+																			set .@chooseClass, select(.@BuildClassMenu$+"^" + $@da_Color$[1] + "- Voltar.^000000":^" + $@da_Color$[0] + "- Cancelar^000000")-1;
+											
+																			if( .@chooseClass == getarraysize(.@c_auto_id) )
+																				set .@loop_7, 0;
+																			else if( .@chooseClass > getarraysize(.@c_auto_id) )
+																			{
+																				set .@loop_7, 0;
+																				set .@loop_6, 0;
+																				set .@loop_5, 0;
+																				set .@loop_4, 0;
+																				set .@loop_3, 0;
+																				set .@loop_2, 0;
+																				set .@loop_1, 0;
+																			}
+																			else {
+																				mes $@da_BasicSettings$[4];
+																				mes "Tem certeza que deseja remover a classe ^" + $@da_Color$[3] + jobname(.@c_value[.@chooseItem]) + "^000000 do Grupo ^'" + $@da_Color$[3] + .@groups_name$[.@chooseItem] + "'^000000 de Restrições?";
+																				next;
+																				switch( select("- Sim, por favor.", "- Não, desejo remover outra classe.", "^" + $@da_Color$[1] + "- Voltar.^000000", ^" + $@da_Color$[0] + "- Cancelar^000000") )
+																				{
+																					case 1:
+																						// Remover o item do Grupo de Restrição
+																						query_sql "DELETE FROM `" + $@da_DataBase$[2] + "` WHERE `auto_id`='" + .@c_auto_id[.@chooseClass] + "'";
+																						
+																						mes $@da_BasicSettings$[4];
+																						mes "A classe ^" + $@da_Color$[3] + jobname(.@i_value[.@chooseClass]) + "^000000 foi removida do Grupo ^'" + $@da_Color$[3] + .@groups_name$[.@chooseItem] + "'^000000 de Restrições?";
+																						next;
+																						set .@loop_7, 0;
+																						break;
+																					case 2:
+																						break;
+																					case 3:
+																						set .@loop_7, 0;
+																						break;
+																					case 4:
+																						set .@loop_7, 0;
+																						set .@loop_6, 0;
+																						set .@loop_5, 0;
+																						set .@loop_4, 0;
+																						set .@loop_3, 0;
+																						set .@loop_2, 0;
+																						set .@loop_1, 0;
+																						break;
+																				}
+																			}
+																		}
+																		break;
+																	case 5:
+																		set .@loop_6, 0;
+																		break;
+																	case 6:
+																		set .@loop_6, 0;
+																		set .@loop_5, 0;
+																		set .@loop_4, 0;
+																		set .@loop_3, 0;
+																		set .@loop_2, 0;
+																		set .@loop_1, 0;
+																		break;
+																}
+															}
 															break;
 														case 2:
-															set .@loop_5, 0;
+															// Copiar restrições para outro Grupo.
+															set .@loop_6, 1;
+															while(.@loo6_4)
+															{
+																mes $@da_BasicSettings$[4];
+																mes "Selecione o ^" + $@da_Color$[3] + "Grupo de Restrições^000000 no qual você deseja que as restrições do Grupo ^" + $@da_Color$[3] + .@goups_name$[.@chooseGroup]; + "^0000000 seja copiada.";
+																next;
+																set .@BuildtoGroupMenu$, "";
+																
+																for( set .@i, 0; .@i < getarraysize(.@groups_id); set .@i, .@i + 1 )
+																	set .@BuildtoGroupMenu$, .@BuildtoGroupMenu$ + (.@groups_id[.@i]!=.@groups_id[.@chooseGroup]?"- " + .@group_name$[.@i] + ".":"") + ":";
+																	
+																set .@choosetoGroup, select(.@BuildGroupMenu$+"^" + $@da_Color$[1] + "- Voltar.^000000":^" + $@da_Color$[0] + "- Cancelar^000000")-1;
+																
+																if( .@choosetoGroup == getarraysize(.@groups_id) )
+																	set .@loop_6, 0;
+																else if( .@choosetoGroup > getarraysize(.@groups_id) )
+																{
+																	set .@loop_6, 0;
+																	set .@loop_5, 0;
+																	set .@loop_4, 0;
+																	set .@loop_3, 0;
+																	set .@loop_2, 0;
+																	set .@loop_1, 0;
+																}
+																else {
+																	setarray .@copy[0], 0, callfunc("GetGroupInfo", 2, .@groups_id[.@choosetoGroup]), callfunc("GetGroupInfo", 2, .@groups_id[.@chooseGroup]), 0, callfunc("GetGroupInfo", 1, .@groups_id[.@choosetoGroup]), callfunc("GetGroupInfo", 1, .@groups_id[.@chooseGroup]);
+																	set .@loop_7, 0;
+																	while(.@loop_7)
+																	{
+																		if( !.@copy[0] && (.@copy[1]+.@copy[2]) > 120 )
+																		{
+																			mes $@da_BasicSettings$[4];
+																			mes "A quantidade de item cadastrado no grupo no qual você deseja adicionar a cópia com a quantidade de item cadastrado no grupo aonde deseja ser copiado é maior que 120.";
+																			mes "Não é possível mover os valores do item, deseja continuar sem copiar os itens?";
+																			next;
+																			switch( select("- Sim, por favor.", "- Voltar.^000000", ^" + $@da_Color$[0] + "- Cancelar^000000") )
+																			{
+																				case 1:
+																					set .@copy[0], 1;
+																					break;
+																				case 2:
+																					set .@loop_7, 0;
+																					break;
+																				case 3:
+																					set .@loop_7, 0;
+																					set .@loop_6, 0;
+																					set .@loop_5, 0;
+																					set .@loop_4, 0;
+																					set .@loop_3, 0;
+																					set .@loop_2, 0;
+																					set .@loop_1, 0;
+																					break;
+																			}
+																		}
+																		else if( !.@copy[3] && (.@copy[4]+.@copy[5] > 120 )
+																		{
+																			mes $@da_BasicSettings$[4];
+																			mes "A quantidade de classe cadastrada no grupo no qual você deseja adicionar a cópia com a quantidade de classe cadastrada no grupo aonde deseja ser copiado é maior que 120.";
+																			mes "Não é possível mover os valores das classes, deseja continuar sem copiar as classes?";
+																			next;
+																			switch( select("- Sim, por favor.", "- Voltar.^000000", ^" + $@da_Color$[0] + "- Cancelar^000000") )
+																			{
+																				case 1:
+																					set .@copy[3], 1;
+																					break;
+																				case 2:
+																					set .@loop_7, 0;
+																					break;
+																				case 3:
+																					set .@loop_7, 0;
+																					set .@loop_6, 0;
+																					set .@loop_5, 0;
+																					set .@loop_4, 0;
+																					set .@loop_3, 0;
+																					set .@loop_2, 0;
+																					set .@loop_1, 0;
+																					break;
+																			}
+																		}
+																		else if( .@copy[0] && .@copy[3] )
+																		{
+																			mes $@da_BasicSettings$[4];
+																			mes "Não há nada a ser copiado.";
+																			next;
+																			set .@loop_7, 0;
+																			break;
+																		}
+																		else {
+																			mes $@da_BasicSettings$[4];
+																			mes "Tem certeza que deseja copiar as restrições do Grupo ^" + $@da_Color$[3] + .@goups_name$[.@chooseGroup] + "^000000 para o Grupo ^" + $@da_Color$[3] + .@groups_name$[.@choosetoGroup] + "^000000?";
+																			next;
+																			switch( select("- Sim, por favor.", "- Não, desejo selecionar outro grupo.", "- Voltar.^000000", ^" + $@da_Color$[0] + "- Cancelar^000000")) )
+																			{
+																				case 1:
+																					for( set .@i, 0; .@i < 2; set .@i, .@i + 1 )
+																					{
+																						if( (.@i==0&&!.@copy[0]) || (.@i==1&&!.@copy[3]) )
+																						{
+																							query_sql "SELECT `value`, `type` FROM `" + $@da_DataBase$[2] + "` WHERE `type`='" + .@i + "' AND `auto_id`='" + .@groups_id[.@chooseGroup] + "'", .@c_value, .@c_type;
+																							
+																							for( set .@c, 0; .@c < getarraysize(.@c_value); set .@c, .@c + 1 )
+																								query_sql "INSERTO INTO `" + $@da_DataBase[2] + "` (group_id, value, type) VALUES (" + .@groups_id[.@choosetoGroup] + ", " + .@c_value[.@i]", " + .@c_type[.@i] + ")";
+																						}
+																					}
+																					mes $@da_BasicSettings$[4];
+																					mes "Foi feito uma copia das restrições do Grupo ^" + $@da_Color$[3] + .@goups_name$[.@chooseGroup] + "^000000 para o Grupo ^" + $@da_Color$[3] + .@groups_name$[.@choosetoGroup] + "^000000?";
+																					next;
+																					next;
+																					set .@loop_7, 0;
+																					break;
+																				case 2:
+																					break;
+																				case 3:
+																					set .@loop_7, 0;
+																					break;
+																				case 4:
+																					set .@loop_7, 0;
+																					set .@loop_6, 0;
+																					set .@loop_5, 0;
+																					set .@loop_4, 0;
+																					set .@loop_3, 0;
+																					set .@loop_2, 0;
+																					set .@loop_1, 0;
+																					break;
+																			}
+																		}
+																	}
+																}
+															}
 															break;
 														case 3:
 															set .@loop_5, 0;
-															set .@loop_4, 0;
-															set .@loop_3, 0;
-															set .@loop_2, 0;
-															set .@loop_1, 0;
-															break;
-													}
-												}
-												else {
-													mes $@da_BasicSettings$[4];
-													mes "Tem certeza que deseja mudar o nome do Grupo ^'" + $@da_Color$[3] + $@groups_name$[.@chooseGroup] + "'^000000 para ^'" + $@da_Color$[3] + .@GroupName$ + "'^000000?";
-													next;
-													switch( select("- Sim, por favor.", "- Não, digitar outro.", "^" + $@da_Color$[1] + "- Voltar.^000000", ^" + $@da_Color$[0] + "- Cancelar^000000") )
-													{
-														case 1:
-															// Alterar nome do grupo.
-															query_sql "UPDATE `" + $@da_DataBase$[1] + "` SET `name`='" + .@GroupName$ + "' WHERE `auto_id`='" + .@groups_id[.@chooseGroup] + "'";
-															mes $@da_BasicSettings$[4];
-															mes "Nome do Grupo ^'" + $@da_Color$[3] + $@groups_name$[.@chooseGroup] + "'^000000 foi alterado para ^'" + $@da_Color$[3] + .@GroupName$ + "'^000000?";
-															next;
-															set .@loop_5, 0;
-															break;
-														case 2:
 															break;
 														case 4:
-															set .@loop_5, 0;
-															break;
-														case 5:
 															set .@loop_5, 0;
 															set .@loop_4, 0;
 															set .@loop_3, 0;
@@ -379,8 +943,6 @@ OnInit:
 											}
 										}
 										break;
-									case 4:
-										// Gerenciar Regras de Restrições.
 									case 5:
 										set .@loop_3, 0;
 										break;
@@ -424,7 +986,7 @@ OnInit:
 
 // Funções
 
-	//	* getGroupInfo(type {,id})
+	// * getGroupInfo(type {,id})
 	//		type: Tipo da informação que deseja adquirir.
 	//				[0]: Total de grupos cadastrado.
 	//				[1]: Total de arenas cadastrada de um grupo.
@@ -436,5 +998,11 @@ OnInit:
 	function	script	GetGroupInfo	{
 		return false;
 	}
-
+	
+	// * checkRestriction(value, id)
+	//		value: Id do item ou classe que deseja checar se existe nas restrições.
+	//		id: Id do grupo a ser checado.
+	function	script	CheckRestriction	{
+		return false;
+	}
 }

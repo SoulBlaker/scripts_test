@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `da_arena` (
 	`max_player` int(4) NOT NULL default '0',
 	`max_level` int(4) unsigned NOT NULL default '0',
 	`min_level` int(4) unsigned NOT NULL default '0',
-	`group_id` int(11) unsgigned NOT NULL default '0',
+	`group_id` int(11) unsigned NOT NULL default '0',
 	 PRIMARY KEY (`auto_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1;
 
@@ -43,9 +43,9 @@ CREATE TABLE IF NOT EXISTS `da_group` (
 --- }
 CREATE TABLE IF NOT EXISTS `da_restrictions` (
 	`auto_id` int(11) unsigned NOT NULL auto_increment,
-	`group_id` int(11) unsgigned NOT NULL default '0',
-	`value` int(11) unsgigned NOT NULL default '0',
-	`type` int(1) unsgigned NOT NULL default '0',
+	`group_id` int(11) unsigned  NOT NULL default '0',
+	`value` int(11) unsigned NOT NULL default '0',
+	`type` int(1) unsigned NOT NULL default '0',
 	 PRIMARY KEY (`auto_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1;
 
@@ -59,10 +59,10 @@ CREATE TABLE IF NOT EXISTS `da_restrictions` (
 --- }
 CREATE TABLE IF NOT EXISTS `da_ranking` (
 	`auto_id` int(11) unsigned NOT NULL auto_increment,
-	`object_id` int(11) unsgigned NOT NULL default '0',
-	`type` int(1) unsgigned NOT NULL default '0',
-	`wins` int(4) unsgigned NOT NULL default '0',
-	`loss` int(4) unsgigned NOT NULL default '0',
-	`ration` int(4) unsgigned NOT NULL default '0',
+	`object_id` int(11) unsigned NOT NULL default '0',
+	`type` int(1) unsigned NOT NULL default '0',
+	`wins` int(4) unsigned NOT NULL default '0',
+	`loss` int(4) unsigned NOT NULL default '0',
+	`ration` int(4) unsigned NOT NULL default '0',
 	 PRIMARY KEY (`auto_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1;
