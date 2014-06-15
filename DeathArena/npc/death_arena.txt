@@ -8,26 +8,29 @@
 
 OnInit:
 	// *---------------------------------------------*
-	// *				Configurações				 *
+	// *               Configurações                 *
 	// *---------------------------------------------*
-	setarray $@da_BasicSettings$[0],	99,								// Nível de GM para Configurações.
-										3,								// Sistema de eventos de avisos na arena. [Nota 2]
-										1,								// Habilitar janela de chat em cima do npc? [Nota 1]
-										"Death Arena",					// Mensagem a ser exibida na janela de chat do npc ou referência sobre o npc. [Requer BasicSettings[2] habilitado]
-										"^E066FF[Death Arena]^000000"	// Nome do npc que será exibido nas janelas de dialogo do npc.
+	setarray $@da_BasicSettings$[0],
+						99,								// Nível de GM para Configurações.
+						3,								// Sistema de eventos de avisos na arena. [Nota 2]
+						1,								// Habilitar janela de chat em cima do npc? [Nota 1]
+						"Death Arena",					// Mensagem a ser exibida na janela de chat do npc ou referência sobre o npc. [Requer BasicSettings[2] habilitado]
+						"^E066FF[Death Arena]^000000"	// Nome do npc que será exibido nas janelas de dialogo do npc.
 	;
 	
-	setarray $@da_Color$[0],	"FF0000",								// Cor hexadecimal para opções de menus com a função de Cancelar.
-								"FFA500",								// Cor hexadecimal para opções de menus com a função de Voltar.
-								"FFA500",								// Cor hexadecimal para opções de menus com a função de Próximo.
-								"0000FF",								// Cor hexadecimal para uma referência um objeto para função.
-								"0000FF",								// Cor hexadecimal para opção do menu de administrador.
-								"0000FF"								// Cor hexadecimal para referência sobre o npc.
+	setarray $@da_Color$[0],
+						"FF0000",								// Cor hexadecimal para opções de menus com a função de Cancelar.
+						"FFA500",								// Cor hexadecimal para opções de menus com a função de Voltar.
+						"FFA500",								// Cor hexadecimal para opções de menus com a função de Próximo.
+						"0000FF",								// Cor hexadecimal para uma referência um objeto para função.
+						"0000FF",								// Cor hexadecimal para opção do menu de administrador.
+						"0000FF"								// Cor hexadecimal para referência sobre o npc.
 	;							
-	setarray $@da_DataBase$[0],	"da_arena",								// Banco de Dados de arenas.
-								"da_group",								// Banco de Dados do Grupo de restrições.
-								"da_restrictions",						// Banco de Dados das restrições.
-								"da_ranking"							// Banco de Dados do Ranking.
+	setarray $@da_DataBase$[0],
+						"da_arena",								// Banco de Dados de arenas.
+						"da_group",								// Banco de Dados do Grupo de restrições.
+						"da_restrictions",						// Banco de Dados das restrições.
+						"da_ranking"							// Banco de Dados do Ranking.
 	;
 
 
