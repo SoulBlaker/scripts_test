@@ -1,4 +1,5 @@
 [2014/06/15] - SoulBlaker
+	++ Adicionado funções de gerenciamento de grupos.
 	++ Adicionado menu de gerenciamento de grupos e regras de restrições.
 	Adicionado configurações básicas, menus básicos.
 	Adicionado npc death_arena.
