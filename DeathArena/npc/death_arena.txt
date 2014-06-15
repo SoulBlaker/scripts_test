@@ -1,0 +1,203 @@
+// [Nota 1]: Ponha 0 para desabilitar esta opção.
+// [Nota 2]: Sistema de configurações de avisos na arena.
+//			 [0]: Desabilita avisos na arena.
+//			 [1]: Habilita somente mensagem global no mapa da arena ao matar um jogador.
+//			 [2]: Habilita somente sons de eventos ao matar um jogador.
+//			 [3]: Habilita mensagem global no mapa da arena e sons de eventos ao matar um jogador.
+-	script	DeathArena#Main::DeathArena	-1,{
+
+OnInit:
+	// *---------------------------------------------*
+	// *				Configurações				 *
+	// *---------------------------------------------*
+	setarray $@da_BasicSettings$[0],	99,								// Nível de GM para Configurações.
+										3,								// Sistema de eventos de avisos na arena. [Nota 2]
+										1,								// Habilitar janela de chat em cima do npc? [Nota 1]
+										"Death Arena",					// Mensagem a ser exibida na janela de chat do npc ou referência sobre o npc. [Requer BasicSettings[2] habilitado]
+										"^E066FF[Death Arena]^000000"	// Nome do npc que será exibido nas janelas de dialogo do npc.
+	;
+	
+	setarray $@da_Color$[0],	"FF0000",								// Cor hexadecimal para opções de menus com a função de Cancelar.
+								"FFA500",								// Cor hexadecimal para opções de menus com a função de Voltar.
+								"FFA500",								// Cor hexadecimal para opções de menus com a função de Próximo.
+								"0000FF",								// Cor hexadecimal para uma referência um objeto para função.
+								"0000FF",								// Cor hexadecimal para opção do menu de administrador.
+								"0000FF"								// Cor hexadecimal para referência sobre o npc.
+	;							
+	setarray $@da_DataBase$[0],	"da_arena",								// Banco de Dados de arenas.
+								"da_group",								// Banco de Dados do Grupo de restrições.
+								"da_restrictions",						// Banco de Dados das restrições.
+								"da_ranking"							// Banco de Dados do Ranking.
+	;
+
+
+	bind_atcmd "daconfig", "da_arena::OnManagerScript", atoi($@da_BasicSettings$[0]), atoi($@da_BasicSettings$[0]);
+	end;
+}
+
+-	script	Death Arena#da_arena01::da_arena	-1,{
+
+	set .@loop_1, 1;
+	while(.@loop_1)
+	{
+		mes $@da_BasicSettings$[4];
+		mes "Bem-vindo a " + $@da_BasicSettings$[4] + ".";
+		mes "Em que posso ajudar?";
+		next;
+		switch( select("- Ír para uma arena.", "- Ranking.", (getgmlevel()>=atoi($@da_BasicSettings$[0])?"^"+ $@da_Color$[4] + "- Gerenciar script."^000000"), "^" + $@da_Color$[0] + "- Cancelar."^000000") )
+		{
+			case 1:
+				// Ír para um arena.
+			case 2:
+				// Raking.
+			case 3:
+			OnManagerScript: //atcmd_func
+				// Gerenciar script.
+				set .@loop_2, 1;
+				while(.@loop_2)
+				{
+					mes $@da_BasicSettings$[4];
+					mes "O que deseja gerenciar na ^" + $@da_Color$[5] + $@da_BasicSettings$[4] + "^000000?";
+					next;
+					switch( select("- Gerenciar Grupos de Restrições.", "- Gerenciar Arenas.", "- Gerenciar Ranking.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.") )
+					{
+						case 1:
+							// Gerenciar Grupos de Restrições.
+							set .@loop_3, 1;
+							while(.@loop_3)
+							{
+								mes $@da_BasicSettings$[4];
+								mes "O que deseja gerenciar no ^" + $@da_Color$[3] + "Grupos de Restrições^000000?";
+								next;
+								switch( select("- Adicionar Grupo.", "- Remover Grupo.", "- Alterar nome de um Grupo.", "- Gerenciar Regras de Restrições.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[1] + "- Cancelar.^000000") )
+								{
+									case 1:
+										// Adicionar Grupo.
+										if( callfunc("GetGroupInfo", 0) >= 120 )
+										{
+											mes $@da_BasicSettings$[4];
+											mes "O limite máximo de ^" + $@da_Color$[3] + "Grupos de Restrições^000000 já foi atingido.";
+											next;
+											break;
+										}
+										
+										set .@loop_4, 0;
+										while(.@loop_4)
+										{
+											mes $@da_BasicSettings$[4];
+											mes "Por favor, digite o nome para o novo ^" + $@da_Color$[3] + "Grupo de Restrições^0000000.";
+											next;
+											input .@GroupName$;
+										
+											if( !.@GroupName$ )
+											{
+												mes $@da_BasicSettings$[4];
+												mes "Você tem que digitar um nome para o novo ^" + $@da_Color$[3] + "Grupo de Restrições^000000!";
+												mes "Deseja tentar novamente?";
+												next;
+												switch( select("- Sim, por favor.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar^000000") )
+												{
+													case 1:
+														break;
+													case 2:
+														set .@loop_4, 0;
+														break;
+													case 3:
+														set .@loop_4, 0;
+														set .@loop_3, 0;
+														set .@loop_2, 0;
+														set .@loop_1, 0;
+														break;
+												}
+											}
+											else {
+												mes $@da_BasicSettings$[4];
+												mes "Você tem certeza que deseja adicionar ^" + .@da_Color$[3] + "'" + .@GroupName$ + "'^000000 ao ^" + $@da_Color$[3] + "Grupos de Restrições^000000?";
+												next;
+												switch( select("- Sim, por favor.", "- Não, desejo adicionar outro.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar^000000") )
+												{
+													case 1:
+														// Adicionar ao grupo de restrições.
+														query_sql "INSERT INTO `" + $@da_DataBase$[1] + "` (name) VALUES ('" + .@GroupName$ + "')";
+														mes $@da_BasicSettings$[4];
+														mes "O Grupo ^'" + $@da_Color$[3] + .@GroupName$ "'^000000 foi adicionado!";
+														mes "Para adicionar restrições a este grupo, vá até ao menu de ^" + $@da_Color$[3] + "Gerenciar Regras de Restrições^000000.";
+														next;
+														set .@loop_4, 0;
+														break;
+													case 2:
+														break;
+													case 3:
+														set .@loop_4, 0;
+														break;
+													case 4:
+														set .@loop_4, 0;
+														set .@loop_3, 0;
+														set .@loop_2, 0;
+														set .@loop_1, 0;
+														break;
+												}
+											}
+										}
+										break;
+									case 2:
+										// Remover Grupo.
+									case 3:
+										// Alterar nome de um Grupo.
+									case 4:
+										// Gerenciar Regras de Restrições.
+									case 5:
+										set .@loop_3, 0;
+										break;
+									case 6:
+										set .@loop_3, 0;
+										set .@loop_2, 0;
+										set .@loop_1, 0;
+										break;
+								}
+							}
+							break;
+						case 2:
+							// Gerenciar Arenas.
+						case 3:
+							// Gerenciar Raking.
+						case 4:
+							set .@loop_2, 0;
+							break;
+						case 5:
+							set .@loop_1, 0;
+							set .@loop_2, 0;
+							break;
+					}
+				}
+				break;
+			case 4:
+				set .@loop_1, 0;
+				break;
+		}
+	}
+	
+	mes $@da_BasicSettings$[4];
+	mes "Volte quando desejar batalhar em uma arena!";
+	close;
+	
+OnInit:
+	if( atoi($@da_BasicSettings$[2]) )
+		waitingroom $@da_BasicSettings$[3];
+	end;
+}
+
+// Funções
+
+	//	* getGroupInfo(type {,id})
+	//		type: Tipo da informação que deseja adquirir.
+	//				[0]: Total de grupos cadastrado.
+	//				[1]: Total de itens cadastrado na restrição de um grupo.
+	//					id: Identificação do grupo.
+	//				[2]: Total de classes cadastrada na restrição de um grupo.
+	//					id: Identificação da classe.
+	function	script	GetGroupInfo	{
+		return false;
+	}
+
+}

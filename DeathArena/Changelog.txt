@@ -1,0 +1,6 @@
+[2014/06/15] - SoulBlaker
+	++ Adicionado menu de gerenciamento de grupos e regras de restrições.
+	Adicionado configurações básicas, menus básicos.
+	Adicionado npc death_arena.
+	Criado banco de dados.
+	Criado estrutura do projeto.
