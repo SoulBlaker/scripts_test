@@ -1,4 +1,5 @@
-[2014/06/19] - SoulBlaker
+[2014/06/16] - SoulBlaker
+	++ Adicionado mais funções ao módulo de gerenciar arenas.
 	++ Adicionado template da visualização full do rank pvp.
 	++ Adicionado módulo de cadastro de arenas.
 [2014/06/15] - SoulBlaker
