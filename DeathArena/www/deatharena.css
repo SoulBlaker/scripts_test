@@ -1,0 +1,33 @@
+body { background-color:#000000; margin: 2% 2% 2% 20%; position:absolute; }
+			
+#layout {
+	position:relative;
+}
+			
+#logo { 
+	width: 270px;
+}
+		
+#logo img { width: 250px; }
+			
+#contents { width: 800px; background-color:#FFFFFF; position:relative; padding:1%; }
+			
+#menu { background-color:#000000;  }
+#menu, #footer {  width:98%; text-align:center; position:relative; padding:1%; color:#FFFFFF; font-family: "Lucida Console", Monaco, monospace; font-size:14px; }
+#menu span { padding-left: 2%; padding-right: 2%; }
+#menu a { color:#FFFFFF; text-decoration: none; padding:1%; }
+#menu a:hover { background-color:#c45d6f; color:#FFFFFF; }
+		
+#filter-bar { float: right; }
+#page-bar { text-align: right; }
+#filter-bar select, #filter-bar select option, #page-bar select, #page-bar select option { border: 1px solid #c45d6f; color:#c45d6f; }
+			
+#rank { padding-top:2%; padding-bottom: 2%;	}	
+#rank table { border:0px; width:100%; border-spacing:0px; font-family: "Lucida Console", Monaco, monospace; }
+#rank table #title { background-color:#c45d6f; color:#FFFFFF; }
+#rank table #title td, #rank table #line-0 td, #rank table #line-1 td { padding-top:5px; padding-bottom:5px; font-size:13px; text-align:center; }
+#rank table #line-0, #rank table #line-1 { color:#000; font-family: "Lucida Console", Monaco, monospace; font-size:12px; text-align:center; }
+#rank table #line-0 { background:#CDC9C9; }
+#footer { font-size:12px; background-color:#c45d6f; }
+#footer a { color:#FFFFFF; text-decoration:none; }
+#footer a:hover { text-decoration:underline; }

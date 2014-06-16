@@ -579,7 +579,7 @@ OnUnLoadMapFlags:
 																			mes $@da_BasicSettings$[4];
 																			mes "Por favor, selecione o item que deseja remover do Grupo '^" .@da_Color$[3] + .@group_name$[.@chooseGroup] + "'^000000 de Restrições.";
 																			next;
-																			query_sql "SELECT `auto_id`, `value` FROM `" + $@da_DataBase$[2] + "` WHERE `type`='0' AND `group_id`='" + .@group_id + "' ORDER BY `value` DESC", .@i_auto_id, .@i_value;
+																			query_sql "SELECT `auto_id`, `value` FROM `" + $@da_DataBase$[2] + "` WHERE `type`='0' AND `group_id`='" + .@groups_id[.@chooseGroup] + "' ORDER BY `value` DESC", .@i_auto_id, .@i_value;
 																		
 																			set .@BuildItemMenu$, "";
 																			for( set .@i, 0; .@i < getarraysize(.@i_auto_id); set .@i, .@i + 1 )
@@ -729,7 +729,7 @@ OnUnLoadMapFlags:
 																			mes $@da_BasicSettings$[4];
 																			mes "Por favor, selecione a classe que deseja remover do Grupo '^" .@da_Color$[3] + .@group_name$[.@chooseGroup] + "'^000000 de Restrições.";
 																			next;
-																			query_sql "SELECT `auto_id`, `value` FROM `" + $@da_DataBase$[2] + "` WHERE `type`='0' AND `group_id`='" + .@group_id + "' ORDER BY `value` DESC", .@c_auto_id, .@c_value;
+																			query_sql "SELECT `auto_id`, `value` FROM `" + $@da_DataBase$[2] + "` WHERE `type`='0' AND `group_id`='" + .@groups_id[.@chooseGroup] + "' ORDER BY `value` DESC", .@c_auto_id, .@c_value;
 																		
 																			set .@BuildItemMenu$, "";
 																			for( set .@i, 0; .@i < getarraysize(.@c_auto_id); set .@i, .@i + 1 )
@@ -809,7 +809,7 @@ OnUnLoadMapFlags:
 																for( set .@i, 0; .@i < getarraysize(.@groups_id); set .@i, .@i + 1 )
 																	set .@BuildtoGroupMenu$, .@BuildtoGroupMenu$ + (.@groups_id[.@i]!=.@groups_id[.@chooseGroup]?"- " + .@group_name$[.@i] + ".":"") + ":";
 																	
-																set .@choosetoGroup, select(.@BuildGroupMenu$+"^" + $@da_Color$[1] + "- Voltar.^000000":^" + $@da_Color$[0] + "- Cancelar^000000")-1;
+																set .@choosetoGroup, select(.@BuildtoGroupMenu$+"^" + $@da_Color$[1] + "- Voltar.^000000":^" + $@da_Color$[0] + "- Cancelar^000000")-1;
 																
 																if( .@choosetoGroup == getarraysize(.@groups_id) )
 																	set .@loop_6, 0;
@@ -956,6 +956,303 @@ OnUnLoadMapFlags:
 							break;
 						case 2:
 							// Gerenciar Arenas.
+							set .@loop_3, 1;
+							while(.@loop_3)
+							{
+								mes $@da_BasicSettings$[4];
+								mes "O que deseja gerenciar nas ^" + $@da_Color$[3] + "Arenas^000000?";
+								next;
+								switch( select("- Adicionar uma Arena.", "- Remover uma Arena.", "- Alterar uma Arena.", "^" + $@da_Color$[1] + "- Voltar.^000000", ^" + $@da_Color$[0] + "- Cancelar^000000") )
+								{
+									case 1:
+										// Adicionar uma Arena.
+										set .@loop_4, 1;
+										while(.@loop_4)
+										{
+											mes $@da_BasicSettings$[4];
+											mes "Por favor, escolha um tipo para a nova ^" + $@da_Color$[3] + "Arenas^000000?";
+											next;
+											set .@type, select("- Jogadores vs Jogadores.", "- Clãns vs Clãns.", "- Grupos vs Grupos.", "^" + $@da_Color$[1] + "- Voltar.^000000", ^" + $@da_Color$[0] + "- Cancelar^000000")-1;
+											switch(.@type)
+											{
+												default:
+													setarray .@mask_name$, "Jogadores", "Clãns", "Grupos";
+													
+													set .@loop_5, 1;
+													while(.@loop_5)
+													{
+														mes $@da_BasicSettings$[4];
+														mes "Por favor, digite o nome para a nova arena de ^" + $@da_Color$[3] + .@mask_name$[.@type] + "^000000.";
+														next;
+														input .@Name$;
+														if( !.@Name$ )
+														{
+															mes $@da_BasicSettings$[4];
+															mes "Você tem que digitar um nome para a nova arena de ^" + $@da_Color$[3] + .@mask_name$[.@type] + "^000000.";
+															mes "Deseja tentar novamente?";
+															next;
+															switch( select("- Sim, por favor.", "^" + $@da_Color$[1] + "- Voltar.^000000", ^" + $@da_Color$[0] + "- Cancelar^000000") )
+															{
+																case 1:
+																	break;
+																case 2:
+																	set .@loop_5, 0;
+																	break;
+																case 3:
+																	set .@loop_5, 0;
+																	set .@loop_4, 0;
+																	set .@loop_3, 0;
+																	set .@loop_2, 0;
+																	set .@loop_1, 0;
+																	break;
+															}
+														}
+														else {
+															set .@loop_6, 0;
+															mes $@da_BasicSettings$[4];
+															mes "Por favor, digite o mapa aonde vai ser a arena ^" + $@da_Color$[3] + .@Name$ + "^000000.";
+															next;
+															input .@MapIndex$;
+															if( !.@MapIndex$ )
+															{
+																mes $@da_BasicSettings$[4];
+																mes "Você tem que digitar o mapa aonde vai ser a arena ^" + $@da_Color$[3] + .@Name$ + "^000000.";
+																mes "Deseja tentar novamente?";
+																next;
+																switch( select("- Sim, por favor.", "^" + $@da_Color$[1] + "- Voltar.^000000", ^" + $@da_Color$[0] + "- Cancelar^000000") )
+																{
+																	case 1:
+																		break;
+																	case 2:
+																		set .@loop_6, 0;
+																		break;
+																	case 3:
+																		set .@loop_6, 0;
+																		set .@loop_5, 0;
+																		set .@loop_4, 0;
+																		set .@loop_3, 0;
+																		set .@loop_2, 0;
+																		set .@loop_1, 0;
+																		break;
+																}
+															}
+															else {
+																set .@loop_7, 1;
+																while(.@loop_7)
+																{
+																	mes $@da_BasicSettings$[4];
+																	mes "Por favor, digite a coordenada x aonde os jogadores serão teleportados no mapa ^" + $@da_Color$[3] + .@MapIndex$ + "^000000.";
+																	mes "Digite 0 para os jogadores serem teleportado aleatóriamente e as coordenadas y serão configurada para 0.";
+																	next;
+																	input .@CoordX;
+																	
+																	if( .@CoordX )
+																	{
+																		mes $@da_BasicSettings$[4];
+																		mes "Por favor, digite a coordenada y aonde os jogadores serão teleportados no mapa ^" + $@da_Color$[3] + .@MapIndex$ + "^000000.";
+																		mes "Digite 0 para os jogadores serem teleportado aleatóriamente e as coordenadas x serão configurada para 0.";
+																		next;
+																		input .@CoordY;
+																		if( !.@CoordY ) set .@CoordX, 0;
+																	}
+																	else
+																		set .@CoordY, 0;
+																		
+																	mes $@da_BasicSettings$[4];
+																	mes "Tem certeza que deseja adicionar as coordenadas ^" + $@da_Color$[3] +"x[" + (.@CoordX?.@CoordX:"aleatório") + "] y[" + (.@CoordY?.@CoordY:"alterório") + "]^000000 para o mapa ^" + $@da_Color$[3] + .@MapIndex$ + "^000000?";
+																	next;
+																	switch( select("- Sim, por favor.", "- Não, desejo adicionar outras coordenadas.", "^" + $@da_Color$[1] + "- Voltar.^000000", ^" + $@da_Color$[0] + "- Cancelar^000000") )
+																	{
+																		case 1:
+																			set .@loop_8, 1;
+																			while(.@loop_8)
+																			{
+																				mes $@da_BasicSettings$[4];
+																				mes "Por favor, digite o máximo de jogadores que podem acessar a arena ^" + $@da_Color$[3] + .@Name$ + "^000000.";
+																				mes "Digite 0 para que o acesso a a arena seja ilimitado.";
+																				next;
+																				input .@MaxPlayer;
+																				
+																				mes $@da_BasicSettings$[4];
+																				mes "Por favor, digite o nível minimo de base para jogadores poderem acessar a arena ^" + $@da_Color$[3] + .@Name$ + "^000000.";
+																				mes "Digite 0 para que o nível minimo de base seja desabilitado.";
+																				next;
+																				input .@MinBaseLevel;
+																				
+																				mes $@da_BasicSettings$[4];
+																				mes "Por favor, digite o nível máximo de base para jogadores poderem acessar a arena ^" + $@da_Color$[3] + .@Name$ + "^000000.";
+																				mes "Digite 0 para que o nível máximo de base seja desabilitado.";
+																				next;
+																				input .@MinBaseLevel;
+																				
+																				mes $@da_BasicSettings$[4];
+																				mes "Tem certeza que o máximo de jogadores a entrar na arena seja ^" + $@da_Color$[3] + (.@MaxPlayer?.@MaxPlayer:"ilimitado") + "^000000, o nível minimo de base seja ^" + $@da_Color$[3] + (.@MinBaseLevel?.@MinBaseLevel:"desabilitado") + "^000000 e o nível máximo de base seja ^" + $@da_Color$[3] + (.@MaxBaseLevel?.@MaxBaseLevel:"desabilitado") + "^000000?";
+																				next;
+																				switch( select("- Sim, por favor.", "- Não, desejo mudar.", "^" + $@da_Color$[1] + "- Voltar.^000000", ^" + $@da_Color$[0] + "- Cancelar^000000") )
+																				{
+																					case 1:
+																						set .@loop_9, 1;
+																						while(.@loop_9)
+																						{
+																							mes $@da_BasicSettings$[4];
+																							mes "Por favor, selecione o ^" + $@da_Color$[3] + "'Grupo de Restrições'^000000 que deseja adicionar a arena ^" + $@da_Color$[3] + .@Name$ + "^000000.";
+																							next;
+																							query_sql "SELECT `auto_id`, `name` FROM `" + $@da_DataBase[1] + "` ORDER BY `name` DESC", .@groups_id, .@groups_name$;
+
+																							set .@BuildGroupMenu$, "";
+																							for( set .@i, 0; .@i < getarraysize(.@groups_id); set .@i, .@i + 1 )
+																								set .@BuildGroupMenu$, .@BuildGroupMenu$ + (callfunc("GetGroupInfo", 1, .@groups_id$[.@i])<120?"- " + .@groups_name$[.@i] + ".":"") + ":";
+																								
+																							set .@chooseGroup, select(.@BuildGroupMenu$+"^" + $@da_Color$[1] + "- Voltar.^000000":^" + $@da_Color$[0] + "- Cancelar^000000")-1;
+																							
+																							if( .@chooseGroup == getarraysize(.@groups_id) )
+																								set .@loop_9, 0;
+																							else if( .@chooseGroup > getarraysize(.@groups_id) )
+																							{
+																								set .@loop_9, 0;
+																								set .@loop_8, 0;
+																								set .@loop_7, 0;
+																								set .@loop_6, 0;
+																								set .@loop_5, 0;
+																								set .@loop_4, 0;
+																								set .@loop_3, 0;
+																								set .@loop_2, 0;
+																								set .@loop_1, 0;
+																							}
+																							else {
+																								mes $@da_BasicSettings$[4];
+																								mes "Tem certeza que deseja adicionar o grupo ^'" + $@da_Color$[3] + .@groups_name$[.@chooseGroup] + "^0000000 de restrições' na arena ^" + $@da_Color$[3] + .@Name$ + "^000000?";
+																								next;
+																								switch( select("- Sim, por favor.", "- Não, desejo selecionar outro grupo.", "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar^000000") )
+																								{
+																									case 1:
+																										mes $@da_BasicSettings$[4];
+																										mes "Por favor, confirme as informações abaixo para concluír o cadastrado da arena:";
+																										mes " ";
+																										mes $@da_Color$[3] + "Arena:^000000 " + .@Name$;
+																										mes $@da_Color$[3] + "Tipo:^000000 " + .@mask_name$[.@type];
+																										mes $@da_Color$[3] + "Grupo de Restrições:^000000 "+ .@groups_name$[.@chooseGroup];
+																										mes $@da_Color$[3] + "Mapa:^000000 " + .@MapIndex$;
+																										mes $@da_Color$[3] + "Coordenadas:^000000 " + (.@CoordX&&.@CoordY?"x[" + .@CoordX + "] - y[" + .@CoordY + "]":"aleatória");
+																										mes $@da_Color$[3] + "Máximo de Jogadores:^000000 " + (.@MaxPlayer?.@MaxPlayer:"ilimitado");
+																										mes $@da_Color$[3] + "Nível Minimo:^000000 " + (.@MinBaseLevel?.@MinBaseLevel?"desabilitado");
+																										mes $@da_Color$[3] + "Nível Máximo:^000000 " + (.@MaxBaseLevel?.@MaxBaseLevel?"desabilitado");
+																										next;
+																										switch( select("- Sim, está tudo correto.", "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar^000000") )
+																										{
+																											case 1:
+																												// Adicionar arena.
+																												query_sql "INSERT INTO `" + $@da_DataBase$[0] + "` (map_index, coord_x, coord_y, name, type, max_player, max_level, min_level, group_id) VALUES('" + .@MapIndex$ + "', " + .@CoordX + ", " + .@CoordY + ", '" + .@Name$ + "', " + .@type + ", " + .@MaxPlayer + ", " + @MaxBaseLevel + ", " + .@MinBaseLevel + ", " + .@groups_id[.@chooseGroup] + ")";
+																												mes $@da_BasicSettings$[4];
+																												mes "A arena '" + $@da_Color$[3] + .@Name$ + "' foi adicionada.";
+																												next;
+																												set .@loop_9, 0;
+																												set .@loop_8, 0;
+																												set .@loop_7, 0;
+																												set .@loop_6, 0;
+																												set .@loop_5, 0;
+																												set .@loop_4, 0;
+																												break;
+																											case 2:
+																												set .@loop_9, 0;
+																												break;
+																											case 3:
+																												set .@loop_9, 0;
+																												set .@loop_8, 0;
+																												set .@loop_7, 0;
+																												set .@loop_6, 0;
+																												set .@loop_5, 0;
+																												set .@loop_4, 0;
+																												set .@loop_3, 0;
+																												set .@loop_2, 0;
+																												set .@loop_1, 0; 
+																												break;
+																										}
+																										break;
+																									case 2:
+																										break;
+																									case 3:
+																										set .@loop_9, 0;
+																										break;
+																									case 4:
+																										set .@loop_9, 0;
+																										set .@loop_8, 0;
+																										set .@loop_7, 0;
+																										set .@loop_6, 0;
+																										set .@loop_5, 0;
+																										set .@loop_4, 0;
+																										set .@loop_3, 0;
+																										set .@loop_2, 0;
+																										set .@loop_1, 0;
+																										break;
+																								}
+																							}
+																						}
+																						break;
+																					case 2:
+																						break;
+																					case 3:
+																						set .@loop_8, 0;
+																						break;
+																					case 4:
+																						set .@loop_8, 0;
+																						set .@loop_7, 0;
+																						set .@loop_6, 0;
+																						set .@loop_5, 0;
+																						set .@loop_4, 0;
+																						set .@loop_3, 0;
+																						set .@loop_2, 0;
+																						set .@loop_1, 0;
+																						break;
+																				}
+																			}
+																			break;
+																		case 2:
+																			break;
+																		case 3:
+																			set .@loop_7, 0;
+																			break;
+																		case 4:
+																			set .@loop_7, 0;
+																			set .@loop_6, 0;
+																			set .@loop_5, 0;
+																			set .@loop_4, 0;
+																			set .@loop_3, 0;
+																			set .@loop_2, 0;
+																			set .@loop_1, 0;
+																			break;
+																	}
+																}
+															}
+														}
+													}
+													break;
+												case 3:
+													set .@loop_4, 0;
+													break;
+												case 4:
+													set .@loop_4, 0;
+													set .@loop_3, 0;
+													set .@loop_2, 0;
+													set .@loop_1, 0;
+													break;
+											}
+										}
+										break;
+									case 2:
+										// Remover uma Arena.
+									case 3:
+										// Alterar uma Arena.
+									case 4:
+										set .@loop_3, 0;
+										break;
+									case 5:
+										set .@loop_3, 0;
+										set .@loop_2, 0;
+										set .@loop_1, 0;
+										break;
+							}
+							break;
 						case 3:
 							// Gerenciar Raking.
 						case 4:

@@ -1,3 +1,6 @@
+[2014/06/19] - SoulBlaker
+	++ Adicionado template da visualização full do rank pvp.
+	++ Adicionado módulo de cadastro de arenas.
 [2014/06/15] - SoulBlaker
 	++ Completado módulo de gerenciamento de grupos e regras de restrições.
 	Correções nas tabelas sql.
