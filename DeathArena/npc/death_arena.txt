@@ -1,4 +1,29 @@
-﻿// [Nota 1]: Ponha 0 para desabilitar esta opção.
+﻿// .----------------------------------------------------------.
+// .                ___________________                       .
+// .               /   _____/\______   \                      .
+// .               \_____  \  |    |  _/                      .
+// .               /        \ |    |   \                      .
+// .              /_______  / |______  /                      .
+// .                      \/         \/                       .
+// .               [ Advanced Scripts ]                      .
+// .                                                    v1.2  .
+// .----------------------------------------------------------.
+// ;               https:github.com/SoulBlaker/               ;
+// .----------------------------------------------------------.
+// . Script:                                                  .
+// .  Death Arena                                             .
+// .----------------------------------------------------------.
+// . Por: SoulBlaker   Compátivel: eAthena Based         v1.0 .
+// .----------------------------------------------------------.
+// . Descrição:                                               .
+// .  (Descrição)                                             .
+// .----------------------------------------------------------.
+// . Changelog da Versão:                                     .
+// .  * 1.0 [SoulBlaker]                                      .
+// .	- Iniciado NPC.                                       .
+// *----------------------------------------------------------*
+
+// [Nota 1]: Ponha 0 para desabilitar esta opção.
 // [Nota 2]: Sistema de configurações de avisos na arena.
 //			 [0]: Desabilita avisos na arena.
 //			 [1]: Habilita somente mensagem global no mapa da arena ao matar um jogador.
@@ -169,7 +194,7 @@ OnUnLoadMapFlags:
 											}
 											else {
 												mes $@da_BasicSettings$[4];
-												mes "Você tem certeza que deseja adicionar ^" + .@da_Color$[3] + "'" + .@GroupName$ + "'^000000 ao ^" + $@da_Color$[3] + "Grupos de Restrições^000000?";
+												mes "Você tem certeza que deseja adicionar ^" + $@da_Color$[3] + "'" + .@GroupName$ + "'^000000 ao ^" + $@da_Color$[3] + "Grupos de Restrições^000000?";
 												next;
 												switch( select("- Sim, por favor.", "- Não, desejo adicionar outro.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar^000000") )
 												{
@@ -177,7 +202,7 @@ OnUnLoadMapFlags:
 														// Adicionar ao grupo de restrições.
 														query_sql "INSERT INTO `" + $@da_DataBase$[1] + "` (name) VALUES ('" + .@GroupName$ + "')";
 														mes $@da_BasicSettings$[4];
-														mes "O Grupo ^'" + $@da_Color$[3] + .@GroupName$ "'^000000 foi adicionado!";
+														mes "O Grupo ^" + $@da_Color$[3] + "'" + .@GroupName$ "'^000000 foi adicionado!";
 														mes "Para adicionar restrições a este grupo, vá até ao menu de ^" + $@da_Color$[3] + "Gerenciar Regras de Restrições^000000.";
 														next;
 														set .@loop_4, 0;
@@ -233,7 +258,7 @@ OnUnLoadMapFlags:
 											}
 											else {
 												mes $@da_BasicSettings$[4];
-												mes "Tem certeza que deseja remover o Grupo ^'" + $@da_Color$[3] + .@goups_name$[.@chooseGroup] + "'^000000?";
+												mes "Tem certeza que deseja remover o Grupo ^" + $@da_Color$[3] + "'" + .@goups_name$[.@chooseGroup] + "'^000000?";
 												next;
 												switch( select("- Sim, por favor.", "- Não, desejo remover outro.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar^000000") )
 												{
@@ -246,7 +271,7 @@ OnUnLoadMapFlags:
 															if( .@total_arena )
 															{
 																mes $@da_BasicSettings$[4];
-																mes "Há ^'" + $@da_Color$[3] + .@total_arena + "'^000000 arenas cadastrada nesse grupo, oque deseja fazer com elas?";
+																mes "Há ^" + $@da_Color$[3] + "'" + .@total_arena + "'^000000 arenas cadastrada nesse grupo, oque deseja fazer com elas?";
 																next;
 																switch( select("- Mover para outro grupo.", "- Remover todas as arenas.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar^000000") )
 																{
@@ -278,7 +303,7 @@ OnUnLoadMapFlags:
 																			}
 																			else {
 																				mes $@da_BasicSettings$[4];
-																				mes "Tem certeza que deseja mover as arenas do Grupo ^'" + $@da_Color$[3] + .@goups_name[.@chooseGroup] + "'^000000 para o Grupo ^'" + $@da_Color$[3] + .@goups_name[.@nchooseGroup] + "'^000000?";
+																				mes "Tem certeza que deseja mover as arenas do Grupo ^" + $@da_Color$[3] + "'" + .@goups_name[.@chooseGroup] + "'^000000 para o Grupo '^" + $@da_Color$[3] + "'" + .@goups_name[.@nchooseGroup] + "'^000000?";
 																				next;
 																				switch( select("- Sim, por favor.", "- Não, desejo mover para outro grupo.", "^" + $@da_Color$[1] + "- Voltar.^000000", ^" + $@da_Color$[0] + "- Cancelar^000000") )
 																				{
@@ -325,7 +350,7 @@ OnUnLoadMapFlags:
 																query_sql "DELETE FROM `" + $@da_DataBase$[1] + "` WHERE `auto_id`='" + .@groups_id[.@chooseGroup] + "'";
 																
 																mes $@da_BasicSettings$[4];
-																mes "O Grupo ^'" + $@da_Color$[3] + .@goups_name[.@chooseGroup] + "'^000000 foi removido.";
+																mes "O Grupo '^" + $@da_Color$[3] + "'" + .@goups_name[.@chooseGroup] + "'^000000 foi removido.";
 																next;
 																set .@loop_5, 0;
 															}
@@ -352,7 +377,7 @@ OnUnLoadMapFlags:
 										while(.@loop_4)
 										{
 											mes $@da_BasicSettings$[4];
-											mes "Por favor, selecione o ^'" + $@da_Color$[3] + "Grupo de Restrições'^000000 que deseja alterar o nome.";
+											mes "Por favor, selecione o '^" + $@da_Color$[3] + "'" + "Grupo de Restrições'^000000 que deseja alterar o nome.";
 											next;
 											set .@BuildGroupMenu$, "";
 											query_sql "SELECT `auto_id`, `name` FROM `" + $@da_DataBase[1] + "` ORDER BY `name` DESC", .@groups_id, .@groups_name$;
@@ -377,14 +402,14 @@ OnUnLoadMapFlags:
 												while(.@loop_5)
 												{
 													mes $@da_BasicSettings$[4];
-													mes "Por favor, digite um novo nome para o Grupo ^'" + $@da_Color$[3] + $@groups_name$[.@chooseGroup] + "'^000000.";
+													mes "Por favor, digite um novo nome para o Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000.";
 													next;
 													input .@GroupName$;
 											
 													if( !.@GroupName$ || .@GroupName$ == .@goups_name[.@chooseGroup] )
 													{
 														mes $@da_BasicSettings$[4];
-														mes "Você deve digitar um novo nome para o Grupo ^'" + $@da_Color$[3] + $@groups_name$[.@chooseGroup] + "'^000000.";
+														mes "Você deve digitar um novo nome para o Grupo '^" + $@da_Color$[3] + "'"+ .@groups_name$[.@chooseGroup] + "'^000000.";
 														mes "Deseja tentar novamente?";
 														next;
 														switch( select("- Sim, por favor.", "^" + $@da_Color$[1] + "- Voltar.^000000", ^" + $@da_Color$[0] + "- Cancelar^000000") )
@@ -405,7 +430,7 @@ OnUnLoadMapFlags:
 													}
 													else {
 														mes $@da_BasicSettings$[4];
-														mes "Tem certeza que deseja mudar o nome do Grupo ^'" + $@da_Color$[3] + $@groups_name$[.@chooseGroup] + "'^000000 para ^'" + $@da_Color$[3] + .@GroupName$ + "'^000000?";
+														mes "Tem certeza que deseja mudar o nome do Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000 para '^" + $@da_Color$[3] + "'" + .@GroupName$ + "'^000000?";
 														next;
 														switch( select("- Sim, por favor.", "- Não, digitar outro.", "^" + $@da_Color$[1] + "- Voltar.^000000", ^" + $@da_Color$[0] + "- Cancelar^000000") )
 														{
@@ -413,7 +438,7 @@ OnUnLoadMapFlags:
 																// Alterar nome do grupo.
 																query_sql "UPDATE `" + $@da_DataBase$[1] + "` SET `name`='" + .@GroupName$ + "' WHERE `auto_id`='" + .@groups_id[.@chooseGroup] + "'";
 																mes $@da_BasicSettings$[4];
-																mes "Nome do Grupo ^'" + $@da_Color$[3] + $@groups_name$[.@chooseGroup] + "'^000000 foi alterado para ^'" + $@da_Color$[3] + .@GroupName$ + "'^000000?";
+																mes "Nome do Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000 foi alterado para '^" + $@da_Color$[3] + "'" + .@GroupName$ + "'^000000?";
 																next;
 																set .@loop_5, 0;
 																break;
@@ -476,7 +501,7 @@ OnUnLoadMapFlags:
 															while(.@loop_6)
 															{
 																mes $@da_BasicSettings$[4];
-																mes "O que deseja gerenciar de classes e itens nas Regras do Grupo ^'" + $@da_Color$[3] + .@groups_name$[.@chooseGroup] + "'^000000?";
+																mes "O que deseja gerenciar de classes e itens nas Regras do Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000?";
 																next;
 																set .@countItem, callfunc("GetGroupInfo", 2, .@groups_id[.@chooseGroup]);
 																set .@countClass, callfunc("GetGroupInfo", 3, .@groups_id[.@chooseGroup]);
@@ -488,13 +513,13 @@ OnUnLoadMapFlags:
 																		while(.@loop_7)
 																		{
 																			mes $@da_BasicSettings$[4];
-																			mes "Por favor, digite o ^" + $@da_Color$[3] + "id do item^000000 que deseja adicionar ao Grupo ^'" + $@da_Color$[3] + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições.";
+																			mes "Por favor, digite o ^" + $@da_Color$[3] + "id do item^000000 que deseja adicionar ao Grupo '^" + $@da_Color$[3] + "'" + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições.";
 																			next;
 																			input .@item_id;
 																			if( !.@item_id || !getitemname(.@item_id) )
 																			{
 																				mes $@da_BasicSettings$[4];
-																				mes "Você deve digitar o ^" + $@da_Color$[3] + "id do item válido^000000 que deseja adicionar ao Grupo ^'" + $@da_Color$[3] + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições.";
+																				mes "Você deve digitar o ^" + $@da_Color$[3] + "id do item válido^000000 que deseja adicionar ao Grupo '^" + $@da_Color$[3] + "'" + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições.";
 																				mes "Deseja tentar novamente?";
 																				next;
 																				switch( select("- Sim, por favor.", "^" + $@da_Color$[1] + "- Voltar.^000000", ^" + $@da_Color$[0] + "- Cancelar^000000") )
@@ -518,7 +543,7 @@ OnUnLoadMapFlags:
 																			else if( checkRestriction(.@groups_id[.@chooseGroup], .@item_id) )
 																			{
 																				mes $@da_BasicSettings$[4];
-																				mes "O item ^" + $@da_Color$[3] + getitemname(.@item_id) + "^000000 já existe no Grupo ^'" + $@da_Color$[3] + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições.";
+																				mes "O item ^" + $@da_Color$[3] + getitemname(.@item_id) + "^000000 já existe no Grupo '^" + $@da_Color$[3] + "'" + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições.";
 																				mes "Deseja tentar novamente?";
 																				next;
 																				switch( select("- Sim, por favor.", "^" + $@da_Color$[1] + "- Voltar.^000000", ^" + $@da_Color$[0] + "- Cancelar^000000") )
@@ -541,7 +566,7 @@ OnUnLoadMapFlags:
 																			}
 																			else {
 																				mes $@da_BasicSettings$[4];
-																				mes "Tem certeza que deseja adicionar o item ^'" + $@da_Color$[3] + getitemname(.@item_id) + "'^000000 no Grupo ^'" + $@da_Color$[3] + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições?";
+																				mes "Tem certeza que deseja adicionar o item '^" + $@da_Color$[3] + "'" + getitemname(.@item_id) + "'^000000 no Grupo '^" + $@da_Color$[3] + "'" + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições?";
 																				next;
 																				switch( select("- Sim, por favor.", "- Não, desejo adicionar outro item.", "^" + $@da_Color$[1] + "- Voltar.^000000", ^" + $@da_Color$[0] + "- Cancelar^000000") )
 																				{
@@ -549,7 +574,7 @@ OnUnLoadMapFlags:
 																						// Adicionar item no grupo de restrição.
 																						query_sql "INSERT INTO `" + $@da_DataBase$[2] + "` (group_id, value, type) VALUES (" + .@goups_id[.@chooseGroup] + ", " + .@item_id + ", 0)";
 																						mes $@da_BasicSettings$[4];
-																						mes "O item ^'" + $@da_Color$[3] + getitemname(.@item_id) + "'^000000 foi adicionado ao Grupo ^'" + $@da_Color$[3] + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições?";
+																						mes "O item '^" + $@da_Color$[3] + "'" + getitemname(.@item_id) + "'^000000 foi adicionado ao Grupo '^" + $@da_Color$[3] + "'" + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições?";
 																						next;
 																						set .@loop_7, 0;
 																						break;
@@ -577,7 +602,7 @@ OnUnLoadMapFlags:
 																		while(.@loop_7)
 																		{
 																			mes $@da_BasicSettings$[4];
-																			mes "Por favor, selecione o item que deseja remover do Grupo '^" .@da_Color$[3] + .@group_name$[.@chooseGroup] + "'^000000 de Restrições.";
+																			mes "Por favor, selecione o item que deseja remover do Grupo ^" $@da_Color$[3] + "'" + .@group_name$[.@chooseGroup] + "'^000000 de Restrições.";
 																			next;
 																			query_sql "SELECT `auto_id`, `value` FROM `" + $@da_DataBase$[2] + "` WHERE `type`='0' AND `group_id`='" + .@groups_id[.@chooseGroup] + "' ORDER BY `value` DESC", .@i_auto_id, .@i_value;
 																		
@@ -601,7 +626,7 @@ OnUnLoadMapFlags:
 																			}
 																			else {
 																				mes $@da_BasicSettings$[4];
-																				mes "Tem certeza que deseja remover o item ^" + $@da_Color$[3] + getitemname(.@i_value[.@chooseItem]) + "^000000 do Grupo ^'" + $@da_Color$[3] + .@groups_name$[.@chooseItem] + "'^000000 de Restrições?";
+																				mes "Tem certeza que deseja remover o item ^" + $@da_Color$[3] + getitemname(.@i_value[.@chooseItem]) + "^000000 do Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseItem] + "'^000000 de Restrições?";
 																				next;
 																				switch( select("- Sim, por favor.", "- Não, desejo remover outro item.", "^" + $@da_Color$[1] + "- Voltar.^000000", ^" + $@da_Color$[0] + "- Cancelar^000000") )
 																				{
@@ -610,7 +635,7 @@ OnUnLoadMapFlags:
 																						query_sql "DELETE FROM `" + $@da_DataBase$[2] + "` WHERE `auto_id`='" + .@i_auto_id[.@chooseItem] + "'";
 																						
 																						mes $@da_BasicSettings$[4];
-																						mes "O item ^" + $@da_Color$[3] + getitemname(.@i_value[.@chooseItem]) + "^000000 foi removido do Grupo ^'" + $@da_Color$[3] + .@groups_name$[.@chooseItem] + "'^000000 de Restrições?";
+																						mes "O item ^" + $@da_Color$[3] + getitemname(.@i_value[.@chooseItem]) + "^000000 foi removido do Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseItem] + "'^000000 de Restrições?";
 																						next;
 																						set .@loop_7, 0;
 																						break;
@@ -638,13 +663,13 @@ OnUnLoadMapFlags:
 																		while(.@loop_7)
 																		{
 																			mes $@da_BasicSettings$[4];
-																			mes "Por favor, digite o ^" + $@da_Color$[3] + "id da classe^000000 que deseja adicionar ao Grupo ^'" + $@da_Color$[3] + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições.";
+																			mes "Por favor, digite o ^" + $@da_Color$[3] + "id da classe^000000 que deseja adicionar ao Grupo '^" + $@da_Color$[3] + "'" + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições.";
 																			next;
 																			input .@class_id;
 																			if( !.@class_id || !jobname(.@class_id) )
 																			{
 																				mes $@da_BasicSettings$[4];
-																				mes "Você deve digitar o ^" + $@da_Color$[3] + "id do classe válido^000000 que deseja adicionar ao Grupo ^'" + $@da_Color$[3] + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições.";
+																				mes "Você deve digitar o ^" + $@da_Color$[3] + "id do classe válido^000000 que deseja adicionar ao Grupo '^" + $@da_Color$[3] + "'" + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições.";
 																				mes "Deseja tentar novamente?";
 																				next;
 																				switch( select("- Sim, por favor.", "^" + $@da_Color$[1] + "- Voltar.^000000", ^" + $@da_Color$[0] + "- Cancelar^000000") )
@@ -668,7 +693,7 @@ OnUnLoadMapFlags:
 																			else if( checkRestriction(.@groups_id[.@chooseGroup], .@class_id) )
 																			{
 																				mes $@da_BasicSettings$[4];
-																				mes "A classe ^" + $@da_Color$[3] + jobname(.@class_id) + "^000000 já existe no Grupo ^'" + $@da_Color$[3] + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições.";
+																				mes "A classe ^" + $@da_Color$[3] + jobname(.@class_id) + "^000000 já existe no Grupo '^" + $@da_Color$[3] + "'" + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições.";
 																				mes "Deseja tentar novamente?";
 																				next;
 																				switch( select("- Sim, por favor.", "^" + $@da_Color$[1] + "- Voltar.^000000", ^" + $@da_Color$[0] + "- Cancelar^000000") )
@@ -691,7 +716,7 @@ OnUnLoadMapFlags:
 																			}
 																			else {
 																				mes $@da_BasicSettings$[4];
-																				mes "Tem certeza que deseja adicionar a classe ^'" + $@da_Color$[3] + jobname(.@class_id) + "'^000000 no Grupo ^'" + $@da_Color$[3] + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições?";
+																				mes "Tem certeza que deseja adicionar a classe '^" + $@da_Color$[3] + "'" + jobname(.@class_id) + "'^000000 no Grupo '^" + $@da_Color$[3] + "'" + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições?";
 																				next;
 																				switch( select("- Sim, por favor.", "- Não, desejo adicionar outra classe.", "^" + $@da_Color$[1] + "- Voltar.^000000", ^" + $@da_Color$[0] + "- Cancelar^000000") )
 																				{
@@ -699,7 +724,7 @@ OnUnLoadMapFlags:
 																						// Adicionar classe no grupo de restrição.
 																						query_sql "INSERT INTO `" + $@da_DataBase$[2] + "` (group_id, value, type) VALUES (" + .@goups_id[.@chooseGroup] + ", " + .@class_id + ", 1)";
 																						mes $@da_BasicSettings$[4];
-																						mes "A classe ^'" + $@da_Color$[3] + jobname(.@class_id) + "'^000000 foi adicionada ao Grupo ^'" + $@da_Color$[3] + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições?";
+																						mes "A classe '^" + $@da_Color$[3] + "'" + jobname(.@class_id) + "'^000000 foi adicionada ao Grupo '^" + $@da_Color$[3] + "'" + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições?";
 																						next;
 																						set .@loop_7, 0;
 																						break;
@@ -727,7 +752,7 @@ OnUnLoadMapFlags:
 																		while(.@loop_7)
 																		{
 																			mes $@da_BasicSettings$[4];
-																			mes "Por favor, selecione a classe que deseja remover do Grupo '^" .@da_Color$[3] + .@group_name$[.@chooseGroup] + "'^000000 de Restrições.";
+																			mes "Por favor, selecione a classe que deseja remover do Grupo '" $@da_Color$[3] + "'" + .@group_name$[.@chooseGroup] + "'^000000 de Restrições.";
 																			next;
 																			query_sql "SELECT `auto_id`, `value` FROM `" + $@da_DataBase$[2] + "` WHERE `type`='0' AND `group_id`='" + .@groups_id[.@chooseGroup] + "' ORDER BY `value` DESC", .@c_auto_id, .@c_value;
 																		
@@ -751,7 +776,7 @@ OnUnLoadMapFlags:
 																			}
 																			else {
 																				mes $@da_BasicSettings$[4];
-																				mes "Tem certeza que deseja remover a classe ^" + $@da_Color$[3] + jobname(.@c_value[.@chooseItem]) + "^000000 do Grupo ^'" + $@da_Color$[3] + .@groups_name$[.@chooseItem] + "'^000000 de Restrições?";
+																				mes "Tem certeza que deseja remover a classe ^" + $@da_Color$[3] + jobname(.@c_value[.@chooseItem]) + "^000000 do Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseItem] + "'^000000 de Restrições?";
 																				next;
 																				switch( select("- Sim, por favor.", "- Não, desejo remover outra classe.", "^" + $@da_Color$[1] + "- Voltar.^000000", ^" + $@da_Color$[0] + "- Cancelar^000000") )
 																				{
@@ -760,7 +785,7 @@ OnUnLoadMapFlags:
 																						query_sql "DELETE FROM `" + $@da_DataBase$[2] + "` WHERE `auto_id`='" + .@c_auto_id[.@chooseClass] + "'";
 																						
 																						mes $@da_BasicSettings$[4];
-																						mes "A classe ^" + $@da_Color$[3] + jobname(.@i_value[.@chooseClass]) + "^000000 foi removida do Grupo ^'" + $@da_Color$[3] + .@groups_name$[.@chooseItem] + "'^000000 de Restrições?";
+																						mes "A classe ^" + $@da_Color$[3] + jobname(.@i_value[.@chooseClass]) + "^000000 foi removida do Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseItem] + "'^000000 de Restrições?";
 																						next;
 																						set .@loop_7, 0;
 																						break;
@@ -1121,7 +1146,7 @@ OnUnLoadMapFlags:
 																							}
 																							else {
 																								mes $@da_BasicSettings$[4];
-																								mes "Tem certeza que deseja adicionar o grupo ^'" + $@da_Color$[3] + .@groups_name$[.@chooseGroup] + "^0000000 de restrições' na arena ^" + $@da_Color$[3] + .@Name$ + "^000000?";
+																								mes "Tem certeza que deseja adicionar o grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "^0000000 de restrições' na arena ^" + $@da_Color$[3] + .@Name$ + "^000000?";
 																								next;
 																								switch( select("- Sim, por favor.", "- Não, desejo selecionar outro grupo.", "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar^000000") )
 																								{
@@ -1279,7 +1304,7 @@ OnUnLoadMapFlags:
 														}
 														else {
 															mes $@da_BasicSettings$[4];
-															mes "Tem certeza que deseja remover a arena "^'" + $@da_Color$[3] + .@a_name$[.@chooseArena] + "'^000000?";
+															mes "Tem certeza que deseja remover a arena "'^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000?";
 															next;
 															switch( select("- Sim, por favor.", "- Não, desejo selecionar outra.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar^000000") )
 															{
@@ -1287,7 +1312,7 @@ OnUnLoadMapFlags:
 																	// Remover arena.
 																	query_sql "DELETE FROM `" + $@da_DataBase$[0] + "` WHERE `auto_id`='" + .@a_auto_id[.@chooseArena] + "'";
 																	mes $@da_BasicSettings$[4];
-																	mes "A arena "^'" + $@da_Color$[3] + .@a_name$[.@chooseArena] + "'^000000 foi removida.";
+																	mes "A arena "'^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000 foi removida.";
 																	next;
 																	set .@loop_5, 0;
 																	break;
@@ -1338,7 +1363,7 @@ OnUnLoadMapFlags:
 														mes $@da_BasicSettings$[4];
 														mes "Por favor, selecione uma arena de ^" + $@da_Color$[3] + .@mask_name$[.@type] + "^000000.";
 														next;
-														query_sql "SELECT `auto_id`, `name`, `type`, `map_index`, `coord_x`, `coord_y` FROM `" + $@da_DataBase$[0] + "` WHERE `type`='" + .@type + "' ORDER BY `name`", .@a_auto_id, .@a_name$, .@a_type, .@a_map_index$, .@a_coord_x, .@a_coord_y;
+														query_sql "SELECT `auto_id`, `name`, `type`, `map_index`, `coord_x`, `coord_y`, `max_player`, `min_level`, `max_level`, `group_id` FROM `" + $@da_DataBase$[0] + "` WHERE `type`='" + .@type + "' ORDER BY `name`", .@a_auto_id, .@a_name$, .@a_type, .@a_map_index$, .@a_coord_x, .@a_coord_y, .@a_max_player, .@a_min_level, .@a_max_level, .@a_group_id;
 														set .@BuildArenaMenu$, "";
 														for( set .@i, 0; .@i < getarraysize(.@a_auto_id); set .@i, .@i + 1 )
 															set .@BuildArenaMenu$, .@BuildArenaMenu$ + "- " + .@a_name$[.@i] + ".:";
@@ -1360,9 +1385,9 @@ OnUnLoadMapFlags:
 															while( .@loop_6 )
 															{
 																mes $@da_BasicSettings$[4];
-																mes "O que deseja alterar na arena ^'" + $@da_Color$[3] + .@a_name$[.@chooseArena] + "'^000000?";
+																mes "O que deseja alterar na arena '^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000?";
 																next;
-																switch( select("- Alterar nome.", "- Alterar tipo.", "- Alterar Mapa e Coordenadas.", "- Alterar limites.", "- Alterar Grupo de Restrições.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar^000000") )
+																switch( select("- Alterar nome.", "- Alterar tipo.", "- Alterar mapa e coordenadas.", "- Alterar níveis e limites.", "- Alterar Grupo de Restrições.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar^000000") )
 																{
 																	case 1:
 																		// Alterar nome.
@@ -1370,13 +1395,13 @@ OnUnLoadMapFlags:
 																		while(.@loop_7)
 																		{
 																			mes $@da_BasicSettings$[4];
-																			mes "Por favor, digite um novo nome para a arena ^'" + $@da_Color$[3] + .@a_name$[.@chooseArena] + "'^000000.";
+																			mes "Por favor, digite um novo nome para a arena '^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000.";
 																			next;
 																			input .@Name$;
 																			if( !.@Name$ || .@Name$ == .@a_name$[.@chooseArena] )
 																			{
 																				mes $@da_BasicSettings$[4];
-																				mes "Você deve digitar um novo nome para a arena ^'" + $@da_Color$[3] + .@a_name$[.@chooseArena] + "'^000000.";
+																				mes "Você deve digitar um novo nome para a arena '^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000.";
 																				mes "Deseja tentar novamente?";
 																				next;
 																				switch( select("- Sim, por favor.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar^000000") )
@@ -1399,7 +1424,7 @@ OnUnLoadMapFlags:
 																			}
 																			else {
 																				mes $@da_BasicSettings$[4];
-																				mes "Você tem certeza que deseja alterar o nome da arena ^'" + $@da_Color$[3] + .@a_name$[.@chooseArena] + "'^000000 para "^'" + $@da_Color$[3] + .@Name$ + "'^00000?";
+																				mes "Você tem certeza que deseja alterar o nome da arena '^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000 para "'^" + $@da_Color$[3] + "'" + .@Name$ + "'^00000?";
 																				next;
 																				switch( select("- Sim, por favor.", "- Não, desejo digitar outro nome.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar^000000") )
 																				{
@@ -1407,7 +1432,7 @@ OnUnLoadMapFlags:
 																						// Alterar o nome.
 																						query_sql "UPDATE `" + $@da_DataBase$[0] + "` SET `name`='" + .@Name$ + "' WHERE `auto_id`='" + .@a_auto_id[.@chooseArena] + "'";
 																						mes $@da_BasicSettings$[4];
-																						mes "O nome da arena "^'" + $@da_Color$[3] + .@a_name$[.@chooseArena] + "'^000000 foi alterado para ^'" + $@da_Color$[3] + .@Name$ + "'^00000?";
+																						mes "O nome da arena "'^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000 foi alterado para '^" + $@da_Color$[3] + "'" + .@Name$ + "'^00000?";
 																						next;
 																						set .@a_name$[.@chooseArena], .@Name$;
 																						set .@loop_7, 0;
@@ -1436,7 +1461,7 @@ OnUnLoadMapFlags:
 																		while(.@loop_7)
 																		{
 																			mes $@da_BasicSettings$[4];
-																			mes "Por favor, selecione um novo tipo para a arena ^'" + $@da_Color$[3] + .@a_name$[.@chooseArena] + "'^000000.";
+																			mes "Por favor, selecione um novo tipo para a arena '^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000.";
 																			next;
 																			set .@type, select("- Jogadores vs Jogadores.", "- Clãns vs Clãns.", "- Grupos vs Grupos.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar^000000")-1;
 																			switch(.@type)
@@ -1444,7 +1469,7 @@ OnUnLoadMapFlags:
 																				default:
 																					set .@mask_name$[0], "Jogadores vs Jogadores", "Clãns vs Clãns", "Grupos vs Grupos";
 																					mes $@da_BasicSettings$[4];
-																					mes "Tem certeza que deseja alterar o tipo da arena ^'" + $@da_Color$[3] + .@a_name$[.@chooseArena] + "'^000000 de ^'" + $@da_Color$[3] + .@mask_name[.@a_type[.@chooseArena]] + "'^000000 para ^'" + $@da_Color$[3] + .@mask_name[.@type] + "'^000000?";
+																					mes "Tem certeza que deseja alterar o tipo da arena '^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000 de '^" + $@da_Color$[3] + "'" + .@mask_name[.@a_type[.@chooseArena]] + "'^000000 para '^" + $@da_Color$[3] + "'" + .@mask_name[.@type] + "'^000000?";
 																					next;
 																					switch( select("- Sim, por favor.", "- Não, desejo mudar o tipo.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar^000000") )
 																					{
@@ -1452,7 +1477,7 @@ OnUnLoadMapFlags:
 																							// Alter o tipo da arena.
 																							query_sql "UPDATE `" + $@da_DataBase$[0] + "` SET `type`='" + .@type + "' WHERE `auto_id`='" + .@a_auto_id[.@chooseArena] + "'";
 																							mes $@da_BasicSettings$[4];
-																							mes "O tipo da arena "^'" + $@da_Color$[3] + .@a_name$[.@chooseArena] + "'^000000 foi alterado de ^'" + $@da_Color$[3] + .@mask_name$[.@a_type[.@chooseArena]] + "^000000 para ^'" + $@da_Color$[3] + .@mask_name$[.@type ] + "'^00000?";
+																							mes "O tipo da arena "'^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000 foi alterado de '^" + $@da_Color$[3] + "'" + .@mask_name$[.@a_type[.@chooseArena]] + "^000000 para '^" + $@da_Color$[3] + "'" + .@mask_name$[.@type ] + "'^00000?";
 																							next;
 																							set .@a_name$[.@chooseArena], .@type;
 																							set .@loop_7, 0;
@@ -1494,7 +1519,7 @@ OnUnLoadMapFlags:
 																		while(.@loop_7)
 																		{
 																			mes $@da_BasicSettings$[4];
-																			mes "O que deseja alterar no mapa da arena ^'" + $@da_Color$[3] + .@a_name$[.@chooseArena] + "'^000000?";
+																			mes "O que deseja alterar no mapa da arena '^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000?";
 																			next;
 																			switch( select("- Alterar mapa.", "- Alterar coordenadas". ", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar^000000") )
 																			{
@@ -1504,13 +1529,13 @@ OnUnLoadMapFlags:
 																					while(.@loop_8)
 																					{
 																						mes $@da_BasicSettings$[4];
-																						mes "Por favor, digite um novo mapa para a arena ^'" + $@da_Color$[3] + .@a_name$[.@chooseArena] + "'^000000.";
+																						mes "Por favor, digite um novo mapa para a arena '^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000.";
 																						next;
 																						input .@MapName$;
 																						if( !.@MapName$ || .@MapName$ == .@a_map_index$[.@chooseArena] )
 																						{
 																							mes $@da_BasicSettings$[4];
-																							mes "Você tem que digitar um novo mapa para a arena ^'" + $@da_Color$[3] + .@a_name$[.@chooseArena] + "'^000000.";
+																							mes "Você tem que digitar um novo mapa para a arena '^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000.";
 																							mes "Deseja tentar novamente?";
 																							next;
 																							switch( select("- Sim, por favor.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar^000000") )
@@ -1534,7 +1559,7 @@ OnUnLoadMapFlags:
 																						}
 																						else {
 																							mes $@da_BasicSettings$[4];
-																							mes "Você tem que certeza que deseja alterar o mapa da arena ^'" + $@da_Color$[3] + .@a_name$[.@chooseArena] + "'^000000 de ^'" + $@da_Color$[3] + .@a_map_index$[.@chooseArena] + "'^000000 para ^'" + $@da_Color$[3] + .@MapIndex$ + "'^000000?";
+																							mes "Você tem que certeza que deseja alterar o mapa da arena ^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000 de ^" + $@da_Color$[3] + "'" + .@a_map_index$[.@chooseArena] + "'^000000 para ^" + $@da_Color$[3] + "'" + .@MapIndex$ + "'^000000?";
 																							next;
 																							switch( select("- Sim, por favor.", "- Não, desejo alterar para outro mapa.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar^000000") )
 																							{
@@ -1542,7 +1567,7 @@ OnUnLoadMapFlags:
 																									// Alterar mapindex.
 																									query_sql "UPDATE `" + $@da_DataBase$[0] + "` SET `type`='" + .@type + "' WHERE `auto_id`='" + .@a_auto_id[.@chooseArena] + "'";
 																									mes $@da_BasicSettings$[4];
-																									mes "O mapa da arena "^'" + $@da_Color$[3] + .@a_name$[.@chooseArena] + "'^000000 foi alterado de ^'" + $@da_Color$[3] + .@a_map_index$[.@chooseArena] + "^000000 para ^'" + $@da_Color$[3] + .@MapIndex$ + "'^00000?";
+																									mes "O mapa da arena "^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000 foi alterado de ^" + $@da_Color$[3] + "'" + .@a_map_index$[.@chooseArena] + "^000000 para ^" + $@da_Color$[3] + "'" + .@MapIndex$ + "'^00000?";
 																									next;
 																									set .@a_map_index$[.@chooseArena], .@MapIndex$;
 																									set .@loop_8, 0;
@@ -1572,14 +1597,14 @@ OnUnLoadMapFlags:
 																					while(.@loop_8)
 																					{
 																						mes $@da_BasicSettings$[4];
-																						mes "Por favor, digite uma nova coordenada x aonde os jogadores serão teleportados para o mapa ^'" + $@da_Color$[3] .@a_map_index$[.@chooseArena] + "'^000000 da arena ^'" + $@da_Color$[3] + .@a_name$[.@chooseArena] + "'^000000.";
+																						mes "Por favor, digite uma nova coordenada x aonde os jogadores serão teleportados para o mapa ^" + $@da_Color$[3] + "'" + .@a_map_index$[.@chooseArena] + "'^000000 da arena ^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000.";
 																						mes "Digite 0 para os jogadores serem teleportado aleatóriamente e as coordenadas y serão configurada para 0.";
 																						next;
 																						input .@CoordX;
 																						if( .@CoordX )
 																						{
 																							mes $@da_BasicSettings$[4];
-																							mes "Por favor, digite a coordenada y aonde os jogadores serão teleportados no mapa ^'" + $@da_Color$[3] .@a_map_index$[.@chooseArena] + "'^000000 da arena ^'" + $@da_Color$[3] + .@a_name$[.@chooseArena] + "'^000000.";
+																							mes "Por favor, digite a coordenada y aonde os jogadores serão teleportados no mapa ^" + $@da_Color$[3] + "'" + .@a_map_index$[.@chooseArena] + "'^000000 da arena ^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000.";
 																							mes "Digite 0 para os jogadores serem teleportado aleatóriamente e as coordenadas x serão configurada para 0.";
 																							next;
 																							input .@CoordY;
@@ -1589,7 +1614,7 @@ OnUnLoadMapFlags:
 																							set .@CoordY, 0;
 																						
 																						mes $@da_BasicSettings$[4];
-																						mes "Tem certeza que deseja alterar as coordenadas do mapa ^'" + $@da_Color$[3] .@a_map_index$[.@chooseArena] + "'^000000 da arena ^'" + $@da_Color$[3] + .@a_name$[.@chooseArena] + "'^000000 de ^'" + $@da_Color$[3] + (.@a_coord_x[.@chooseArena]&&.@a_coord_y[.@chooseArena]?"x[" + .@a_coord_x[.@chooseArena] + "] - y[" + .@a_coord_y[.@chooseArena] + "]":"aleatório") + "'^000000 para ^'" + $@da_Color$[3] + (.@CoordX&&.@CoordY?"x[" + .@CoordX + "] - y[" + .@CoordY + "]":"aleatório") + "'^000000?";
+																						mes "Tem certeza que deseja alterar as coordenadas do mapa ^" + $@da_Color$[3] + "'" + .@a_map_index$[.@chooseArena] + "'^000000 da arena ^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000 de ^" + $@da_Color$[3] + "'" + (.@a_coord_x[.@chooseArena]&&.@a_coord_y[.@chooseArena]?"x[" + .@a_coord_x[.@chooseArena] + "] - y[" + .@a_coord_y[.@chooseArena] + "]":"aleatório") + "'^000000 para ^" + $@da_Color$[3] + "'" + (.@CoordX&&.@CoordY?"x[" + .@CoordX + "] - y[" + .@CoordY + "]":"aleatório") + "'^000000?";
 																						next;
 																						switch( select("- Sim, por favor.", "- Não, desejo alterar para outras coordenadas.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar^000000") )
 																						{
@@ -1597,7 +1622,7 @@ OnUnLoadMapFlags:
 																								// Alterar coordenadas.
 																								query_sql "UPDATE `" + $@da_DataBase$[0] + "` SET `coord_x`='" + .@CoordX + "', `coord_y`='" + .@CoordY + "' WHERE `auto_id`='" + .@a_auto_id[.@chooseArena] + "'";
 																								mes $@da_BasicSettings$[4];
-																								mes "As coordenadas do mapa ^'" + $@da_Color$[3] .@a_map_index$[.@chooseArena] + "'^000000 da arena ^'" + $@da_Color$[3] + .@a_name$[.@chooseArena] + "'^000000 foi alterada de ^'" + $@da_Color$[3] + (.@a_coord_x[.@chooseArena]&&.@a_coord_y[.@chooseArena]?"x[" + .@a_coord_x[.@chooseArena] + "] - y[" + .@a_coord_y[.@chooseArena] + "]":"aleatório") + "'^000000 para ^'" + $@da_Color$[3] + (.@CoordX&&.@CoordY?"x[" + .@CoordX + "] - y[" + .@CoordY + "]":"aleatório") + "'^000000.";
+																								mes "As coordenadas do mapa ^" + $@da_Color$[3] + "'" + .@a_map_index$[.@chooseArena] + "'^000000 da arena ^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000 foi alterada de ^" + $@da_Color$[3] + "'" + (.@a_coord_x[.@chooseArena]&&.@a_coord_y[.@chooseArena]?"x[" + .@a_coord_x[.@chooseArena] + "] - y[" + .@a_coord_y[.@chooseArena] + "]":"aleatório") + "'^000000 para ^" + $@da_Color$[3] + "'" + (.@CoordX&&.@CoordY?"x[" + .@CoordX + "] - y[" + .@CoordY + "]":"aleatório") + "'^000000.";
 																								next;
 																								set .@a_coord_x[.@chooseArena], .@CoordX;
 																								set .@a_coord_y[.@chooseArena], .@CoordY;
@@ -1638,8 +1663,222 @@ OnUnLoadMapFlags:
 																		break;
 																	case 4:
 																		// Alterar limites
+																		set .@loop_7, 1;
+																		while(.@loop_7)
+																		{
+																			mes $@da_BasicSettings$[4];
+																			mes "O que deseja alterar nos níveis e limites da arena ^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000?";
+																			next;
+																			switch( select("- Alterar máximo de jogadores.", "- Alterar nível minimo de Base.", "- Alterar nível máximo de Base.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar^000000") )
+																			{
+																				case 1:
+																					// Máximo de jogadores.
+																					set .@loop_8, 1;
+																					while(.@loop_8)
+																					{
+																						mes $@da_BasicSettings$[4];
+																						mes "Por favor, digite um novo limite de jogadores que pode acessar a arena ^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000.";
+																						mes "Digite 0 para desabilitar o limite de jogadores na arena.";
+																						next;
+																						input .@max_player;
+																						
+																						mes $@da_BasicSettings$[4];
+																						mes "Você tem certeza que deseja alterar o limite de jogadores que pode acessar a arena ^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000 de ^" + $@da_Color$[3] + "'" + (.@a_max_player[.@chooseArena]?.@a_max_player[.@chooseArena]:"ilimitado") + "'^000000 para ^" + $@da_Color$[3] + "'" + (.@max_player?.@max_player:"ilimitado") + "'^000000?";
+																						next;
+																						switch( select("- Sim, por favor.", "- Não, desejo alterar para outro limite.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar^000000") )
+																						{
+																							case 1:
+																								// Alterar limite de jogadores.
+																								query_sql "UPDATE `" + $@da_DataBase$[0] + "` SET `max_player`='" + .@max_player + "' WHERE `auto_id`='" + .@a_auto_id[.@chooseArena] + "'";
+																								mes $@da_BasicSettings$[4];
+																								mes "O limite de jogadores que pode acessar a arena ^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000 foi alterado de ^" + $@da_Color$[3] + "'" + (.@a_max_player[.@chooseArena]?.@a_max_player[.@chooseArena]:"ilimitado") + "'^000000 para ^" + $@da_Color$[3] + "'" + (.@max_player?.@max_player:"ilimitado") + "'^000000.";
+																								next;
+																								set .@a_max_player[.@chooseArena], .@max_player;
+																								set .@loop_8, 0;
+																								break;
+																							case 2:
+																								break;
+																							case 3:
+																								set .@loop_8, 0;
+																								break;
+																							case 4:
+																								set .@loop_8, 0;
+																								set .@loop_7, 0;
+																								set .@loop_6, 0;
+																								set .@loop_5, 0;
+																								set .@loop_4, 0;
+																								set .@loop_3, 0;
+																								set .@loop_2, 0;
+																								set .@loop_1, 0;
+																								break;
+																						
+																						}
+																					}
+																					break;
+																				case 2:
+																					// Minimo de base.
+																					set .@loop_8, 1;
+																					while(.@loop_8)
+																					{
+																						mes $@da_BasicSettings$[4];
+																						mes "Por favor, digite um novo minimo de base que jogadores que pode acessar a arena ^" + $@da_Color$[3] + "'" + .@a_min_level$[.@chooseArena] + "'^000000.";
+																						mes "Digite 0 para desabilitar o nível minimo de base para os jogadores adentrar a arena.";
+																						next;
+																						input .@min_level;
+																						
+																						mes $@da_BasicSettings$[4];
+																						mes "Você tem certeza que deseja alterar o minimo de base dos jogadore da arena ^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000 de ^" + $@da_Color$[3] + "'" + (.@a_min_level[.@chooseArena]?.@a_min_level[.@chooseArena]:"desabilitado") + "'^000000 para ^" + $@da_Color$[3] + "'" + (.@min_level?.@min_level:"desabilitado") + "'^000000?";
+																						next;
+																						switch( select("- Sim, por favor.", "- Não, desejo alterar para outro nível.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar^000000") )
+																						{
+																							case 1:
+																								// Alterar base minima de jogadores.
+																								query_sql "UPDATE `" + $@da_DataBase$[0] + "` SET `min_level`='" + .@min_level + "' WHERE `auto_id`='" + .@a_auto_id[.@chooseArena] + "'";
+																								mes $@da_BasicSettings$[4];
+																								mes "O nível minimo de base dos jogadores que pode acessar a arena ^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000 foi alterado de ^" + $@da_Color$[3] + "'" + (.@a_min_level[.@chooseArena]?.@a_min_level[.@chooseArena]:"desabilitado") + "'^000000 para ^" + $@da_Color$[3] + "'" + (.@min_level?.@min_level:"desabilitado") + "'^000000.";
+																								next;
+																								set .@a_min_level[.@chooseArena], .@min_level;
+																								set .@loop_8, 0;
+																								break;
+																							case 2:
+																								break;
+																							case 3:
+																								set .@loop_8, 0;
+																								break;
+																							case 4:
+																								set .@loop_8, 0;
+																								set .@loop_7, 0;
+																								set .@loop_6, 0;
+																								set .@loop_5, 0;
+																								set .@loop_4, 0;
+																								set .@loop_3, 0;
+																								set .@loop_2, 0;
+																								set .@loop_1, 0;
+																								break;
+																						
+																						}
+																					}
+																					break;
+																				case 3:
+																					// Máximo de base.
+																					set .@loop_8, 1;
+																					while(.@loop_8)
+																					{
+																						mes $@da_BasicSettings$[4];
+																						mes "Por favor, digite um novo máximo de base que jogadores que pode acessar a arena ^" + $@da_Color$[3] + "'" + .@a_min_level$[.@chooseArena] + "'^000000.";
+																						mes "Digite 0 para desabilitar o nível máximo de base para os jogadores adentrar a arena.";
+																						next;
+																						input .@max_level;
+																						
+																						mes $@da_BasicSettings$[4];
+																						mes "Você tem certeza que deseja alterar o máximo de base dos jogadore da arena ^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000 de ^" + $@da_Color$[3] + "'" + (.@a_max_level[.@chooseArena]?.@a_max_level[.@chooseArena]:"desabilitado") + "'^000000 para ^" + $@da_Color$[3] + "'" + (.@max_level?.@max_level:"desabilitado") + "'^000000?";
+																						next;
+																						switch( select("- Sim, por favor.", "- Não, desejo alterar para outro nível.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar^000000") )
+																						{
+																							case 1:
+																								// Alterar base máximo de jogadores.
+																								query_sql "UPDATE `" + $@da_DataBase$[0] + "` SET `max_level`='" + .@min_level + "' WHERE `auto_id`='" + .@a_auto_id[.@chooseArena] + "'";
+																								mes $@da_BasicSettings$[4];
+																								mes "O nível máximo de base dos jogadores que pode acessar a arena ^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000 foi alterado de ^" + $@da_Color$[3] + "'" + (.@a_max_level[.@chooseArena]?.@a_max_level[.@chooseArena]:"desabilitado") + "'^000000 para ^" + $@da_Color$[3] + "'" + (.@max_level?.@max_level:"desabilitado") + "'^000000.";
+																								next;
+																								set .@a_max_level[.@chooseArena], .@max_level;
+																								set .@loop_8, 0;
+																								break;
+																							case 2:
+																								break;
+																							case 3:
+																								set .@loop_8, 0;
+																								break;
+																							case 4:
+																								set .@loop_8, 0;
+																								set .@loop_7, 0;
+																								set .@loop_6, 0;
+																								set .@loop_5, 0;
+																								set .@loop_4, 0;
+																								set .@loop_3, 0;
+																								set .@loop_2, 0;
+																								set .@loop_1, 0;
+																								break;
+																						
+																						}
+																					}
+																					break;
+																				case 4:
+																					set .@loop_7, 0;
+																					break;
+																				case 5:
+																					set .@loop_8, 0;
+																					set .@loop_7, 0;
+																					set .@loop_6, 0;
+																					set .@loop_5, 0;
+																					set .@loop_4, 0;
+																					set .@loop_3, 0;
+																					set .@loop_2, 0;
+																					set .@loop_1, 0;
+																					break;
+																			}
+																		}
+																		break;
 																	case 5:
 																		// Alterar grupo de restrições.
+																		set .@loop_7, 0;
+																		while(.@loop_7)
+																		{
+																			mes $@da_BasicSettings$[4];
+																			mes "Por favor selecione um novo grupo de restrições para arena ^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000.";
+																			next;
+																			query_sql "SELECT `auto_id`, `name` `" + $@da_DataBase$[1] + "` ORDER BY `name`", .@a_groups_id, .@a_groups_name$;
+																			set .@BuildGroupMenu$, "";
+																			for( set .@i, 0; .@i < getarraysize(.@a_groups_id); set .@i, .@i + 1 )
+																				set .@BuildGroupMenu$, .@BuildGroupMenu$ + "- " + (.@a_groups_id[.@i]!=.@a_group_id[.@chooseArena]&&callfunc("GetGroupInfo", 1, .@a_groups_id[.@i])<120?:"- " + .@a_groups_name$[.@i] + ".") + ":";
+															
+																			set .@choosetoGroup, select(.@BuildGroupMenu$+"^" + $@da_Color$[1] + "- Voltar.^000000:^" + $@da_Color$[0] + "- Cancelar^000000")-1;
+																							
+																			if( .@choosetoGroup == getarraysize(.@a_groups_id) )
+																				set .@loop_7, 0;
+																			else if( .@choosetoGroup > getarraysize(.@a_groups_id) )
+																			{
+																				set .@loop_7, 0;
+																				set .@loop_6, 0;
+																				set .@loop_5, 0;
+																				set .@loop_4, 0;
+																				set .@loop_3, 0;
+																				set .@loop_2, 0;
+																				set .@loop_1, 0;
+																			}
+																			else {
+																				mes $@da_BasicSettings$[4];
+																				mes "Tem certeza que deseja alterar o grupo de restrições da arena ^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000 de ^" + $@da_Color$[3] + "'" + callfunc("GetGroupInfo", 4, .@a_group_id[.@chooseArena]) + "'^000000 para ^" + $@da_Color$[3] + "'" + .@a_groups_id[.@choosetoGroup] + "'^000000?";
+																				next;
+																				switch( select("- Sim, por favor.", "- Não, desejo alterar para outro grupo.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar^000000") )
+																				{
+																					case 1:
+																						// Alterar o grupo de restriçoes
+																						query_sql "UPDATE `" + $@da_DataBase$[0] + "` SET `group_id`='" + .@a_groups_id[.@choosetoGroup] + "' WHERE `auto_id`='" + .@a_auto_id[.@chooseArena] + "'";
+																						mes $@da_BasicSettings$[4];
+																						mes "O grupo de restrições da arena ^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000 foi alterada de ^" + $@da_Color$[3] + "'" + callfunc("GetGroupInfo", 4, .@a_group_id[.@chooseArena]) + "'^000000 para ^" + $@da_Color$[3] + "'" + .@a_groups_id[.@choosetoGroup] + "'^000000.";
+																						next;
+																						set .@a_group_id[.@chooseArena], .@a_groups_id[.@choosetoGroup];
+																						set .@loop_7, 0;
+																						break;
+																					case 2:
+																						break;
+																					case 3:
+																						set .@loop_7, 0;
+																						break;
+																					case 4:
+																						set .@loop_7, 0;
+																						set .@loop_6, 0;
+																						set .@loop_5, 0;
+																						set .@loop_4, 0;
+																						set .@loop_3, 0;
+																						set .@loop_2, 0;
+																						set .@loop_1, 0;
+																						break;
+																				}
+																			}
+																		}
+																		break;
 																	case 6:
 																		set .@loop_6, 0;
 																		break;
@@ -1716,6 +1955,8 @@ OnInit:
 	//				[2]: Total de itens cadastrado na restrição de um grupo.
 	//					id: Identificação do grupo.
 	//				[3]: Total de classes cadastrada na restrição de um grupo.
+	//					id: Identificação do grupo.
+	//				[4]: Nome de um grupo.
 	//					id: Identificação do grupo.
 	function	script	GetGroupInfo	{
 		return false;
