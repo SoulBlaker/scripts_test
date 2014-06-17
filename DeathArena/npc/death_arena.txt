@@ -44,7 +44,7 @@ OnInit:
 						"^E066FF[Death Arena]^000000",		// Nome do npc que será exibido nas janelas de dialogo do npc.
 						1,					// Checar se caso um item na restrição seja carta se ele está equipado em um equipamento?
 						10,					// Total de resultados exibidos por ranking. [Nota 3]
-						0					// Nível de GM para utilizar o comando @daranking.
+						0					// Nível de GM para utilizar o comando de acessar raking.
 	;
 	
 	setarray $@da_Color$[0],
@@ -136,6 +136,166 @@ OnUnLoadMapFlags:
 		{
 			case 1:
 				// Ír para um arena.
+				set .@loop_2, 1;
+				while(.@loop_2)
+				{
+					mes $@da_BasicSettings$[4];
+					mes "Muito bem, escolha o tipo de arena que deseja entrar.";
+					next;
+					set .@type, select("- Jogadores vs Jogadores.", "- Clãns vs Clãns.", "- Grupos vs Grupos.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000")-1;
+					switch(.@type)
+					{
+						default:
+							set .@loop_3, 1;
+							while(.@loop_3)
+							{
+								setarray .@mask_name$[0], "Jogadores vs Jogadores", "Clãns vs Clãns", "Grupos vs Grupos";
+								mes $@da_BasicSettings$[4];
+								mes "Escolha ^" + $@da_Color$[3] + "arena de " + .@mask_name$[.@type] + "^000000 que deseja entrar.";
+								next;
+								query_sql "SELECT `auto_id`, `map_index`, `coord_x`, `coord_y`, `name`, `max_player`, `min_level`, `max_level`, `group_id` FROM `" + $@da_DataBase$[0] + "` WHERE `type`='" + .@type + "' ORDER BY `name` DESC", .@auto_id, .@map_index$, .@coord_x, .@coord_y, .@name$, .@max_player, .@min_level, .@max_level, .@group_id;
+								
+								set .@BuildArenaMenu$, "";
+								for( set .@i, 0; .@i < getarraysize(.@auto_id); set .@i, .@i + 1 )
+									set .@BuildArenaMenu$, .@BuildArenaMenu$ + "- " + .@name$[.@i]  + ". [" + getmapusers(.@map_index$[.@i]) + (.@max_player[.@i]?"/"+.@max_player[.@i]:"") + "]:";
+									
+								set .@chooseArena, select(.@BuildArenaMenu$+^" + $@da_Color$[1] + "- Voltar.^000000:^" + $@da_Color$[0] + "- Cancelar.^000000")-1;
+								
+								if( .@chooseArena == getarraysize(.@a_auto_id) )
+									set .@loop_3, 0;
+								else if( .@chooseArena > getarraysize(.@a_auto_id) )
+								{
+									set .@loop_3, 0;
+									set .@loop_2, 0;
+									set .@loop_1, 0;
+								}
+								else {
+									set .@loop_4, 1;
+									while(.@loop_4)
+									{
+										mes $@da_BasicSettings$[4];
+										mes "Deseja entrar na arena ^" + $@da_Color$[3] + .@name$[.@chooseArena] + "^000000?";
+										next;
+										switch( select("- Sim, por favor.", "- Informações.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
+										{
+											case 1:
+												// Entrar na arena.
+												set .@item_id, 0;
+												set .@class_id, 0;
+												
+												for( set .@t, 0; .@t < 2; set .@t, .@t + 1 )
+												{
+													query_sql "SELECT `value` FROM `" + $@da_DataBase$[2] + "` WHERE `type`='" + .@t + "' AND `group_id`='" + .@group_id[.@chooseArena] + "'", .@object_id;
+													for( set .@i, 0; .@i < getarraysize(.@item_id); set .@i, .@i + 1 )
+													{
+														if( !.@type && !.@item_id && countitem(.@object_id[.@i]) )
+															set .@item_id, .@object_id[.@i];
+														else if( .@type && !.@class_id && Class == .@object_id[.@i] )
+															set .@class_id, .@object_id[.@i];
+													}	
+												}
+													
+												if( .@item_id )
+												{
+													mes $@da_BasicSettings$[4];
+													mes "Você não pode entrar na arena com o item ^" + $@da_Color$[3] + getitemname(.@item_id[.@i]) + "^000000,  saiba os requisitos no menu de ^" + $@da_Color$[3] + "Informações^000000.";
+													next;
+												}
+												else if( .@class_id )
+												{
+													mes $@da_BasicSettings$[4];
+													mes "Você não pode entrar na arena com a classe ^" + $@da_Color$[3] + jobname(.@class_id[.@i]) + "^000000,  saiba os requisitos no menu de ^" + $@da_Color$[3] + "Informações^000000.";
+													next;
+												}
+												else if( .@max_player[.@chooseArena] && getmapusers(.@map_index$[.@chooseArena]) >= .@max_player[.@chooseArena] )
+												{
+													mes $@da_BasicSettings$[4];
+													mes "A quantidade máxima de jogadores na arena já foi atingida, tente novamente mais tarde!";
+													next;
+												}
+												else if( .@min_level[.@chooseArena] && BaseLevel < .@min_level[.@chooseArena] )
+												{
+													mes $@da_BasicSettings$[4];
+													mes "Você não tem o nível minimo para entrar na arena, saiba os requisitos no menu de ^" + $@da_Color$[3] + "Informações^000000.";
+													next;
+												}
+												else if( .@min_level[.@chooseArena] && BaseLevel < .@min_level[.@chooseArena] )
+												{
+													mes $@da_BasicSettings$[4];
+													mes "Você não ultrapassou do nível máximo para entrar na arena, saiba os requisitos no menu de ^" + $@da_Color$[3] + "Informações^000000.";
+													next;
+												}
+												else {
+													// Levar para a arena.
+													mes $@da_BasicSettings$[4];
+													mes "Vou te mandar para arena ^" + $@da_Color$[3] + .@name$[.@chooseArena] + "^000000, tenha uma boa batalha!";
+													close2;
+													warp .@map_index$[.@chooseArena], .@coord_x[.@chooseArena], .@coord_y[.@chooseArena];
+													end;
+												}
+												break;
+											case 2:
+												// Informações.
+												// Entrar na arena.
+												mes "^" + $@da_Color$[3] + "Arena:^000000 " + .@name$[.@chooseArena];
+												mes "^" + $@da_Color$[3] + "Tipo: ^000000" + .@mask_name$[.@type];
+												mes "^" + $@da_Color$[3] + "Mapa: ^000000" + .@map_index$[.@chooseArena] + (.@coord_x[.@chooseArena]&&.@coord_y[.@chooseArena]?"x["+.@coord_x[.@chooseArena]+"] - y["+.@coord_y[.@chooseArena]+"]":"");
+												mes "^" + $@da_Color$[3] + "Máximo de Jogadores: ^000000" + (.@max_playe[.@chooseArena]?.@max_player[.@chooseArena]:"ilimitado");
+												mes "^" + $@da_Color$[3] + "Nível Minimo de Base: ^000000" + (.@min_level[.@chooseArena]?.@min_level[.@chooseArena]:"qualquer");
+												mes "^" + $@da_Color$[3] + "Nível Máximo de Base: ^000000" + (.@max_level[.@chooseArena]?.@max_level[.@chooseArena]:"qualquer");
+												
+												set .@item_list, "";
+												set .@class_list, "";
+												
+												for( set .@t, 0; .@t < 2; set .@t, .@t + 1 )
+												{
+													query_sql "SELECT `value` FROM `" + $@da_DataBase$[2] + "` WHERE `type`='" + .@t + "' AND `group_id`='" + .@group_id[.@chooseArena] + "'", .@object_id;
+													for( set .@i, 0; .@i < getarraysize(.@object_id); set .@i, .@i + 1 )
+													{
+														if( !.@type )
+															set .@item_list$, .@item_list$ + getitename(.@object_id[.@i]) + ((.@i+1)==getarraysize(.@object_id)?".":", ");
+														else if( .@type && Class == .@object_id[.@i] )
+															set .@class_list$, .@class_list$ + jobname(.@object_id[.@i]) + ((.@i+1)==getarraysize(.@object_id)?".":", ");
+													}	
+												}
+												
+												if( .@item_list$ )
+												{
+													mes " ";
+													mes "^" + $@da_Color$[3] + "Itens restritos:^000000 " + .@item_list$;
+												}
+												if( .@class_list )
+												{
+													mes " ";
+													mes "^" + $@da_Color$[3] + "Classes restritas:^000000 " + .@class_list$;
+												}
+												
+												next;
+												break;
+											case 3:
+												set .@loop_4, 0;
+												break;
+											case 4:
+												set .@loop_4, 0;
+												set .@loop_3, 0;
+												set .@loop_2, 0;
+												set .@loop_1, 0;
+												break;
+										}
+									}
+								}
+							}
+							break;
+						case 3:
+							set .@loop_2, 0;
+							break;
+						case 4:
+							set .@loop_1, 0;
+							set .@loop_2, 0;
+							break;
+					}
+				}
+				break;
 			case 2:
 				// Ranking.
 				OnRanking: //atcmd_func

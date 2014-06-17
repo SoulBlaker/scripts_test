@@ -1,4 +1,5 @@
 [2014/06/17] - SoulBlaker
+	++ Concluído módulo de teleporte para arena.
 	Adicionar um campo na tabela da_raking e outras pequenas correções.
 	++ Concluído módulo do rankings.
 	++ Concluído módulo de gerenciar rankings.
