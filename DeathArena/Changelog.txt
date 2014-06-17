@@ -1,4 +1,5 @@
 [2014/06/17] - SoulBlaker
+	@@ Concluído script death_arena, posto em BETA.
 	++ Adicionado módulo de sons e anuncios na arena e algumas funções já foram escritas.
 	++ Adicionado wavs que vai ser utilizado no sistema.
 	++ Concluído módulo de teleporte para arena.
