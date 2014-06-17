@@ -30,6 +30,10 @@
 //			 [2]: Habilita somente sons de eventos ao matar um jogador.
 //			 [3]: Habilita mensagem global no mapa da arena e sons de eventos ao matar um jogador.
 // [Nota 3]: O valor máximo é 120.
+// [Nota 4]: As configurações de sons são feito através de uma matriz, quando o jogador chega a
+//			 quantidade de mortes o som é tocado, lembre-se que a matriz que seja configurada
+//			 na indice '0' será a que repetirá quando o jogador ultrapassar a quantidade máxima 
+//			 de mortes feita sobre os jogadores.
 -	script	DeathArena#Main::DeathArena	-1,{
 
 OnInit:
@@ -64,10 +68,72 @@ OnInit:
 						"da_ranking"				// Banco de Dados do Ranking.
 	;
 
-
+	// Configurações dos sons da arena. [Nota 4]
+	//	<quantidade_morte>, "<wav>"
+	setarray $@da_SoundEffect$[0],
+						0, "death_arena_15.wav",	// Monster Kill
+						1, "death_arena_01.wav",	// First Blood
+						2, "death_arena_02.wav",	// Double Kill
+						3, "death_arena_03.wav",	// Triple Kill
+						4, "death_arena_04.wav",	// Mega Kill
+						5, "death_arena_05.wav",	// Ultra Kill
+						6, "death_arena_06.wav",	// Killing Spree
+						7, "death_arena_07.wav",	// Ownage
+						8, "death_arena_08.wav",	// Holy Shit
+						9, "death_arena_09.wav",	// Good Like
+						10, "death_arena_10.wav",	// Dominating
+						11, "death_arena_11.wav",	// Unstoppable
+						12, "death_arena_12.wav",	// Combowhore
+						13, "death_arena_14.wav		// Whicked Sick
+	;
+						
 	bind_atcmd "daconfig", "da_arena::OnManagerScript", atoi($@da_BasicSettings$[0]), atoi($@da_BasicSettings$[0]);
 	bind_atcmd "daranking", "da_arena::OnRanking", 
 	doevent "DeathArena::OnLoadMapFlags";
+	end;
+	
+OnPCKillEvent:
+	if( callfunc("getArenaInfo", 0, strcharinfo(3)) )
+	{
+		set da_kill_count, da_kill_count + 1;
+	
+		// Sistemas de sons.
+		if( atoi($@da_BasicSettings$[1]) >= 2 )
+		{
+			if( da_kill_count >= $@da_SoundEffect$[(getarraysize($@da_SoundEffect$)-2)] )
+				soundeffectall $@da_SoundEffect$[(getarraysize($@da_SoundEffect$)-1], 0, strcharinfo(3);
+			else {
+				for( set .@i, 2; .@i < getarraysize($@da_SoundEffect$); set .@i, .@i + 2 )
+				{
+					if( da_kill_count == $@da_SoundEffect$[.@i] )
+					{
+						soundeffectall $@da_SoundEffect$[(.@i+1)], 0, strcharinfo(3);
+						break;
+					}
+				}
+			}
+		}
+	
+		set .@type, callfunc("getArenaInfo", 1, strcharinfo(3));
+		
+		callfunc("UpdateRanking", getcharid(0), killedrid, 0);
+
+		if( .@type == 1 )
+		{
+			set .@killed_gid, (callfunc("CharName", killedrid)?getcharid(2, callfunc("CharName", killedrid)):0);
+			callfunc("UpdateRanking", getcharid(2), .@killed_gid, 1);
+		}
+		else if( .@type == 2 )
+		{
+			set .@killed_pid, (callfunc("CharName", killedrid)?getcharid(1, callfunc("CharName", killedrid)):0);
+			callfunc("UpdateRanking", getcharid(1), .@killed_pid, 2);
+		}
+			
+		if( atoi($@da_BasicSettings$[1]) == 1 || atoi($@da_BasicSettings$[1] == 3 )
+			mapannounce strcharinfo(3), "O jogador [" + strcharinfo(3) + "] derrotou o jogador [" + callfunc("GetRankInfo", 4, 0, killedrid) + "] e é a " + da_kill_count + " cabeça consecutiva que ele cortou!", bc_all, "0x00FF00";
+	
+		message strcharinfo(0), "Você derrotou " + da_kill_count + " jogadores.";
+	}
 	end;
 	
 OnLoadMapFlags:
@@ -2436,11 +2502,12 @@ function	script	GetGroupInfo	{
 	return false;
 }
 	
-// * checkRestriction(value, id)
-//		value: Id do item ou classe que deseja checar se existe nas restrições.
+// * checkRestriction(id, value)
 //		id: Id do grupo a ser checado.
+//		value: Id do item ou classe que deseja checar se existe nas restrições.
 function	script	CheckRestriction	{
-	return false;
+	query_sql "SELECT `auto_id` FROM `" + $@da_DatBase$[2] + "` WHERE `value`='" + getarg(1) + "' AND `group_id`='" + getarg(0) + "'", .@id;
+	return (getarraysize(.@id)?.@id[0]:0);
 }
 
 // * getRankInfo(type_1, type_2, object_id)
@@ -2457,4 +2524,52 @@ function	script	CheckRestriction	{
 //		object_id: Id do objeto a ser consultado.
 function	script	getRankInfo	{
 	return false;
+}
+
+// * getArenaInfo(type, map_index)
+//		type: Retorna com uma informação da arena.
+//			[0]: Retorna com o id da arena.
+//			[1]: Retorna com o tipo da arena.
+function	script	getArenaInfo	{
+	query_sql "SELECT `auto_id`, `name` FROM `" + $@da_DatBase$[0] + "` WHERE `map_index`='" + getarg(1) + "'", .@id, .@name$;
+	return (getarraysize(.@id)?(getarg(0)==1?.@name$[0]:.@id[0]):0);
+}
+
+// * GetCharName(char_id)
+//		char_id: Indentificação do personagem.
+function	script	GetCharName	{
+	query_sql "SELECT `name` FROM `char` WHERE `char_id`='" + getarg(0) + "'", .@name$;	
+	return (getarraysize(.@name$)?.@name$[0]:0);
+}
+
+// * UpdateRanking(object_kill_id, object_death_id, type)
+//		object_kill_id: Adiciona 1 ponto de vitória e proporcional ao objeto.
+//		object_death_id: Adiciona  1 ponto de derrota e proporcional ao objeto.
+//		type: Tipo do objeto.
+//			[0]: Jogador.
+//			[1]: Clã.
+//			[2]: Grupo.
+function	script	UpdateRanking	{
+
+	if( getarg(0) )
+	{
+		query_sql "SELECT `auto_id` FROM `" + $@da_DataBase$[3] + "` WHERE `object_id`='" + getarg(0) + "' AND `type`='" + getarg(2) + "'", .@auto_id;
+	
+		if( !.@auto_id )
+			query_sql "INSERT INTO `" + $@da_DatBase$[3] + "` (object_id, object_name, type, wins, ration) VALUES (" + getarg(0) + ", '" + (getarg(2)==1?getguildname(getarg(0)):(getarg(2)==2?getpartyname(getarg(0)):callfunc("GetCharName", getarg(0)))) + "', getarg(2), 1, 1)";
+		else
+			query_sql "UPDATE `" + $@da_DataBase$[3] + "` SET `wins`=`wins`+'1', `ration`=`ration`+'1' WHERE `object_id`='" + getarg(0) + "' AND `type`='" + getarg(2) + "'";
+	}
+	
+	if( getarg(1) )
+	{
+		query_sql "SELECT `auto_id` FROM `" + $@da_DataBase$[3] + "` WHERE `object_id`='" + getarg(0) + "' AND `type`='" + getarg(2) + "'", .@auto_id;
+	
+		if( !.@auto_id )
+			query_sql "INSERT INTO `" + $@da_DatBase$[3] + "` (object_id, object_name, type, loss, ration) VALUES (" + getarg(0) + ", '" + (getarg(2)==1?getguildname(getarg(0)):(getarg(2)==2?getpartyname(getarg(0)):callfunc("GetCharName", getarg(0)))) + "', getarg(2), 0, 0)";
+		else
+			query_sql "UPDATE `" + $@da_DataBase$[3] + "` SET `loss`=`loss`-'1', `ration`=`ration`-'1' WHERE `object_id`='" + getarg(0) + "' AND `type`='" + getarg(2) + "'";
+	}
+	
+	return;
 }
