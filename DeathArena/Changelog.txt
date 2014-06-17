@@ -1,14 +1,16 @@
+[2014/06/17] - SoulBlaker
+	++ Concluído módulo de gerenciar rankings.
 [2014/06/16] - SoulBlaker
 	++ Concluído módulo de gerenciar arenas.
-	++ Adicionado mais funções ao módulo de gerenciar arenas.
-	++ Adicionado template da visualização full do rank pvp.
-	++ Adicionado módulo de cadastro de arenas.
+	Adicionado mais funções ao módulo de gerenciar arenas.
+	Adicionado template da visualização full do rank pvp.
+	Adicionado módulo de cadastro de arenas.
 [2014/06/15] - SoulBlaker
-	++ Completado módulo de gerenciamento de grupos e regras de restrições.
+	++ Concluído módulo de gerenciamento de grupos e regras de restrições.
 	Correções nas tabelas sql.
-	++ Adicionado label de eventos para armar e desarmar mapflags das arenas.
-	++ Adicionado funções de gerenciamento de grupos.
-	++ Adicionado menu de gerenciamento de grupos e regras de restrições.
+	Adicionado label de eventos para armar e desarmar mapflags das arenas.
+	Adicionado funções de gerenciamento de grupos.
+	Adicionado menu de gerenciamento de grupos e regras de restrições.
 	Adicionado configurações básicas, menus básicos.
 	Adicionado npc death_arena.
 	Criado banco de dados.
