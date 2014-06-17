@@ -87,7 +87,7 @@ OnInit:
 						13, "death_arena_14.wav"	// Whicked Sick
 	;
 						
-	bindatcmd "daconfig", "da_arena::OnManagerScript", atoi($@da_BasicSettings$[0]), atoi($@da_BasicSettings$[0]);
+	bindatcmd "damanager", "da_arena::OnManagerScript", atoi($@da_BasicSettings$[0]), atoi($@da_BasicSettings$[0]);
 	bindatcmd "daranking", "da_arena::OnRanking";
 	donpcevent "DeathArena::OnLoadMapFlags";
 	end;
@@ -189,7 +189,7 @@ OnUnLoadMapFlags:
 	end;
 }
 
--	script	Death Arena#da_arena01::da_arena	-1,{
+prontera,150,150,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 
 	set .@loop_1, 1;
 	while(.@loop_1)
