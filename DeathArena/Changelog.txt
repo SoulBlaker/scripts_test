@@ -1,4 +1,6 @@
 [2014/06/17] - SoulBlaker
+	Adicionar um campo na tabela da_raking e outras pequenas correções.
+	++ Concluído módulo do rankings.
 	++ Concluído módulo de gerenciar rankings.
 [2014/06/16] - SoulBlaker
 	++ Concluído módulo de gerenciar arenas.

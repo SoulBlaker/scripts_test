@@ -29,6 +29,7 @@
 //			 [1]: Habilita somente mensagem global no mapa da arena ao matar um jogador.
 //			 [2]: Habilita somente sons de eventos ao matar um jogador.
 //			 [3]: Habilita mensagem global no mapa da arena e sons de eventos ao matar um jogador.
+// [Nota 3]: O valor máximo é 120.
 -	script	DeathArena#Main::DeathArena	-1,{
 
 OnInit:
@@ -41,17 +42,21 @@ OnInit:
 						1,					// Habilitar janela de chat em cima do npc? [Nota 1]
 						"Death Arena",				// Mensagem a ser exibida na janela de chat do npc ou referência sobre o npc.
 						"^E066FF[Death Arena]^000000",		// Nome do npc que será exibido nas janelas de dialogo do npc.
-						1					// Checar se caso um item na restrição seja carta se ele está equipado em um equipamento?
+						1,					// Checar se caso um item na restrição seja carta se ele está equipado em um equipamento?
+						10,					// Total de resultados exibidos por ranking. [Nota 3]
+						0					// Nível de GM para utilizar o comando @daranking.
 	;
 	
 	setarray $@da_Color$[0],
 						"FF0000",				// Cor hexadecimal para opções de menus com a função de Cancelar.
 						"FFA500",				// Cor hexadecimal para opções de menus com a função de Voltar.
-						"FFA500",				// Cor hexadecimal para opções de menus com a função de Próximo.
+						"FFA500",				// Cor hexadecimal para opções de menus com a função de Próximo/Anterior.
 						"0000FF",				// Cor hexadecimal para uma referência um objeto para função.
 						"0000FF",				// Cor hexadecimal para opção do menu de administrador.
-						"0000FF"				// Cor hexadecimal para referência sobre o npc.
-	;							
+						"0000FF",				// Cor hexadecimal para referência sobre o npc.
+						"0000FF",				// Cor hexadecimal parao cabeçalho do rank.
+	;
+						
 	setarray $@da_DataBase$[0],
 						"da_arena",				// Banco de Dados de arenas.
 						"da_group",				// Banco de Dados do Grupo de restrições.
@@ -61,6 +66,7 @@ OnInit:
 
 
 	bind_atcmd "daconfig", "da_arena::OnManagerScript", atoi($@da_BasicSettings$[0]), atoi($@da_BasicSettings$[0]);
+	bind_atcmd "daranking", "da_arena::OnRanking", 
 	doevent "DeathArena::OnLoadMapFlags";
 	end;
 	
@@ -132,9 +138,122 @@ OnUnLoadMapFlags:
 				// Ír para um arena.
 			case 2:
 				// Ranking.
+				OnRanking: //atcmd_func
+				set .@loop_2, 1;
+				while(.@loop_2)
+				{
+					mes $@da_BasicSettings$[4];
+					mes "Qual o ^" + $@da_Color$[3] + "Ranking^000000 deseja visualizar?";
+					next;
+					set .@type, select("- Ranking de Jogadores.", "- Ranking de Clãns.", "- Ranking de Grupos.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000")-1;
+					switch(.@type)
+					{
+						default:
+							set .@loop_3, 1;
+							setarray .@mask_name$, "Jogadores", "Grupos", "Clãns";
+							while(.@loop_3)
+							{
+								mes $@da_BasicSettings$[4];
+								mes "Como deseja filtrar o ^" + $@da_Color$[3] + "Rank de " + .@mask_name$[.@type] + "^000000?";
+								next;
+								set .@filter, select("- Filtrar por Vitórias.", "- Filtrar por Derrotas.", "- Filtrar Proporcionalmente.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000")-1;
+								switch(.@filter)
+								{
+									default:
+										set .@row_init, 0;
+										set .@row_end, atoi($@da_BasicSettings$[6])-1;
+										set .@row_position, 1;										
+										set .@loop_4, 1;
+										while(.@loop_4)
+										{
+											mes "^"+$@da_Color$[6] + "=~*~*~*~*~*~*~*~*~*~*~*~*=^000000";
+											mes "^"+$@da_Color$[6] + "[Rank: " + .@mask_name$[.@type] + "]^000000";
+											mes "^"+$@da_Color$[6] + "=~*~*~*~*~*~*~*~*~*~*~*~*=^000000";
+											
+											query_sql "SELECT `object_id`, `object_name`, `wins`, `loss`, `ration` WHERE `type`='" + .@filter + "' ORDER BY `" + (.@filter==1?"loss":(.@filter==2?"ration":"wins"))` DESC LIMIT " + .@row_init + "," + .@row_end + "", .@object_id, .@object_name$, .@wins, .@loss;
+											
+											if( !getarraysize(.@object_id) )
+											{
+												mes $@da_BasicSettings$[4];
+												mes "Não há nenhum resultados para o ^" + $@da_Color$[3]" + "Rank de " + .@mask_name$[.@type] + "^000000.";
+											
+											for( set .@i, 0; .@i < getarraysize(.@object_id)&&.@loop_4; set .@i, .@i + 1 )
+											{
+												mes " ";
+												mes "^"+$@da_Color$[3] + "Posição: " + .@row_position;
+												
+												if( .@type == 1 )
+													mes "^"+$@da_Color$[3] + "Clã:^000000 " + .@object_name$[.@i];
+												else if( .@type == 2 )
+													mes "^"+$@da_Color$[3] + "Grupo:^000000 " + .@object_name$[.@i];
+												else
+												{
+													mes "^"+$@da_Color$[3] + "Jogador:^000000 " + .@object_name$[.@i];
+													mes "^"+$@da_Color$[3] + "Clã:^000000 " + (getcharid(2)?getguildname(getcharid(2)):"N/a");
+													mes "^"+$@da_Color$[3] + "Grupo:^000000 " + (getcharid(1)?getpartyname(getcharid(1)):"N/a");
+												}
+												
+												mes "^"+$@da_Color$[3] + "Vitórias:^000000 " + .@wins[.@i];
+												mes "^"+$@da_Color$[3] + "Derrotas:^000000 " + .@loss[.@i];
+												mes "^"+$@da_Color$[3] + "Proporção:^000000 " + .@ration[.@i;
+												
+												mes " ";
+												mes "¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨";
+												
+												set .@row_position, .@row_postion + 1;
+											}
+											
+											set .@tmp_row_init, .@row_init;
+											set .@tmp_row_end, .@row_end;
+											set .@row_init, .@row_end + 1;
+											set .@row_end, .@row_end + atoi($@da_BasicSettings$[6]);
+											
+											query_sql "SELECT `object_id` WHERE `type`='" + .@filter + "' ORDER BY `" + (.@filter==1?"loss":(.@filter==2?"ration":"wins"))` DESC LIMIT " + (.@row_end+1) + "," + (.@row_end+atoi($@da_BasicSettings$[6])) + "", .@tmp_object_next;
+											next;
+											switch( select((.@row_init>$@da_BasicSettings$[6]?"^"+$@da_Color$[2]+"- Anterior.^000000":""), (getarraysize(.@tmp_object_next)?"^"+$@da_Color$[2]+"- Próximo.^000000":""), ""^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
+											{
+												case 1:
+													set .@row_init, .@tmp_row_init;
+													set .@row_end, .@tmp_row_end;
+													break;
+												case 2:
+													break;
+												case 3:
+													set .@loop_4, 0;
+													break;
+												case 4:
+													set .@loop_4, 0;
+													set .@loop_3, 0;
+													set .@loop_2, 0;
+													set .@loop_1, 0;
+													break;
+											}
+										}
+										break;
+									case 3:
+										set .@loop_3, 0;
+										break;
+									case 4:
+										set .@loop_3, 0;
+										set .@loop_2, 0;
+										set .@loop_1, 0;
+										break;
+								}
+							}
+							break;
+						case 3:
+							set .@loop_2, 0;
+							break;
+						case 4:
+							set .@loop_1, 0;
+							set .@loop_2, 0;
+							break;
+					}
+				}
+				break;
 			case 3:
-			OnManagerScript: //atcmd_func
 				// Gerenciar script.
+				OnManagerScript: //atcmd_func
 				set .@loop_2, 1;
 				while(.@loop_2)
 				{
@@ -1154,14 +1273,14 @@ OnUnLoadMapFlags:
 																										mes $@da_BasicSettings$[4];
 																										mes "Por favor, confirme as informações abaixo para concluír o cadastrado da arena:";
 																										mes " ";
-																										mes $@da_Color$[3] + "Arena:^000000 " + .@Name$;
-																										mes $@da_Color$[3] + "Tipo:^000000 " + .@mask_name$[.@type];
-																										mes $@da_Color$[3] + "Grupo de Restrições:^000000 "+ .@groups_name$[.@chooseGroup];
-																										mes $@da_Color$[3] + "Mapa:^000000 " + .@MapIndex$;
-																										mes $@da_Color$[3] + "Coordenadas:^000000 " + (.@CoordX&&.@CoordY?"x[" + .@CoordX + "] - y[" + .@CoordY + "]":"aleatória");
-																										mes $@da_Color$[3] + "Máximo de Jogadores:^000000 " + (.@MaxPlayer?.@MaxPlayer:"ilimitado");
-																										mes $@da_Color$[3] + "Nível Minimo:^000000 " + (.@MinBaseLevel?.@MinBaseLevel?"desabilitado");
-																										mes $@da_Color$[3] + "Nível Máximo:^000000 " + (.@MaxBaseLevel?.@MaxBaseLevel?"desabilitado");
+																										mes "^"+$@da_Color$[3] + "Arena:^000000 " + .@Name$;
+																										mes "^"+$@da_Color$[3] + "Tipo:^000000 " + .@mask_name$[.@type];
+																										mes "^"+$@da_Color$[3] + "Grupo de Restrições:^000000 "+ .@groups_name$[.@chooseGroup];
+																										mes "^"+$@da_Color$[3] + "Mapa:^000000 " + .@MapIndex$;
+																										mes "^"+$@da_Color$[3] + "Coordenadas:^000000 " + (.@CoordX&&.@CoordY?"x[" + .@CoordX + "] - y[" + .@CoordY + "]":"aleatória");
+																										mes "^"+$@da_Color$[3] + "Máximo de Jogadores:^000000 " + (.@MaxPlayer?.@MaxPlayer:"ilimitado");
+																										mes "^"+$@da_Color$[3] + "Nível Minimo:^000000 " + (.@MinBaseLevel?.@MinBaseLevel?"desabilitado");
+																										mes "^"+$@da_Color$[3] + "Nível Máximo:^000000 " + (.@MaxBaseLevel?.@MaxBaseLevel?"desabilitado");
 																										next;
 																										switch( select("- Sim, está tudo correto.", "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
 																										{
@@ -2030,7 +2149,7 @@ OnUnLoadMapFlags:
 															while(.@loop_6)
 															{
 																setarray .@rank_points[0], callfunc("getRankInfo", 1, .@type, .@object_id ), callfunc("getRankInfo", 2, .@type, .@object_id ), callfunc("getRankInfo", 3, .@type, .@object_id );
-																set .@name$, (.@type==1?getguildname(.@object_id):(.@type==1?getpartyname(.@object_id):callfunc("getCharName", .@object_id)));
+																set .@name$, callfunc("GetRankInfo", 4, .@type, .@object_id);
 																mes $@da_BasicSettings$[4];
 																mes "O que deseja alterar no ^" + $@da_Color$[3] + "'" + .@mask_name$[.@type] + .@name$ "'^000000?";
 																next;
@@ -2170,17 +2289,12 @@ function	script	CheckRestriction	{
 //				[1]: Retorna com as vitórias de um objeto(type_2).
 //				[2]: Retorna com as derrotas de um objeto(type_2).
 //				[3]: Retorna com o proporcional de vitórias sobre derrotas de um objeto(type_2).
+//				[4]: Retorna com o nome do objeto(type_2).
 //		type_2: Tipo do objeto.
 //				[0]: Jogador.
 //				[1]: Clã.
 //				[2]: Grupo.
 //		object_id: Id do objeto a ser consultado.
 function	script	getRankInfo	{
-	return false;
-}
-
-// * getCharName(char_id)
-//		retorna com o nome do jogador.
-function	script	getCharName	{
 	return false;
 }

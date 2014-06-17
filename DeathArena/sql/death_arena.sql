@@ -1,16 +1,17 @@
----
---- table `da_arena` {
---- 	auto_id		-> Auto-implementação de identificação da arena.
---- 	map_index	-> Mapa da arena.
---- 	coord_x		-> Coordenada X aonde os jogadores serão teleportados. (Padrão: 0 = random)
---- 	coord_y		-> Coordenada Y aonde os jogadores serão teleportados. (Padrão: 0 = random)
---- 	name		-> Nome da arena.
---- 	type		-> Tipo da arena. (0: Jogadores vs Jogadores/ 1: Clãns vs Clãns/ 2: Grupos vs Grupos)
---- 	max_player	-> Máximo de jogadores que podem acessar a arena. (0 é ilimitado)
---- 	min_level	-> Nível Minimo de Base para acessar a arena. (0 é desabilitado)
---- 	max_level	-> Nível Máximo de Base para acessar a arena. (1 é habilitado)
---- 	group		-> Identificação do Grupo de Restrições.
---- }
+--
+-- table `da_arena` {
+-- 	auto_id		-> Auto-implementação de identificação da arena.
+-- 	map_index	-> Mapa da arena.
+-- 	coord_x		-> Coordenada X aonde os jogadores serão teleportados. (Padrão: 0 = random)
+-- 	coord_y		-> Coordenada Y aonde os jogadores serão teleportados. (Padrão: 0 = random)
+-- 	name		-> Nome da arena.
+-- 	type		-> Tipo da arena. (0: Jogadores vs Jogadores/ 1: Clãns vs Clãns/ 2: Grupos vs Grupos)
+-- 	max_player	-> Máximo de jogadores que podem acessar a arena. (0 é ilimitado)
+-- 	min_level	-> Nível Minimo de Base para acessar a arena. (0 é desabilitado)
+-- 	max_level	-> Nível Máximo de Base para acessar a arena. (1 é habilitado)
+-- 	group		-> Identificação do Grupo de Restrições.
+-- }
+--
 CREATE TABLE IF NOT EXISTS `da_arena` (
 	`auto_id` int(11) unsigned NOT NULL auto_increment,
 	`map_index` varchar(11) NOT NULL default 'unknown',
@@ -24,23 +25,25 @@ CREATE TABLE IF NOT EXISTS `da_arena` (
 	`group_id` int(11) unsigned NOT NULL default '0',
 	 PRIMARY KEY (`auto_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1;
-
---- table `da_group` {
---- 	auto_id		-> Auto-implementação de identificação do Grupo de Restrições.
---- 	name		-> Nome do grupo de restrição.
---- }
+--
+-- table `da_group` {
+-- 	auto_id		-> Auto-implementação de identificação do Grupo de Restrições.
+-- 	name		-> Nome do grupo de restrição.
+-- }
+--
 CREATE TABLE IF NOT EXISTS `da_group` (
 	`auto_id` int(11) unsigned NOT NULL auto_increment,
 	`name` varchar(34) NOT NULL default '',
 	 PRIMARY KEY (`auto_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1;
-
---- table `da_restrictions` {
---- 	auto_id		-> Auto-implementação de identificação da Restrição.
---- 	group_id	-> Id de identificação do grupo.
---- 	value		-> Id do item/classe a ser restringido.
---- 	type		-> Tipo da ser restringido. (0: item/ : classe)
---- }
+--
+-- table `da_restrictions` {
+-- 	auto_id		-> Auto-implementação de identificação da Restrição.
+-- 	group_id	-> Id de identificação do grupo.
+-- 	value		-> Id do item/classe a ser restringido.
+-- 	type		-> Tipo da ser restringido. (0: item/ : classe)
+-- }
+--
 CREATE TABLE IF NOT EXISTS `da_restrictions` (
 	`auto_id` int(11) unsigned NOT NULL auto_increment,
 	`group_id` int(11) unsigned  NOT NULL default '0',
@@ -48,18 +51,21 @@ CREATE TABLE IF NOT EXISTS `da_restrictions` (
 	`type` int(1) unsigned NOT NULL default '0',
 	 PRIMARY KEY (`auto_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1;
-
---- table `da_ranking` {
---- 	auto_id		-> Auto-implementação de identificação do jogador/clã/grupo
---- 	object_id	-> Id do objeto. (jogador, clã ou grupo)
---- 	type		-> Tipo do objeto. (0: jogador/ 1: clã / 2: grupo)
---- 	wins		-> Vitórias do objeto.
---- 	loss		-> Derrotas do objeto.
---- 	ration		-> Vitórias proporcional a derrotas do objeto.
---- }
+--
+-- table `da_ranking` {
+-- 	auto_id		-> Auto-implementação de identificação do jogador/clã/grupo
+-- 	object_id	-> Id do objeto. (jogador, clã ou grupo)
+--  object_name -> Nome do objeto.
+-- 	type		-> Tipo do objeto. (0: jogador/ 1: clã / 2: grupo)
+-- 	wins		-> Vitórias do objeto.
+-- 	loss		-> Derrotas do objeto.
+-- 	ration		-> Vitórias proporcional a derrotas do objeto.
+-- }
+--
 CREATE TABLE IF NOT EXISTS `da_ranking` (
 	`auto_id` int(11) unsigned NOT NULL auto_increment,
 	`object_id` int(11) unsigned NOT NULL default '0',
+	`object_name` varchar(34) NOT NULL default '',
 	`type` int(1) unsigned NOT NULL default '0',
 	`wins` int(4) unsigned NOT NULL default '0',
 	`loss` int(4) unsigned NOT NULL default '0',
