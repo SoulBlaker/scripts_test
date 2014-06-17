@@ -46,7 +46,7 @@ OnInit:
 						1,					// Habilitar janela de chat em cima do npc? [Nota 1]
 						"Death Arena",				// Mensagem a ser exibida na janela de chat do npc ou referência sobre o npc.
 						"^E066FF[Death Arena]^000000",		// Nome do npc que será exibido nas janelas de dialogo do npc.
-						1,					// Checar se caso um item na restrição seja carta se ele está equipado em um equipamento?
+						1,					// Checar se caso um item na restrição seja carta se ele está equipada em um equipamento?
 						10,					// Total de resultados exibidos por ranking. [Nota 3]
 						0					// Nível de GM para utilizar o comando de acessar raking.
 	;
@@ -88,7 +88,7 @@ OnInit:
 	;
 						
 	bindatcmd "damanager", "da_arena::OnManagerScript", atoi($@da_BasicSettings$[0]), atoi($@da_BasicSettings$[0]);
-	bindatcmd "daranking", "da_arena::OnRanking";
+	bindatcmd "daranking", "da_arena::OnRanking", atoi($@da_BasicSettings$[7]);
 	donpcevent "DeathArena::OnLoadMapFlags";
 	end;
 	
