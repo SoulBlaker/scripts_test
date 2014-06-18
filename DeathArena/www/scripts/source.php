@@ -12,6 +12,7 @@ class DeathArena {
 	
 	public $max_row = 10;
 	
+	// [Sistema]
 	public $Ranking = array();
 	
 	public function __construct()
