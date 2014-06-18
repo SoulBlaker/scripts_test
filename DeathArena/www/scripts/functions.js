@@ -1,6 +1,6 @@
 	function ChangeFilter( value )
 	{
-		return window.open('?filter='+value+'&page='+document.getElementById('page').value, '_self');
+		return window.open('?filter='+value, '_self');
 	}
 		
 	function ChangePage( value )

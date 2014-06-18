@@ -1,3 +1,6 @@
+[2014/06/18] - SoulBlaker
+	Correção em uma query do Ranking do npc.
+	@@ Concluído o Ranking web compacto.
 [2014/06/17] - SoulBlaker
 	@@ Concluído script death_arena, posto em BETA.
 	++ Adicionado módulo de sons e anuncios na arena e algumas funções já foram escritas.

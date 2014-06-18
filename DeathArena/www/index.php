@@ -2,8 +2,8 @@
 <html>
 	<head>
 		<title>Death Arena 1.0</title>
-		<link rel="stylesheet" type="text/css" href="deatharena.css" />
-		<script type="text/javascript" src="functions.js"></script>
+		<link rel="stylesheet" type="text/css" href="css/da_full.css" />
+		<script type="text/javascript" src="scripts/functions.js"></script>
 	</head>
 	<body>
 		<div id="layout">
@@ -30,7 +30,8 @@
 				<div id="rank">
 					<table>
 						<tr id="title">
-							<td colspan="2">Jogador</td>
+							<td>&nbsp;</td>
+							<td>Jogador</td>
 							<td>Vitórias</td>
 							<td>Derrotas</td>
 							<td>Clã</td>

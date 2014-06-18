@@ -397,7 +397,7 @@ prontera,150,150,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 											mes "^"+$@da_Color$[6] + "[Rank: " + .@mask_name$[.@type] + "]^000000";
 											mes "^"+$@da_Color$[6] + "=~*~*~*~*~*~*~*~*~*~*~*~*=^000000";
 											
-											query_sql "SELECT `object_id`, `object_name`, `wins`, `loss`, `ration` WHERE `type`='" + .@filter + "' ORDER BY `" + (.@filter==1?"loss":(.@filter==2?"ration":"wins")) + "` DESC LIMIT " + .@row_init + "," + .@row_end + "", .@object_id, .@object_name$, .@wins, .@loss;
+											query_sql "SELECT `object_id`, `object_name`, `wins`, `loss`, `ration` WHERE `type`='" + .@filter + "' ORDER BY `" + (.@filter==1?"loss":(.@filter==2?"ration":"wins")) + "` DESC LIMIT " + .@row_init + "," + atoi($@da_BasicSettings$[6]) + "", .@object_id, .@object_name$, .@wins, .@loss;
 											
 											if( !getarraysize(.@object_id) )
 											{

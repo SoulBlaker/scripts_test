@@ -1,0 +1,37 @@
+body { background-color:#000000; }
+			
+#layout {
+	position:relative;
+}
+			
+#logo { 
+	background: url('../images/da_web_01.png');
+	width: 213px;
+	height: 190px;
+	background-repeat: no-repeat;
+	position: relative;
+}
+
+#content {
+	background-color:#FFFFFF;
+	background-repeat: repeat-y;
+	position:relative;
+	width: 191px;
+	margin-left:14px;
+}
+
+#content table { width:191px; border:0px; border-spacing:0px; padding: 0% 4% 4% 4%; }
+#content table #title { background-color:#c45d6f; color:#FFFFFF; }
+#content table td { text-align:center; }
+
+#content table #line-1 { color:#c45d6f; }
+#content table #line-0 { background:#FFC0CB; color:#c45d6f; }
+
+#filter-bar { padding: 75% 0% 0% 0%; text-align:center; }
+#no-result { text-align:center; color:#c45d6f; }
+#row { position: relative; width:100%; background-color:#FFFFFF; text-align:right;  }
+#row-bar-right { padding-right: 4%; }
+#row-bar-left { float:left; background-color:#FFFFFF; padding-left:4%; }
+
+#row-bar-left a, #row-bar-right a, #filter-bar a { color:#c45d6f; text-decoration:none; }
+#row-bar-left a:hover, #row-bar-right a:hover, #filter-bar a:hover { text-decoration:underline; }
