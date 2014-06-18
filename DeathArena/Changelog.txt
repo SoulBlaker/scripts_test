@@ -1,4 +1,5 @@
 [2014/06/18] - SoulBlaker
+	@@ Concluído o Ranking web Completo.
 	Correção em uma query do Ranking do npc.
 	@@ Concluído o Ranking web compacto.
 [2014/06/17] - SoulBlaker

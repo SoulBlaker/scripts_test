@@ -21,8 +21,10 @@ body { background-color:#000000; margin: 2% 2% 2% 20%; position:absolute; }
 #filter-bar { float: right; }
 #page-bar { text-align: right; }
 #filter-bar select, #filter-bar select option, #page-bar select, #page-bar select option { border: 1px solid #c45d6f; color:#c45d6f; }
-			
-#rank { padding-top:2%; padding-bottom: 2%;	}	
+
+#no-result { text-align:center; color:#c45d6f; padding-top:20%; padding-bottom:20%; }
+
+#rank { padding-top:2%; padding-bottom: 2%; height:300px;	}	
 #rank table { border:0px; width:100%; border-spacing:0px; font-family: "Lucida Console", Monaco, monospace; }
 #rank table #title { background-color:#c45d6f; color:#FFFFFF; }
 #rank table #title td, #rank table #line-0 td, #rank table #line-1 td { padding-top:5px; padding-bottom:5px; font-size:13px; text-align:center; }

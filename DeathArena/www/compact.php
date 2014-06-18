@@ -10,9 +10,9 @@
 		@$DeathArena = new DeathArena();
 	
 		$pg = (isset($_GET['page'])?$_GET['page']:0);
-		$min_row = $pg*($DeathArena->Config['max_row']);
+		$min_row = $pg*($DeathArena->max_row);
 		$type = (isset($_GET['type'])?$_GET['type']:0);
-		$DeathArena->ConsultCompact($type, $min_row, 'wins');
+		$DeathArena->Consult($type, $min_row, 'wins');
 	?>
 		<div id="layout">
 			<div id="logo">
