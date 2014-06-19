@@ -144,49 +144,23 @@ OnLoadMapFlags:
 	{
 		query_sql "SELECT `map_index`, `group_id` FROM `" + $@da_DataBase$[0] + "` WHERE `type`='" + .@type + "'", .@mapindex$, .@group_id;
 		
-		for( set .@i, 0; .@i < getarraysize(.@mapindex); set .@i, .@i + 1 )
+		for( set .@i, 0; .@i < getarraysize(.@mapindex$); set .@i, .@i + 1 )
 		{
-			setmapflag .@mapindex[.@i], mf_nosave;
-			setmapflag .@mapindex[.@i], mf_nomemo;
-			setmapflag .@mapindex[.@i], mf_noteleport;
-			setmapflag .@mapindex[.@i], mf_nowarp;
-			setmapflag .@mapindex[.@i], mf_nowarpto;
+			setmapflag .@mapindex$[.@i], mf_nosave;
+			setmapflag .@mapindex$[.@i], mf_nomemo;
+			setmapflag .@mapindex$[.@i], mf_noteleport;
+			setmapflag .@mapindex$[.@i], mf_nowarp;
+			setmapflag .@mapindex$[.@i], mf_nowarpto;
 			
 			if( .@type == 1 )
-				setmapflag .@mapindex[.@i], mf_pvp_noguild;
+				setmapflag .@mapindex$[.@i], mf_pvp_noguild;
 			else if( .@type == 2 )
-				setmapflag .@mapindex[.@i], mf_pvp_noparty;
+				setmapflag .@mapindex$[.@i], mf_pvp_noparty;
 			else
-				setmapflag .@mapindex[.@i], mf_pvp;
+				setmapflag .@mapindex$[.@i], mf_pvp;
 				
 			if( callfunc("GetGroupInfo", 2, .@group_id[.@i]) )
-				setmapflag .@mapindex[.@i], mf_nocommand;
-		}
-	}
-	end;
-	
-OnUnLoadMapFlags:
-	for( set .@type, 0; .@type < 2; set .@type, .@type + 1 )
-	{
-		query_sql "SELECT `map_index`, `group_id` FROM `" + $@da_DataBase$[0] + "` WHERE `type`='" + .@type + "'", .@mapindex$, .@group_id;
-		
-		for( set .@i, 0; .@i < getarraysize(.@mapindex); set .@i, .@i + 1 )
-		{
-			removemapflag .@mapindex[.@i], mf_nosave;
-			removemapflag .@mapindex[.@i], mf_nomemo;
-			removemapflag .@mapindex[.@i], mf_noteleport;
-			removemapflag .@mapindex[.@i], mf_nowarp;
-			removemapflag .@mapindex[.@i], mf_nowarpto;
-			
-			if( .@type == 1 )
-				removemapflag .@mapindex[.@i], mf_pvp_noguild;
-			else if( .@type == 2 )
-				removemapflag .@mapindex[.@i], mf_pvp_noparty;
-			else
-				removemapflag .@mapindex[.@i], mf_pvp;
-				
-			if( callfunc("GetGroupInfo", 2, .@group_id[.@i]) )
-				removemapflag .@mapindex[.@i], mf_nocommand;
+				setmapflag .@mapindex$[.@i], mf_nocommand;
 		}
 	}
 	end;
@@ -1294,6 +1268,29 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																		break;
 																}
 															}
+															else if( callfunc("getArenaInfo", 0, .@MapIndex$) )
+															{
+																mes $@da_BasicSettings$[4];
+																mes "Já existe uma arena cadastra com o mapa ^" + $@da_Color$[3] + .@MapIndex$ + "^000000.";
+																mes "Deseja tentar novamente?";
+																next;
+																switch( select("- Sim, por favor.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
+																{
+																	case 1:
+																		break;
+																	case 2:
+																		set .@loop_6, 0;
+																		break;
+																	case 3:
+																		set .@loop_6, 0;
+																		set .@loop_5, 0;
+																		set .@loop_4, 0;
+																		set .@loop_3, 0;
+																		set .@loop_2, 0;
+																		set .@loop_1, 0;
+																		break;
+																}
+															}
 															else {
 																set .@loop_7, 1;
 																while(.@loop_7)
@@ -1341,7 +1338,7 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																				mes "Por favor, digite o nível máximo de base para jogadores poderem acessar a arena ^" + $@da_Color$[3] + .@Name$ + "^000000.";
 																				mes "Digite 0 para que o nível máximo de base seja desabilitado.";
 																				next;
-																				input .@MinBaseLevel;
+																				input .@MaxBaseLevel;
 																				
 																				mes $@da_BasicSettings$[4];
 																				mes "Tem certeza que o máximo de jogadores a entrar na arena seja ^" + $@da_Color$[3] + (.@MaxPlayer?.@MaxPlayer:"ilimitado") + "^000000, o nível minimo de base seja ^" + $@da_Color$[3] + (.@MinBaseLevel?.@MinBaseLevel:"desabilitado") + "^000000 e o nível máximo de base seja ^" + $@da_Color$[3] + (.@MaxBaseLevel?.@MaxBaseLevel:"desabilitado") + "^000000?";
@@ -1355,7 +1352,7 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																							mes $@da_BasicSettings$[4];
 																							mes "Por favor, selecione o ^" + $@da_Color$[3] + "'Grupo de Restrições'^000000 que deseja adicionar a arena ^" + $@da_Color$[3] + .@Name$ + "^000000.";
 																							next;
-																							query_sql "SELECT `auto_id`, `name` FROM `" + $@da_DataBase$[1] + "` ORDER BY `name` DESC", .@groups_id, .@groups_name$;
+																							query_sql "SELECT `auto_id`, `name` FROM `" + $@da_DataBase$[1] + "` ORDER BY `name` ASC", .@groups_id, .@groups_name$;
 
 																							set .@BuildGroupMenu$, "";
 																							for( set .@i, 0; .@i < getarraysize(.@groups_id); set .@i, .@i + 1 )
@@ -1379,7 +1376,7 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																							}
 																							else {
 																								mes $@da_BasicSettings$[4];
-																								mes "Tem certeza que deseja adicionar o grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "^0000000 de restrições' na arena ^" + $@da_Color$[3] + .@Name$ + "^000000?";
+																								mes "Tem certeza que deseja adicionar o grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "^000000' de restrições na arena '^" + $@da_Color$[3] + .@Name$ + "^000000'?";
 																								next;
 																								switch( select("- Sim, por favor.", "- Não, desejo selecionar outro grupo.", "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
 																								{
@@ -1400,11 +1397,10 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																										{
 																											case 1:
 																												// Adicionar arena.
-																												query_sql "INSERT INTO `" + $@da_DataBase$[0] + "` (map_index, coord_x, coord_y, name, type, max_player, max_level, min_level, group_id) VALUES('" + .@MapIndex$ + "', " + .@CoordX + ", " + .@CoordY + ", '" + .@Name$ + "', " + .@type + ", " + .@MaxPlayer + ", " + @MaxBaseLevel + ", " + .@MinBaseLevel + ", " + .@groups_id[.@chooseGroup] + ")";
+																												query_sql "INSERT INTO `" + $@da_DataBase$[0] + "` (map_index, coord_x, coord_y, name, type, max_player, max_level, min_level, group_id) VALUES('" + .@MapIndex$ + "', " + .@CoordX + ", " + .@CoordY + ", '" + .@Name$ + "', " + .@type + ", " + .@MaxPlayer + ", " + .@MaxBaseLevel + ", " + .@MinBaseLevel + ", " + .@groups_id[.@chooseGroup] + ")";
 																												mes $@da_BasicSettings$[4];
-																												mes "A arena '" + $@da_Color$[3] + .@Name$ + "' foi adicionada.";
+																												mes "A arena '^" + $@da_Color$[3] + .@Name$ + "'^000000 foi adicionada.";
 																												next;
-																												donpcevent "DeathArena::OnUnLoadMapFlags";
 																												donpcevent "DeathArena::OnLoadMapFlags";
 																												set .@loop_9, 0;
 																												set .@loop_8, 0;
@@ -1518,7 +1514,10 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 														mes $@da_BasicSettings$[4];
 														mes "Por favor, selecione uma arena de ^" + $@da_Color$[3] + .@mask_name$[.@type] + "^000000.";
 														next;
-														query_sql "SELECT `auto_id`, `name` `" + $@da_DataBase$[0] + "` WHERE `type`='" + .@type + "' ORDER BY `name`", .@a_auto_id, .@a_name$;
+														cleararray .@a_auto_id, 0, getarraysize(.@a_auto_id);
+														cleararray .@a_name$, "", getarraysize(.@a_name$);
+														cleararray .@a_mapindex$, "", getarraysize(.@a_mapindex$);
+														query_sql "SELECT `auto_id`, `name`, `map_index` FROM `" + $@da_DataBase$[0] + "` WHERE `type`='" + .@type + "' ORDER BY `name`", .@a_auto_id, .@a_name$, .@a_mapindex$;
 														set .@BuildArenaMenu$, "";
 														for( set .@i, 0; .@i < getarraysize(.@a_auto_id); set .@i, .@i + 1 )
 															set .@BuildArenaMenu$, .@BuildArenaMenu$ + "- " + .@a_name$[.@i] + ".:";
@@ -1547,6 +1546,16 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																	mes $@da_BasicSettings$[4];
 																	mes "A arena '^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000 foi removida.";
 																	next;
+																	// remover mapflags do sistema
+																	removemapflag .@a_mapindex$[.@chooseArena], mf_nosave;
+																	removemapflag .@a_mapindex$[.@chooseArena], mf_nomemo;
+																	removemapflag .@a_mapindex$[.@chooseArena], mf_noteleport;
+																	removemapflag .@a_mapindex$[.@chooseArena], mf_nowarp;
+																	removemapflag .@a_mapindex$[.@chooseArena], mf_nowarpto;
+																	removemapflag .@a_mapindex$[.@chooseArena], mf_pvp_noguild;
+																	removemapflag .@a_mapindex$[.@chooseArena], mf_pvp_noparty;
+																	removemapflag .@a_mapindex$[.@chooseArena], mf_pvp;
+																	removemapflag .@a_mapindex$[.@chooseArena], mf_nocommand;
 																	set .@loop_5, 0;
 																	break;
 																case 2:
@@ -1596,6 +1605,9 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 														mes $@da_BasicSettings$[4];
 														mes "Por favor, selecione uma arena de ^" + $@da_Color$[3] + .@mask_name$[.@type] + "^000000.";
 														next;
+														cleararray .@a_auto_id, 0, getarraysize(.@a_auto_id);
+														cleararray .@a_name$, "", getarraysize(.@a_name$);
+														cleararray .@a_mapindex$, "", getarraysize(.@a_mapindex$);
 														query_sql "SELECT `auto_id`, `name`, `type`, `map_index`, `coord_x`, `coord_y`, `max_player`, `min_level`, `max_level`, `group_id` FROM `" + $@da_DataBase$[0] + "` WHERE `type`='" + .@type + "' ORDER BY `name`", .@a_auto_id, .@a_name$, .@a_type, .@a_map_index$, .@a_coord_x, .@a_coord_y, .@a_max_player, .@a_min_level, .@a_max_level, .@a_group_id;
 														set .@BuildArenaMenu$, "";
 														for( set .@i, 0; .@i < getarraysize(.@a_auto_id); set .@i, .@i + 1 )
@@ -1631,7 +1643,7 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																			mes "Por favor, digite um novo nome para a arena '^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000.";
 																			next;
 																			input .@Name$;
-																			if( !.@Name$ || .@Name$ == .@a_name$[.@chooseArena] )
+																			if( .@Name$ == "" || .@Name$ == .@a_name$[.@chooseArena] )
 																			{
 																				mes $@da_BasicSettings$[4];
 																				mes "Você deve digitar um novo nome para a arena '^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000.";
@@ -2393,7 +2405,7 @@ function	script	GetGroupInfo	{
 	}
 	else if( getarg(0) == 4 )
 	{
-		query_sql "SELECT `auto_id`, `name` FROM `" + $@da_DatBase$[1] + "` WHERE `auto_id`='" + getarg(1) + "'", .@id, .@name$;
+		query_sql "SELECT `auto_id`, `name` FROM `" + $@da_DataBase$[1] + "` WHERE `auto_id`='" + getarg(1) + "'", .@id, .@name$;
 		return (!getarraysize(.@id)?0:.@name$[0]);
 	}
 	else if( getarg(0) == 1 )
@@ -2440,7 +2452,7 @@ function	script	getRankInfo	{
 //			[0]: Retorna com o id da arena.
 //			[1]: Retorna com o tipo da arena.
 function	script	getArenaInfo	{
-	query_sql "SELECT `auto_id`, `name` FROM `" + $@da_DatBase$[0] + "` WHERE `map_index`='" + getarg(1) + "'", .@id, .@name$;
+	query_sql "SELECT `auto_id`, `name` FROM `" + $@da_DataBase$[0] + "` WHERE `map_index`='" + getarg(1) + "'", .@id, .@name$;
 	return (getarraysize(.@id)?(getarg(0)==1?.@name$[0]:.@id[0]):0);
 }
 
@@ -2465,7 +2477,7 @@ function	script	UpdateRanking	{
 		query_sql "SELECT `auto_id` FROM `" + $@da_DataBase$[3] + "` WHERE `object_id`='" + getarg(0) + "' AND `type`='" + getarg(2) + "'", .@auto_id;
 	
 		if( !.@auto_id )
-			query_sql "INSERT INTO `" + $@da_DatBase$[3] + "` (object_id, object_name, type, wins, ration) VALUES (" + getarg(0) + ", '" + (getarg(2)==1?getguildname(getarg(0)):(getarg(2)==2?getpartyname(getarg(0)):callfunc("GetCharName", getarg(0)))) + "', getarg(2), 1, 1)";
+			query_sql "INSERT INTO `" + $@da_DataBase$[3] + "` (object_id, object_name, type, wins, ration) VALUES (" + getarg(0) + ", '" + (getarg(2)==1?getguildname(getarg(0)):(getarg(2)==2?getpartyname(getarg(0)):callfunc("GetCharName", getarg(0)))) + "', getarg(2), 1, 1)";
 		else
 			query_sql "UPDATE `" + $@da_DataBase$[3] + "` SET `wins`=`wins`+'1', `ration`=`ration`+'1' WHERE `object_id`='" + getarg(0) + "' AND `type`='" + getarg(2) + "'";
 	}
@@ -2475,7 +2487,7 @@ function	script	UpdateRanking	{
 		query_sql "SELECT `auto_id` FROM `" + $@da_DataBase$[3] + "` WHERE `object_id`='" + getarg(0) + "' AND `type`='" + getarg(2) + "'", .@auto_id;
 	
 		if( !.@auto_id )
-			query_sql "INSERT INTO `" + $@da_DatBase$[3] + "` (object_id, object_name, type, loss, ration) VALUES (" + getarg(0) + ", '" + (getarg(2)==1?getguildname(getarg(0)):(getarg(2)==2?getpartyname(getarg(0)):callfunc("GetCharName", getarg(0)))) + "', getarg(2), 0, 0)";
+			query_sql "INSERT INTO `" + $@da_DataBase$[3] + "` (object_id, object_name, type, loss, ration) VALUES (" + getarg(0) + ", '" + (getarg(2)==1?getguildname(getarg(0)):(getarg(2)==2?getpartyname(getarg(0)):callfunc("GetCharName", getarg(0)))) + "', getarg(2), 0, 0)";
 		else
 			query_sql "UPDATE `" + $@da_DataBase$[3] + "` SET `loss`=`loss`-'1', `ration`=`ration`-'1' WHERE `object_id`='" + getarg(0) + "' AND `type`='" + getarg(2) + "'";
 	}
