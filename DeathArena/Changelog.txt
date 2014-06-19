@@ -1,5 +1,6 @@
 [2014/06/19] - SoulBlaker
 	Feito manutenção no npc, testes feito em jogo.
+		- Otmizado e corrigido todos erros e sistema relacionado ao gerenciamento das regras de restrições.
 		- Corrigido adicionar um grupo, remover um grupo, alterar nome de um grupo, e suas respectivas checagem.
 		- Corrigido algumas funções.
 		- Correções de váriaveis.

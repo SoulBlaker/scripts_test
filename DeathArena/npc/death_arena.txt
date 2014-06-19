@@ -45,7 +45,7 @@ OnInit:
 						3,					// Sistema de eventos de avisos na arena. [Nota 2]
 						1,					// Habilitar janela de chat em cima do npc? [Nota 1]
 						"Death Arena",				// Mensagem a ser exibida na janela de chat do npc ou referência sobre o npc.
-						"^E066FF[Death Arena]^000000",		// Nome do npc que será exibido nas janelas de dialogo do npc.
+						"^8A2BE2[Death Arena]^000000",		// Nome do npc que será exibido nas janelas de dialogo do npc.
 						1,					// Checar se caso um item na restrição seja carta se ele está equipada em um equipamento?
 						10,					// Total de resultados exibidos por ranking. [Nota 3]
 						0					// Nível de GM para utilizar o comando de acessar raking.
@@ -222,7 +222,7 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 								mes $@da_BasicSettings$[4];
 								mes "Escolha ^" + $@da_Color$[3] + "arena de " + .@mask_name$[.@type] + "^000000 que deseja entrar.";
 								next;
-								query_sql "SELECT `auto_id`, `map_index`, `coord_x`, `coord_y`, `name`, `max_player`, `min_level`, `max_level`, `group_id` FROM `" + $@da_DataBase$[0] + "` WHERE `type`='" + .@type + "' ORDER BY `name` DESC", .@auto_id, .@map_index$, .@coord_x, .@coord_y, .@name$, .@max_player, .@min_level, .@max_level, .@group_id;
+								query_sql "SELECT `auto_id`, `map_index`, `coord_x`, `coord_y`, `name`, `max_player`, `min_level`, `max_level`, `group_id` FROM `" + $@da_DataBase$[0] + "` WHERE `type`='" + .@type + "' ORDER BY `name` ASC", .@auto_id, .@map_index$, .@coord_x, .@coord_y, .@name$, .@max_player, .@min_level, .@max_level, .@group_id;
 								
 								set .@BuildArenaMenu$, "";
 								for( set .@i, 0; .@i < getarraysize(.@auto_id); set .@i, .@i + 1 )
@@ -400,7 +400,7 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 											mes "^"+$@da_Color$[6] + "[Rank: " + .@mask_name$[.@type] + "]^000000";
 											mes "^"+$@da_Color$[6] + "=~*~*~*~*~*~*~*~*~*~*~*~*=^000000";
 											
-											query_sql "SELECT `object_id`, `object_name`, `wins`, `loss`, `ration` WHERE `type`='" + .@filter + "' ORDER BY `" + (.@filter==1?"loss":(.@filter==2?"ration":"wins")) + "` DESC LIMIT " + .@row_init + "," + atoi($@da_BasicSettings$[6]) + "", .@object_id, .@object_name$, .@wins, .@loss;
+											query_sql "SELECT `object_id`, `object_name`, `wins`, `loss`, `ration` WHERE `type`='" + .@filter + "' ORDER BY `" + (.@filter==1?"loss":(.@filter==2?"ration":"wins")) + "` ASC LIMIT " + .@row_init + "," + atoi($@da_BasicSettings$[6]) + "", .@object_id, .@object_name$, .@wins, .@loss;
 											
 											if( !getarraysize(.@object_id) )
 											{
@@ -438,7 +438,7 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 												set .@row_init, .@row_end + 1;
 												set .@row_end, .@row_end + atoi($@da_BasicSettings$[6]);
 											
-												query_sql "SELECT `object_id` WHERE `type`='" + .@filter + "' ORDER BY `" + (.@filter==1?"loss":(.@filter==2?"ration":"wins")) + "` DESC LIMIT " + (.@row_end+1) + "," + (.@row_end+atoi($@da_BasicSettings$[6])) + "", .@tmp_object_next;
+												query_sql "SELECT `object_id` WHERE `type`='" + .@filter + "' ORDER BY `" + (.@filter==1?"loss":(.@filter==2?"ration":"wins")) + "` ASC LIMIT " + (.@row_end+1) + "," + (.@row_end+atoi($@da_BasicSettings$[6])) + "", .@tmp_object_next;
 												next;
 												switch( select((.@row_init>$@da_BasicSettings$[6]?"^"+$@da_Color$[2]+"- Anterior.^000000":""), (getarraysize(.@tmp_object_next)?"^"+$@da_Color$[2]+"- Próximo.^000000":""), "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
 												{
@@ -501,7 +501,7 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 								mes $@da_BasicSettings$[4];
 								mes "O que deseja gerenciar no ^" + $@da_Color$[3] + "Grupos de Restrições^000000?";
 								next;
-								switch( select("- Adicionar Grupo.", "- Remover Grupo.", "- Alterar nome de um Grupo.", "- Gerenciar Regras de Restrições.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[1] + "- Cancelar.^000000") )
+								switch( select("- Adicionar Grupo.", "- Remover Grupo.", "- Alterar nome de um Grupo.", "- Gerenciar Regras de Restrições.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
 								{
 									case 1:
 										// Adicionar Grupo.
@@ -590,10 +590,10 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 											next;
 											
 											set .@BuildGroupMenu$, "";
-											query_sql "SELECT `auto_id`, `name` FROM `" + $@da_DataBase$[1] + "` ORDER BY `name` DESC", .@groups_id, .@groups_name$;
+											query_sql "SELECT `auto_id`, `name` FROM `" + $@da_DataBase$[1] + "` ORDER BY `name` ASC", .@groups_id, .@groups_name$;
 											
 											for( set .@i, 0; .@i < getarraysize(.@groups_id); set .@i, .@i + 1 )
-												set .@BuildGroupMenu$, .@BuildGroupMenu$ + "- " + .@groups_name$ + ".:";
+												set .@BuildGroupMenu$, .@BuildGroupMenu$ + "- " + .@groups_name$[.@i] + ".:";
 												
 											set .@chooseGroup, select(.@BuildGroupMenu$+"^" + $@da_Color$[1] + "- Voltar.^000000:^" + $@da_Color$[0] + "- Cancelar.^000000")-1;
 											
@@ -659,7 +659,7 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																				{
 																					case 1:
 																						// Mover para outro grupo.
-																						query_sql "UPDATE `" + $@da_DataBase$[0] + "` SET `group_id`='" + .@goups_id[.@nchooseGroup] + "' WHERE `group_id`='" + .@groups_id[.@chooseGroup] + "'";
+																						query_sql "UPDATE `" + $@da_DataBase$[0] + "` SET `group_id`='" + .@groups_id[.@nchooseGroup] + "' WHERE `group_id`='" + .@groups_id[.@chooseGroup] + "'";
 																						set .@loop_6, 0;
 																						break;
 																					case 2:
@@ -739,10 +739,10 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 											mes "Por favor, selecione o '^" + $@da_Color$[3] + "'" + "Grupo de Restrições'^000000 que deseja alterar o nome.";
 											next;
 											set .@BuildGroupMenu$, "";
-											query_sql "SELECT `auto_id`, `name` FROM `" + $@da_DataBase$[1] + "` ORDER BY `name` DESC", .@groups_id, .@groups_name$;
+											query_sql "SELECT `auto_id`, `name` FROM `" + $@da_DataBase$[1] + "` ORDER BY `name` ASC", .@groups_id, .@groups_name$;
 											
 											for( set .@i, 0; .@i < getarraysize(.@groups_id); set .@i, .@i + 1 )
-												set .@BuildGroupMenu$, .@BuildGroupMenu$ + "- " + .@groups_name$ + ".:";
+												set .@BuildGroupMenu$, .@BuildGroupMenu$ + "- " + .@groups_name$[.@i] + ".:";
 												
 											set .@chooseGroup, select(.@BuildGroupMenu$+"^" + $@da_Color$[1] + "- Voltar.^000000:^" + $@da_Color$[0] + "- Cancelar.^000000")-1;
 			
@@ -837,10 +837,10 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 											mes "Selecione o ^" + $@da_Color$[3] + "Grupo de Restrições^000000 que deseja gerenciar.";
 											next;
 											set .@BuildGroupMenu$, "";
-											query_sql "SELECT `auto_id`, `name` FROM `" + $@da_DataBase$[1] + "` ORDER BY `name` DESC", .@groups_id, .@groups_name$;
+											query_sql "SELECT `auto_id`, `name` FROM `" + $@da_DataBase$[1] + "` ORDER BY `name` ASC", .@groups_id, .@groups_name$;
 											
 											for( set .@i, 0; .@i < getarraysize(.@groups_id); set .@i, .@i + 1 )
-												set .@BuildGroupMenu$, .@BuildGroupMenu$ + "- " + .@groups_name$ + ".:";
+												set .@BuildGroupMenu$, .@BuildGroupMenu$ + "- " + .@groups_name$[.@i] + ".:";
 												
 											set .@chooseGroup, select(.@BuildGroupMenu$ + "^" + $@da_Color$[1] + "- Voltar.^000000:^" + $@da_Color$[0] + "- Cancelar.^000000")-1;
 											
@@ -873,21 +873,23 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																next;
 																set .@countItem, callfunc("GetGroupInfo", 2, .@groups_id[.@chooseGroup]);
 																set .@countClass, callfunc("GetGroupInfo", 3, .@groups_id[.@chooseGroup]);
-																switch( select((.@countItem<120?"- Adicionar Itens as Regras de Restrições.":""), (.@countItem?"- Remover Itens das Regras de Restrições.":""), (.@countClass<120?"- Adicionar Classes as Regras de Restrições.":""), (.@countClass?"- Remover Itens das Regras de Restrições.":""), "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
+																set .@choosetype, select((.@countItem<120?"- Adicionar Itens as Regras de Restrições.":""), (.@countClass<120?"- Adicionar Classes as Regras de Restrições.":""), (.@countItem?"- Remover Itens das Regras de Restrições.":""), (.@countClass?"- Remover Classes das Regras de Restrições.":""), "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000")-1;
+																switch(.@choosetype)
 																{
+																	case 0:
 																	case 1:
-																		// Adicionar Itens as Regras de Restrições.
+																		// Adicionar itens ou classes as Regras de Restrições.
 																		set .@loop_7, 1;
 																		while(.@loop_7)
 																		{
 																			mes $@da_BasicSettings$[4];
-																			mes "Por favor, digite o ^" + $@da_Color$[3] + "id do item^000000 que deseja adicionar ao Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000 de Restrições.";
+																			mes "Por favor, digite o ^" + $@da_Color$[3] + (.@choosetype?"id da classe":"id do item") + "^000000 que deseja adicionar ao Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000 de Restrições.";
 																			next;
-																			input .@item_id;
-																			if( !.@item_id || !getitemname(.@item_id) )
+																			input .@object_id;
+																			if( (.@choosetype == 0 && getitemname(.@object_id) == "") || (jobname(.@object_id) == "") )
 																			{
 																				mes $@da_BasicSettings$[4];
-																				mes "Você deve digitar o ^" + $@da_Color$[3] + "id do item válido^000000 que deseja adicionar ao Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000 de Restrições.";
+																				mes "Você deve digitar o ^" + $@da_Color$[3] + "id " + (.@choosetype?"da classe":"do item") + " válido^000000 que deseja adicionar ao Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000 de Restrições.";
 																				mes "Deseja tentar novamente?";
 																				next;
 																				switch( select("- Sim, por favor.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
@@ -908,10 +910,10 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																						break;
 																				}
 																			}
-																			else if( callfunc("checkRestriction", .@groups_id[.@chooseGroup], .@item_id) )
+																			else if( callfunc("checkRestriction", .@groups_id[.@chooseGroup], .@object_id) )
 																			{
 																				mes $@da_BasicSettings$[4];
-																				mes "O item ^" + $@da_Color$[3] + getitemname(.@item_id) + "^000000 já existe no Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000 de Restrições.";
+																				mes (.@choosetype?"A classe":"O item") + " ^" + $@da_Color$[3] + (.@choosetype?jobname(.@object_id):getitemname(.@object_id)) + "^000000 já existe no Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000 de Restrições.";
 																				mes "Deseja tentar novamente?";
 																				next;
 																				switch( select("- Sim, por favor.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
@@ -934,15 +936,15 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																			}
 																			else {
 																				mes $@da_BasicSettings$[4];
-																				mes "Tem certeza que deseja adicionar o item '^" + $@da_Color$[3] + "'" + getitemname(.@item_id) + "'^000000 no Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000 de Restrições?";
+																				mes "Tem certeza que deseja adicionar " + (.@choosetype?"a classe":"o item") + " ^" + $@da_Color$[3] + "'" + (.@choosetype?jobname(.@object_id):getitemname(.@object_id)) + "'^000000 no Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000 de Restrições?";
 																				next;
-																				switch( select("- Sim, por favor.", "- Não, desejo adicionar outro item.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
+																				switch( select("- Sim, por favor.", "- Não, desejo adicionar outro.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
 																				{
 																					case 1:
-																						// Adicionar item no grupo de restrição.
-																						query_sql "INSERT INTO `" + $@da_DataBase$[2] + "` (group_id, value, type) VALUES (" + .@goups_id[.@chooseGroup] + ", " + .@item_id + ", 0)";
+																						// Adicionar item ou classe no grupo de restrição.
+																						query_sql "INSERT INTO `" + $@da_DataBase$[2] + "` (group_id, value, type) VALUES (" + .@groups_id[.@chooseGroup] + ", " + .@object_id + ", " + .@choosetype + ")";
 																						mes $@da_BasicSettings$[4];
-																						mes "O item '^" + $@da_Color$[3] + "'" + getitemname(.@item_id) + "'^000000 foi adicionado ao Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000 de Restrições?";
+																						mes (.@choosetype?"A classe":"O item") + " '^" + $@da_Color$[3] + "'" + (.@choosetype?jobname(.@object_id):getitemname(.@object_id)) + "'^000000 foi adicionado ao Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000 de Restrições.";
 																						next;
 																						set .@loop_7, 0;
 																						break;
@@ -965,24 +967,26 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																		}
 																		break;
 																	case 2:
+																	case 3:
+																		set .@choosetype, (.@choosetype==2?0:1);
 																		// Remover Itens das Regras de Restrições.
 																		set .@loop_7, 1;
 																		while(.@loop_7)
 																		{
 																			mes $@da_BasicSettings$[4];
-																			mes "Por favor, selecione o item que deseja remover do Grupo ^" + $@da_Color$[3] + "'" + .@group_name$[.@chooseGroup] + "'^000000 de Restrições.";
+																			mes "Por favor, selecione " + (.@choosetype?"a classe":"o item") + " que deseja remover do Grupo ^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000 de Restrições.";
 																			next;
-																			query_sql "SELECT `auto_id`, `value` FROM `" + $@da_DataBase$[2] + "` WHERE `type`='0' AND `group_id`='" + .@groups_id[.@chooseGroup] + "' ORDER BY `value` DESC", .@i_auto_id, .@i_value;
+																			query_sql "SELECT `auto_id`, `value` FROM `" + $@da_DataBase$[2] + "` WHERE `type`='" + .@choosetype + "' AND `group_id`='" + .@groups_id[.@chooseGroup] + "' ORDER BY `value` ASC", .@object_id, .@object_value;
 																		
-																			set .@BuildItemMenu$, "";
-																			for( set .@i, 0; .@i < getarraysize(.@i_auto_id); set .@i, .@i + 1 )
-																				set .@BuildItemMenu$, .@BuildItemMenu$ + "- " + getitemname(.@i_value[.@i]) + ".:";
+																			set .@BuildObjectMenu$, "";
+																			for( set .@i, 0; .@i < getarraysize(.@object_id); set .@i, .@i + 1 )
+																				set .@BuildObjectMenu$, .@BuildObjectMenu$ + "- " + (.@choosetype?jobname(.@object_value[.@i]):getitemname(.@object_value[.@i])) + ".:";
 																			
-																			set .@chooseItem, select(.@BuildItemMenu$+"^" + $@da_Color$[1] + "- Voltar.^000000:^" + $@da_Color$[0] + "- Cancelar.^000000")-1;
+																			set .@chooseObject, select(.@BuildObjectMenu$+"^" + $@da_Color$[1] + "- Voltar.^000000:^" + $@da_Color$[0] + "- Cancelar.^000000")-1;
 											
-																			if( .@chooseItem == getarraysize(.@i_auto_id) )
+																			if( .@chooseObject == getarraysize(.@object_id) )
 																				set .@loop_7, 0;
-																			else if( .@chooseItem > getarraysize(.@i_auto_id) )
+																			else if( .@chooseObject > getarraysize(.@object_id) )
 																			{
 																				set .@loop_7, 0;
 																				set .@loop_6, 0;
@@ -994,105 +998,16 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																			}
 																			else {
 																				mes $@da_BasicSettings$[4];
-																				mes "Tem certeza que deseja remover o item ^" + $@da_Color$[3] + getitemname(.@i_value[.@chooseItem]) + "^000000 do Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseItem] + "'^000000 de Restrições?";
+																				mes "Tem certeza que deseja remover " + (.@choosetype?"a classe":"o item") + " ^" + $@da_Color$[3] + (.@choosetype?jobname(.@object_value[.@chooseObject]):getitemname(.@object_value[.@chooseObject])) + "^000000 do Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000 de Restrições?";
 																				next;
 																				switch( select("- Sim, por favor.", "- Não, desejo remover outro item.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
 																				{
 																					case 1:
-																						// Remover o item do Grupo de Restrição
-																						query_sql "DELETE FROM `" + $@da_DataBase$[2] + "` WHERE `auto_id`='" + .@i_auto_id[.@chooseItem] + "'";
+																						// Remover o item ou classe do Grupo de Restrição
+																						query_sql "DELETE FROM `" + $@da_DataBase$[2] + "` WHERE `auto_id`='" + .@object_id[.@chooseObject] + "'";
 																						
 																						mes $@da_BasicSettings$[4];
-																						mes "O item ^" + $@da_Color$[3] + getitemname(.@i_value[.@chooseItem]) + "^000000 foi removido do Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseItem] + "'^000000 de Restrições?";
-																						next;
-																						set .@loop_7, 0;
-																						break;
-																					case 2:
-																						break;
-																					case 3:
-																						set .@loop_7, 0;
-																						break;
-																					case 4:
-																						set .@loop_7, 0;
-																						set .@loop_6, 0;
-																						set .@loop_5, 0;
-																						set .@loop_4, 0;
-																						set .@loop_3, 0;
-																						set .@loop_2, 0;
-																						set .@loop_1, 0;
-																						break;
-																				}
-																			}
-																		}
-																		break;
-																	case 3:
-																		// Adicionar Classes as Regras de Restrições.
-																		set .@loop_7, 1;
-																		while(.@loop_7)
-																		{
-																			mes $@da_BasicSettings$[4];
-																			mes "Por favor, digite o ^" + $@da_Color$[3] + "id da classe^000000 que deseja adicionar ao Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000 de Restrições.";
-																			next;
-																			input .@class_id;
-																			if( !.@class_id || !jobname(.@class_id) )
-																			{
-																				mes $@da_BasicSettings$[4];
-																				mes "Você deve digitar o ^" + $@da_Color$[3] + "id do classe válido^000000 que deseja adicionar ao Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000 de Restrições.";
-																				mes "Deseja tentar novamente?";
-																				next;
-																				switch( select("- Sim, por favor.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
-																				{
-																					case 1:
-																						break;
-																					case 2:
-																						set .@loop_7, 0;
-																						break;
-																					case 3:
-																						set .@loop_7, 0;
-																						set .@loop_6, 0;
-																						set .@loop_5, 0;
-																						set .@loop_4, 0;
-																						set .@loop_3, 0;
-																						set .@loop_2, 0;
-																						set .@loop_1, 0;
-																						break;
-																				}
-																			}
-																			else if( callfunc("checkRestriction", .@groups_id[.@chooseGroup], .@class_id) )
-																			{
-																				mes $@da_BasicSettings$[4];
-																				mes "A classe ^" + $@da_Color$[3] + jobname(.@class_id) + "^000000 já existe no Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000 de Restrições.";
-																				mes "Deseja tentar novamente?";
-																				next;
-																				switch( select("- Sim, por favor.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
-																				{
-																					case 1:
-																						break;
-																					case 2:
-																						set .@loop_7, 0;
-																						break;
-																					case 3:
-																						set .@loop_7, 0;
-																						set .@loop_6, 0;
-																						set .@loop_5, 0;
-																						set .@loop_4, 0;
-																						set .@loop_3, 0;
-																						set .@loop_2, 0;
-																						set .@loop_1, 0;
-																						break;
-																				}
-																			}
-																			else {
-																				mes $@da_BasicSettings$[4];
-																				mes "Tem certeza que deseja adicionar a classe '^" + $@da_Color$[3] + "'" + jobname(.@class_id) + "'^000000 no Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000 de Restrições?";
-																				next;
-																				switch( select("- Sim, por favor.", "- Não, desejo adicionar outra classe.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
-																				{
-																					case 1:
-																						// Adicionar classe no grupo de restrição.
-																						query_sql "INSERT INTO `" + $@da_DataBase$[2] + "` (group_id, value, type) VALUES (" + .@goups_id[.@chooseGroup] + ", " + .@class_id + ", 1)";
-																						mes $@da_BasicSettings$[4];
-																						mes "A classe '^" + $@da_Color$[3] + "'" + jobname(.@class_id) + "'^000000 foi adicionada ao Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000 de Restrições?";
+																						mes (.@choostype?"A classe":"O item") + " ^" + $@da_Color$[3] + (.@choosetype?jobname(.@object_value[.@chooseObject]):getitemname(.@object_value[.@chooseObject])) + "^000000 foi removido do Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000 de Restrições.";
 																						next;
 																						set .@loop_7, 0;
 																						break;
@@ -1115,70 +1030,9 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																		}
 																		break;
 																	case 4:
-																		// Remover Classes as Regras de Restrições.
-																		set .@loop_7, 1;
-																		while(.@loop_7)
-																		{
-																			mes $@da_BasicSettings$[4];
-																			mes "Por favor, selecione a classe que deseja remover do Grupo '" + $@da_Color$[3] + "'" + .@group_name$[.@chooseGroup] + "'^000000 de Restrições.";
-																			next;
-																			query_sql "SELECT `auto_id`, `value` FROM `" + $@da_DataBase$[2] + "` WHERE `type`='0' AND `group_id`='" + .@groups_id[.@chooseGroup] + "' ORDER BY `value` DESC", .@c_auto_id, .@c_value;
-																		
-																			set .@BuildItemMenu$, "";
-																			for( set .@i, 0; .@i < getarraysize(.@c_auto_id); set .@i, .@i + 1 )
-																				set .@BuildClassMenu$, .@BuildClassMenu$ + "- " + getitemname(.@c_value[.@i]) + ".:";
-																			
-																			set .@chooseClass, select(.@BuildClassMenu$+"^" + $@da_Color$[1] + "- Voltar.^000000:^" + $@da_Color$[0] + "- Cancelar.^000000")-1;
-											
-																			if( .@chooseClass == getarraysize(.@c_auto_id) )
-																				set .@loop_7, 0;
-																			else if( .@chooseClass > getarraysize(.@c_auto_id) )
-																			{
-																				set .@loop_7, 0;
-																				set .@loop_6, 0;
-																				set .@loop_5, 0;
-																				set .@loop_4, 0;
-																				set .@loop_3, 0;
-																				set .@loop_2, 0;
-																				set .@loop_1, 0;
-																			}
-																			else {
-																				mes $@da_BasicSettings$[4];
-																				mes "Tem certeza que deseja remover a classe ^" + $@da_Color$[3] + jobname(.@c_value[.@chooseItem]) + "^000000 do Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseItem] + "'^000000 de Restrições?";
-																				next;
-																				switch( select("- Sim, por favor.", "- Não, desejo remover outra classe.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
-																				{
-																					case 1:
-																						// Remover o item do Grupo de Restrição
-																						query_sql "DELETE FROM `" + $@da_DataBase$[2] + "` WHERE `auto_id`='" + .@c_auto_id[.@chooseClass] + "'";
-																						
-																						mes $@da_BasicSettings$[4];
-																						mes "A classe ^" + $@da_Color$[3] + jobname(.@i_value[.@chooseClass]) + "^000000 foi removida do Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseItem] + "'^000000 de Restrições?";
-																						next;
-																						set .@loop_7, 0;
-																						break;
-																					case 2:
-																						break;
-																					case 3:
-																						set .@loop_7, 0;
-																						break;
-																					case 4:
-																						set .@loop_7, 0;
-																						set .@loop_6, 0;
-																						set .@loop_5, 0;
-																						set .@loop_4, 0;
-																						set .@loop_3, 0;
-																						set .@loop_2, 0;
-																						set .@loop_1, 0;
-																						break;
-																				}
-																			}
-																		}
-																		break;
-																	case 5:
 																		set .@loop_6, 0;
 																		break;
-																	case 6:
+																	case 5:
 																		set .@loop_6, 0;
 																		set .@loop_5, 0;
 																		set .@loop_4, 0;
@@ -1192,15 +1046,15 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 														case 2:
 															// Copiar restrições para outro Grupo.
 															set .@loop_6, 1;
-															while(.@loo6_4)
+															while(.@loop_6)
 															{
 																mes $@da_BasicSettings$[4];
-																mes "Selecione o ^" + $@da_Color$[3] + "Grupo de Restrições^000000 no qual você deseja que as restrições do Grupo ^" + $@da_Color$[3] + .@groups_name$[.@chooseGroup] + "^0000000 seja copiada.";
+																mes "Selecione o ^" + $@da_Color$[3] + "Grupo de Restrições^000000 no qual você deseja que as restrições do Grupo ^" + $@da_Color$[3] + .@groups_name$[.@chooseGroup] + "^000000 seja copiada.";
 																next;
 																set .@BuildtoGroupMenu$, "";
 																
 																for( set .@i, 0; .@i < getarraysize(.@groups_id); set .@i, .@i + 1 )
-																	set .@BuildtoGroupMenu$, .@BuildtoGroupMenu$ + (.@groups_id[.@i]!=.@groups_id[.@chooseGroup]?"- " + .@group_name$[.@i] + ".":"") + ":";
+																	set .@BuildtoGroupMenu$, .@BuildtoGroupMenu$ + (.@groups_id[.@i]!=.@groups_id[.@chooseGroup]?"- " + .@groups_name$[.@i] + ".":"") + ":";
 																	
 																set .@choosetoGroup, select(.@BuildtoGroupMenu$+"^" + $@da_Color$[1] + "- Voltar.^000000:^" + $@da_Color$[0] + "- Cancelar.^000000")-1;
 																
@@ -1217,7 +1071,7 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																}
 																else {
 																	setarray .@copy[0], 0, callfunc("GetGroupInfo", 2, .@groups_id[.@choosetoGroup]), callfunc("GetGroupInfo", 2, .@groups_id[.@chooseGroup]), 0, callfunc("GetGroupInfo", 1, .@groups_id[.@choosetoGroup]), callfunc("GetGroupInfo", 1, .@groups_id[.@chooseGroup]);
-																	set .@loop_7, 0;
+																	set .@loop_7, 1;
 																	while(.@loop_7)
 																	{
 																		if( !.@copy[0] && (.@copy[1]+.@copy[2]) > 120 )
@@ -1289,15 +1143,17 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																					{
 																						if( (.@i==0&&!.@copy[0]) || (.@i==1&&!.@copy[3]) )
 																						{
-																							query_sql "SELECT `value`, `type` FROM `" + $@da_DataBase$[2] + "` WHERE `type`='" + .@i + "' AND `auto_id`='" + .@groups_id[.@chooseGroup] + "'", .@c_value, .@c_type;
+																							query_sql "SELECT `value`, `type` FROM `" + $@da_DataBase$[2] + "` WHERE `group_id`='" + .@groups_id[.@chooseGroup] + "' AND `type`='" + .@i + "'", .@c_value, .@c_type;
 																							
 																							for( set .@c, 0; .@c < getarraysize(.@c_value); set .@c, .@c + 1 )
-																								query_sql "INSERTO INTO `" + $@da_DataBase$[2] + "` (group_id, value, type) VALUES (" + .@groups_id[.@choosetoGroup] + ", " + .@c_value[.@i] +", " + .@c_type[.@i] + ")";
+																							{
+																								if( !callfunc("checkRestriction", .@groups_id[.@choosetoGroup], .@c_value[.@c]) )
+																									query_sql "INSERT INTO `" + $@da_DataBase$[2] + "` (group_id, value, type) VALUES (" + .@groups_id[.@choosetoGroup] + ", " + .@c_value[.@c] + ", " + .@c_type[.@c] + ")";
+																							}
 																						}
 																					}
 																					mes $@da_BasicSettings$[4];
 																					mes "Foi feito uma copia das restrições do Grupo ^" + $@da_Color$[3] + .@groups_name$[.@chooseGroup] + "^000000 para o Grupo ^" + $@da_Color$[3] + .@groups_name$[.@choosetoGroup] + "^000000?";
-																					next;
 																					next;
 																					set .@loop_7, 0;
 																					break;
@@ -2557,8 +2413,8 @@ function	script	GetGroupInfo	{
 // * checkRestriction(id, value)
 //		id: Id do grupo a ser checado.
 //		value: Id do item ou classe que deseja checar se existe nas restrições.
-function	script	CheckRestriction	{
-	query_sql "SELECT `auto_id` FROM `" + $@da_DatBase$[2] + "` WHERE `value`='" + getarg(1) + "' AND `group_id`='" + getarg(0) + "'", .@id;
+function	script	checkRestriction	{
+	query_sql "SELECT `auto_id` FROM `" + $@da_DataBase$[2] + "` WHERE `value`='" + getarg(1) + "' AND `group_id`='" + getarg(0) + "'", .@id;
 	return (getarraysize(.@id)?.@id[0]:0);
 }
 
