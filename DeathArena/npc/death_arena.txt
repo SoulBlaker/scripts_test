@@ -90,6 +90,9 @@ OnInit:
 	bindatcmd "damanager", "da_arena::OnManagerScript", atoi($@da_BasicSettings$[0]), atoi($@da_BasicSettings$[0]);
 	bindatcmd "daranking", "da_arena::OnRanking", atoi($@da_BasicSettings$[7]);
 	donpcevent "DeathArena::OnLoadMapFlags";
+	
+	if( atoi($@da_BasicSettings$[2]) )
+		donpcevent "da_arena::OnWaitingRoom";
 	end;
 	
 OnPCKillEvent:
@@ -189,16 +192,16 @@ OnUnLoadMapFlags:
 	end;
 }
 
-prontera,150,150,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
+prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 
 	set .@loop_1, 1;
 	while(.@loop_1)
 	{
 		mes $@da_BasicSettings$[4];
-		mes "Bem-vindo a " + $@da_BasicSettings$[4] + ".";
+		mes "Bem-vindo a ^" + $@da_Color$[5] + $@da_BasicSettings$[3] + "^000000.";
 		mes "Em que posso ajudar?";
 		next;
-		switch( select("- Ír para uma arena.", "- Ranking.", (getgmlevel()>=atoi($@da_BasicSettings$[0])?"^"+ $@da_Color$[4] + "- Gerenciar script.^000000":""), "^" + $@da_Color$[0] + "- Cancelar.^000000") )
+		switch( select("- Ír para uma arena.", "- Ranking.", (getgmlevel()>=atoi($@da_BasicSettings$[0])?"^"+ $@da_Color$[4] + "- Gerenciar.^000000":""), "^" + $@da_Color$[0] + "- Cancelar.^000000") )
 		{
 			case 1:
 				// Ír para um arena.
@@ -369,8 +372,8 @@ prontera,150,150,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 				set .@loop_2, 1;
 				while(.@loop_2)
 				{
-					//mes $@da_BasicSettings$[4];
-					//mes "Qual o ^" + $@da_Color$[3] + "Ranking^000000 deseja visualizar?";
+					mes $@da_BasicSettings$[4];
+					mes "Qual o ^" + $@da_Color$[3] + "Ranking^000000 deseja visualizar?";
 					next;
 					set .@type, select("- Ranking de Jogadores.", "- Ranking de Clãns.", "- Ranking de Grupos.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000")-1;
 					switch(.@type)
@@ -480,13 +483,13 @@ prontera,150,150,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 				}
 				break;
 			case 3:
-				// Gerenciar script.
+				// Gerenciar.
 				OnManagerScript: //atcmd_func
 				set .@loop_2, 1;
 				while(.@loop_2)
 				{
 					mes $@da_BasicSettings$[4];
-					mes "O que deseja gerenciar na ^" + $@da_Color$[5] + $@da_BasicSettings$[4] + "^000000?";
+					mes "O que deseja gerenciar na ^" + $@da_Color$[5] + $@da_BasicSettings$[3] + "^000000.?";
 					next;
 					switch( select("- Gerenciar Grupos de Restrições.", "- Gerenciar Arenas.", "- Gerenciar Ranking.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
 					{
@@ -510,15 +513,15 @@ prontera,150,150,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 											break;
 										}
 										
-										set .@loop_4, 0;
+										set .@loop_4, 1;
 										while(.@loop_4)
 										{
 											mes $@da_BasicSettings$[4];
-											mes "Por favor, digite o nome para o novo ^" + $@da_Color$[3] + "Grupo de Restrições^0000000.";
+											mes "Por favor, digite o nome para o novo ^" + $@da_Color$[3] + "Grupo de Restrições^000000.";
 											next;
 											input .@GroupName$;
 										
-											if( !.@GroupName$ )
+											if( .@GroupName$ == "" )
 											{
 												mes $@da_BasicSettings$[4];
 												mes "Você tem que digitar um nome para o novo ^" + $@da_Color$[3] + "Grupo de Restrições^000000!";
@@ -579,7 +582,7 @@ prontera,150,150,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 											break;
 										}
 										
-										set .@loop_4, 0;
+										set .@loop_4, 1;
 										while(.@loop_4)
 										{
 											mes $@da_BasicSettings$[4];
@@ -587,7 +590,7 @@ prontera,150,150,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 											next;
 											
 											set .@BuildGroupMenu$, "";
-											query_sql "SELECT `auto_id`, `name` FROM `" + $@da_DataBase[1] + "` ORDER BY `name` DESC", .@groups_id, .@groups_name$;
+											query_sql "SELECT `auto_id`, `name` FROM `" + $@da_DataBase$[1] + "` ORDER BY `name` DESC", .@groups_id, .@groups_name$;
 											
 											for( set .@i, 0; .@i < getarraysize(.@groups_id); set .@i, .@i + 1 )
 												set .@BuildGroupMenu$, .@BuildGroupMenu$ + "- " + .@groups_name$ + ".:";
@@ -605,7 +608,7 @@ prontera,150,150,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 											}
 											else {
 												mes $@da_BasicSettings$[4];
-												mes "Tem certeza que deseja remover o Grupo ^" + $@da_Color$[3] + "'" + .@goups_name$[.@chooseGroup] + "'^000000?";
+												mes "Tem certeza que deseja remover o Grupo ^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000?";
 												next;
 												switch( select("- Sim, por favor.", "- Não, desejo remover outro.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
 												{
@@ -614,7 +617,7 @@ prontera,150,150,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 														set .@loop_5, 1;
 														while(.@loop_5)
 														{
-															set .@total_arena, callfunc("GetGroupInfo", 1, .@groups_id);
+															set .@total_arena, callfunc("GetGroupInfo", 1, .@groups_id[.@chooseGroup]);
 															if( .@total_arena )
 															{
 																mes $@da_BasicSettings$[4];
@@ -633,7 +636,7 @@ prontera,150,150,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																			next;
 																			set .@nBuildGroupMenu$, "";
 																			for( set .@i, 0; .@i < getarraysize(.@groups_id); set .@i, .@i + 1 )
-																				set .@nBuildGroupMenu$, (.@groups_id[.@i]==.@groups_id[.@chooseGroup]?"":.@goups_name$) + ":";
+																				set .@nBuildGroupMenu$, (.@groups_id[.@i]==.@groups_id[.@chooseGroup]?"":.@groups_name$[.@i]) + ":";
 																				
 																			set .@nchooseGroup, select(.@nBuildGroupMenu$+"^" + $@da_Color$[1] + "- Voltar.^000000:^" + $@da_Color$[0] + "- Cancelar.^000000")-1;
 																			
@@ -650,7 +653,7 @@ prontera,150,150,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																			}
 																			else {
 																				mes $@da_BasicSettings$[4];
-																				mes "Tem certeza que deseja mover as arenas do Grupo ^" + $@da_Color$[3] + "'" + .@goups_name[.@chooseGroup] + "'^000000 para o Grupo '^" + $@da_Color$[3] + "'" + .@goups_name[.@nchooseGroup] + "'^000000?";
+																				mes "Tem certeza que deseja mover as arenas do Grupo ^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000 para o Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@nchooseGroup] + "'^000000?";
 																				next;
 																				switch( select("- Sim, por favor.", "- Não, desejo mover para outro grupo.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
 																				{
@@ -697,9 +700,10 @@ prontera,150,150,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																query_sql "DELETE FROM `" + $@da_DataBase$[1] + "` WHERE `auto_id`='" + .@groups_id[.@chooseGroup] + "'";
 																
 																mes $@da_BasicSettings$[4];
-																mes "O Grupo '^" + $@da_Color$[3] + "'" + .@goups_name[.@chooseGroup] + "'^000000 foi removido.";
+																mes "O Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000 foi removido.";
 																next;
 																set .@loop_5, 0;
+																set .@loop_4, 0;
 															}
 														}
 														break;
@@ -720,6 +724,14 @@ prontera,150,150,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 										break;
 									case 3:
 										// Alterar nome de um Grupo.
+										if( !callfunc("GetGroupInfo", 0) )
+										{
+											mes $@da_BasicSettings$[4];
+											mes "Não há ^" + $@da_Color$[3] + "Grupos de Restrições^000000 para ser removido.";
+											next;
+											break;
+										}
+										
 										set .@loop_4, 1;
 										while(.@loop_4)
 										{
@@ -727,13 +739,13 @@ prontera,150,150,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 											mes "Por favor, selecione o '^" + $@da_Color$[3] + "'" + "Grupo de Restrições'^000000 que deseja alterar o nome.";
 											next;
 											set .@BuildGroupMenu$, "";
-											query_sql "SELECT `auto_id`, `name` FROM `" + $@da_DataBase[1] + "` ORDER BY `name` DESC", .@groups_id, .@groups_name$;
+											query_sql "SELECT `auto_id`, `name` FROM `" + $@da_DataBase$[1] + "` ORDER BY `name` DESC", .@groups_id, .@groups_name$;
 											
 											for( set .@i, 0; .@i < getarraysize(.@groups_id); set .@i, .@i + 1 )
 												set .@BuildGroupMenu$, .@BuildGroupMenu$ + "- " + .@groups_name$ + ".:";
 												
 											set .@chooseGroup, select(.@BuildGroupMenu$+"^" + $@da_Color$[1] + "- Voltar.^000000:^" + $@da_Color$[0] + "- Cancelar.^000000")-1;
-											
+			
 											if( .@chooseGroup == getarraysize(.@groups_id) )
 												set .@loop_4, 0;
 											else if( .@chooseGroup > getarraysize(.@groups_id) )
@@ -753,7 +765,7 @@ prontera,150,150,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 													next;
 													input .@GroupName$;
 											
-													if( !.@GroupName$ || .@GroupName$ == .@goups_name[.@chooseGroup] )
+													if( .@GroupName$ == "" || .@GroupName$ == .@groups_name$[.@chooseGroup] )
 													{
 														mes $@da_BasicSettings$[4];
 														mes "Você deve digitar um novo nome para o Grupo '^" + $@da_Color$[3] + "'"+ .@groups_name$[.@chooseGroup] + "'^000000.";
@@ -785,16 +797,17 @@ prontera,150,150,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																// Alterar nome do grupo.
 																query_sql "UPDATE `" + $@da_DataBase$[1] + "` SET `name`='" + .@GroupName$ + "' WHERE `auto_id`='" + .@groups_id[.@chooseGroup] + "'";
 																mes $@da_BasicSettings$[4];
-																mes "Nome do Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000 foi alterado para '^" + $@da_Color$[3] + "'" + .@GroupName$ + "'^000000?";
+																mes "Nome do Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000 foi alterado para '^" + $@da_Color$[3] + "'" + .@GroupName$ + "'^000000.";
 																next;
 																set .@loop_5, 0;
+																set .@loop_4, 0;
 																break;
 															case 2:
 																break;
-															case 4:
+															case 3:
 																set .@loop_5, 0;
 																break;
-															case 5:
+															case 4:
 																set .@loop_5, 0;
 																set .@loop_4, 0;
 																set .@loop_3, 0;
@@ -809,6 +822,14 @@ prontera,150,150,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 										break;
 									case 4:
 										// Gerenciar Regras de Restrições.
+										if( callfunc("GetGroupInfo", 0) >= 120 )
+										{
+											mes $@da_BasicSettings$[4];
+											mes "O limite máximo de ^" + $@da_Color$[3] + "Grupos de Restrições^000000 já foi atingido.";
+											next;
+											break;
+										}
+										
 										set .@loop_4, 1;
 										while(.@loop_4)
 										{
@@ -816,7 +837,7 @@ prontera,150,150,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 											mes "Selecione o ^" + $@da_Color$[3] + "Grupo de Restrições^000000 que deseja gerenciar.";
 											next;
 											set .@BuildGroupMenu$, "";
-											query_sql "SELECT `auto_id`, `name` FROM `" + $@da_DataBase[1] + "` ORDER BY `name` DESC", .@groups_id, .@groups_name$;
+											query_sql "SELECT `auto_id`, `name` FROM `" + $@da_DataBase$[1] + "` ORDER BY `name` DESC", .@groups_id, .@groups_name$;
 											
 											for( set .@i, 0; .@i < getarraysize(.@groups_id); set .@i, .@i + 1 )
 												set .@BuildGroupMenu$, .@BuildGroupMenu$ + "- " + .@groups_name$ + ".:";
@@ -860,13 +881,13 @@ prontera,150,150,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																		while(.@loop_7)
 																		{
 																			mes $@da_BasicSettings$[4];
-																			mes "Por favor, digite o ^" + $@da_Color$[3] + "id do item^000000 que deseja adicionar ao Grupo '^" + $@da_Color$[3] + "'" + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições.";
+																			mes "Por favor, digite o ^" + $@da_Color$[3] + "id do item^000000 que deseja adicionar ao Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000 de Restrições.";
 																			next;
 																			input .@item_id;
 																			if( !.@item_id || !getitemname(.@item_id) )
 																			{
 																				mes $@da_BasicSettings$[4];
-																				mes "Você deve digitar o ^" + $@da_Color$[3] + "id do item válido^000000 que deseja adicionar ao Grupo '^" + $@da_Color$[3] + "'" + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições.";
+																				mes "Você deve digitar o ^" + $@da_Color$[3] + "id do item válido^000000 que deseja adicionar ao Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000 de Restrições.";
 																				mes "Deseja tentar novamente?";
 																				next;
 																				switch( select("- Sim, por favor.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
@@ -890,7 +911,7 @@ prontera,150,150,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																			else if( callfunc("checkRestriction", .@groups_id[.@chooseGroup], .@item_id) )
 																			{
 																				mes $@da_BasicSettings$[4];
-																				mes "O item ^" + $@da_Color$[3] + getitemname(.@item_id) + "^000000 já existe no Grupo '^" + $@da_Color$[3] + "'" + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições.";
+																				mes "O item ^" + $@da_Color$[3] + getitemname(.@item_id) + "^000000 já existe no Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000 de Restrições.";
 																				mes "Deseja tentar novamente?";
 																				next;
 																				switch( select("- Sim, por favor.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
@@ -913,7 +934,7 @@ prontera,150,150,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																			}
 																			else {
 																				mes $@da_BasicSettings$[4];
-																				mes "Tem certeza que deseja adicionar o item '^" + $@da_Color$[3] + "'" + getitemname(.@item_id) + "'^000000 no Grupo '^" + $@da_Color$[3] + "'" + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições?";
+																				mes "Tem certeza que deseja adicionar o item '^" + $@da_Color$[3] + "'" + getitemname(.@item_id) + "'^000000 no Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000 de Restrições?";
 																				next;
 																				switch( select("- Sim, por favor.", "- Não, desejo adicionar outro item.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
 																				{
@@ -921,7 +942,7 @@ prontera,150,150,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																						// Adicionar item no grupo de restrição.
 																						query_sql "INSERT INTO `" + $@da_DataBase$[2] + "` (group_id, value, type) VALUES (" + .@goups_id[.@chooseGroup] + ", " + .@item_id + ", 0)";
 																						mes $@da_BasicSettings$[4];
-																						mes "O item '^" + $@da_Color$[3] + "'" + getitemname(.@item_id) + "'^000000 foi adicionado ao Grupo '^" + $@da_Color$[3] + "'" + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições?";
+																						mes "O item '^" + $@da_Color$[3] + "'" + getitemname(.@item_id) + "'^000000 foi adicionado ao Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000 de Restrições?";
 																						next;
 																						set .@loop_7, 0;
 																						break;
@@ -1010,13 +1031,13 @@ prontera,150,150,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																		while(.@loop_7)
 																		{
 																			mes $@da_BasicSettings$[4];
-																			mes "Por favor, digite o ^" + $@da_Color$[3] + "id da classe^000000 que deseja adicionar ao Grupo '^" + $@da_Color$[3] + "'" + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições.";
+																			mes "Por favor, digite o ^" + $@da_Color$[3] + "id da classe^000000 que deseja adicionar ao Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000 de Restrições.";
 																			next;
 																			input .@class_id;
 																			if( !.@class_id || !jobname(.@class_id) )
 																			{
 																				mes $@da_BasicSettings$[4];
-																				mes "Você deve digitar o ^" + $@da_Color$[3] + "id do classe válido^000000 que deseja adicionar ao Grupo '^" + $@da_Color$[3] + "'" + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições.";
+																				mes "Você deve digitar o ^" + $@da_Color$[3] + "id do classe válido^000000 que deseja adicionar ao Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000 de Restrições.";
 																				mes "Deseja tentar novamente?";
 																				next;
 																				switch( select("- Sim, por favor.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
@@ -1040,7 +1061,7 @@ prontera,150,150,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																			else if( callfunc("checkRestriction", .@groups_id[.@chooseGroup], .@class_id) )
 																			{
 																				mes $@da_BasicSettings$[4];
-																				mes "A classe ^" + $@da_Color$[3] + jobname(.@class_id) + "^000000 já existe no Grupo '^" + $@da_Color$[3] + "'" + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições.";
+																				mes "A classe ^" + $@da_Color$[3] + jobname(.@class_id) + "^000000 já existe no Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000 de Restrições.";
 																				mes "Deseja tentar novamente?";
 																				next;
 																				switch( select("- Sim, por favor.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
@@ -1063,7 +1084,7 @@ prontera,150,150,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																			}
 																			else {
 																				mes $@da_BasicSettings$[4];
-																				mes "Tem certeza que deseja adicionar a classe '^" + $@da_Color$[3] + "'" + jobname(.@class_id) + "'^000000 no Grupo '^" + $@da_Color$[3] + "'" + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições?";
+																				mes "Tem certeza que deseja adicionar a classe '^" + $@da_Color$[3] + "'" + jobname(.@class_id) + "'^000000 no Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000 de Restrições?";
 																				next;
 																				switch( select("- Sim, por favor.", "- Não, desejo adicionar outra classe.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
 																				{
@@ -1071,7 +1092,7 @@ prontera,150,150,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																						// Adicionar classe no grupo de restrição.
 																						query_sql "INSERT INTO `" + $@da_DataBase$[2] + "` (group_id, value, type) VALUES (" + .@goups_id[.@chooseGroup] + ", " + .@class_id + ", 1)";
 																						mes $@da_BasicSettings$[4];
-																						mes "A classe '^" + $@da_Color$[3] + "'" + jobname(.@class_id) + "'^000000 foi adicionada ao Grupo '^" + $@da_Color$[3] + "'" + .@goups_name$[.@chooseGroup] + "'^000000 de Restrições?";
+																						mes "A classe '^" + $@da_Color$[3] + "'" + jobname(.@class_id) + "'^000000 foi adicionada ao Grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "'^000000 de Restrições?";
 																						next;
 																						set .@loop_7, 0;
 																						break;
@@ -1174,7 +1195,7 @@ prontera,150,150,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 															while(.@loo6_4)
 															{
 																mes $@da_BasicSettings$[4];
-																mes "Selecione o ^" + $@da_Color$[3] + "Grupo de Restrições^000000 no qual você deseja que as restrições do Grupo ^" + $@da_Color$[3] + .@goups_name$[.@chooseGroup] + "^0000000 seja copiada.";
+																mes "Selecione o ^" + $@da_Color$[3] + "Grupo de Restrições^000000 no qual você deseja que as restrições do Grupo ^" + $@da_Color$[3] + .@groups_name$[.@chooseGroup] + "^0000000 seja copiada.";
 																next;
 																set .@BuildtoGroupMenu$, "";
 																
@@ -1259,7 +1280,7 @@ prontera,150,150,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																		}
 																		else {
 																			mes $@da_BasicSettings$[4];
-																			mes "Tem certeza que deseja copiar as restrições do Grupo ^" + $@da_Color$[3] + .@goups_name$[.@chooseGroup] + "^000000 para o Grupo ^" + $@da_Color$[3] + .@groups_name$[.@choosetoGroup] + "^000000?";
+																			mes "Tem certeza que deseja copiar as restrições do Grupo ^" + $@da_Color$[3] + .@groups_name$[.@chooseGroup] + "^000000 para o Grupo ^" + $@da_Color$[3] + .@groups_name$[.@choosetoGroup] + "^000000?";
 																			next;
 																			switch( select("- Sim, por favor.", "- Não, desejo selecionar outro grupo.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
 																			{
@@ -1271,11 +1292,11 @@ prontera,150,150,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																							query_sql "SELECT `value`, `type` FROM `" + $@da_DataBase$[2] + "` WHERE `type`='" + .@i + "' AND `auto_id`='" + .@groups_id[.@chooseGroup] + "'", .@c_value, .@c_type;
 																							
 																							for( set .@c, 0; .@c < getarraysize(.@c_value); set .@c, .@c + 1 )
-																								query_sql "INSERTO INTO `" + $@da_DataBase[2] + "` (group_id, value, type) VALUES (" + .@groups_id[.@choosetoGroup] + ", " + .@c_value[.@i] +", " + .@c_type[.@i] + ")";
+																								query_sql "INSERTO INTO `" + $@da_DataBase$[2] + "` (group_id, value, type) VALUES (" + .@groups_id[.@choosetoGroup] + ", " + .@c_value[.@i] +", " + .@c_type[.@i] + ")";
 																						}
 																					}
 																					mes $@da_BasicSettings$[4];
-																					mes "Foi feito uma copia das restrições do Grupo ^" + $@da_Color$[3] + .@goups_name$[.@chooseGroup] + "^000000 para o Grupo ^" + $@da_Color$[3] + .@groups_name$[.@choosetoGroup] + "^000000?";
+																					mes "Foi feito uma copia das restrições do Grupo ^" + $@da_Color$[3] + .@groups_name$[.@chooseGroup] + "^000000 para o Grupo ^" + $@da_Color$[3] + .@groups_name$[.@choosetoGroup] + "^000000?";
 																					next;
 																					next;
 																					set .@loop_7, 0;
@@ -1338,6 +1359,15 @@ prontera,150,150,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 								{
 									case 1:
 										// Adicionar uma Arena.
+										if( !callfunc("GetGroupInfo", 0) )
+										{
+											mes $@da_BasicSettings$[4];
+											mes "Não há grupos de restrições cadastrado,";
+											mes "por favor cadastre um grupo de restrições no menu ^" + $@da_Color$[3] + "'Gerenciar Grupos de Restrições'^000000.";
+											next;
+											break;
+										}
+										
 										set .@loop_4, 1;
 										while(.@loop_4)
 										{
@@ -1357,7 +1387,7 @@ prontera,150,150,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 														mes "Por favor, digite o nome para a nova arena de ^" + $@da_Color$[3] + .@mask_name$[.@type] + "^000000.";
 														next;
 														input .@Name$;
-														if( !.@Name$ )
+														if( .@Name$ == "" )
 														{
 															mes $@da_BasicSettings$[4];
 															mes "Você tem que digitar um nome para a nova arena de ^" + $@da_Color$[3] + .@mask_name$[.@type] + "^000000.";
@@ -1385,7 +1415,7 @@ prontera,150,150,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 															mes "Por favor, digite o mapa aonde vai ser a arena ^" + $@da_Color$[3] + .@Name$ + "^000000.";
 															next;
 															input .@MapIndex$;
-															if( !.@MapIndex$ )
+															if( .@MapIndex$ == "" )
 															{
 																mes $@da_BasicSettings$[4];
 																mes "Você tem que digitar o mapa aonde vai ser a arena ^" + $@da_Color$[3] + .@Name$ + "^000000.";
@@ -1469,7 +1499,7 @@ prontera,150,150,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																							mes $@da_BasicSettings$[4];
 																							mes "Por favor, selecione o ^" + $@da_Color$[3] + "'Grupo de Restrições'^000000 que deseja adicionar a arena ^" + $@da_Color$[3] + .@Name$ + "^000000.";
 																							next;
-																							query_sql "SELECT `auto_id`, `name` FROM `" + $@da_DataBase[1] + "` ORDER BY `name` DESC", .@groups_id, .@groups_name$;
+																							query_sql "SELECT `auto_id`, `name` FROM `" + $@da_DataBase$[1] + "` ORDER BY `name` DESC", .@groups_id, .@groups_name$;
 
 																							set .@BuildGroupMenu$, "";
 																							for( set .@i, 0; .@i < getarraysize(.@groups_id); set .@i, .@i + 1 )
@@ -1621,7 +1651,7 @@ prontera,150,150,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 											mes $@da_BasicSettings$[4];
 											mes "Por favor, selecione o ^" + $@da_Color$[3] + "tipo da arena^000000 que deseja remover uma arena.";
 											next;
-											set .@type, select("- Jogadores vs Jogadores.", "- Clãns vs Clãns.", "- Grupos vs Grupos.", "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000")-1;
+											set .@type, select("- Jogadores vs Jogadores.", "- Clãns vs Clãns.", "- Grupos vs Grupos.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000")-1;
 											switch( .@type )
 											{
 												default:
@@ -2481,9 +2511,8 @@ prontera,150,150,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 	mes "Volte quando desejar batalhar em uma arena!";
 	close;
 	
-OnInit:
-	if( atoi($@da_BasicSettings$[2]) )
-		waitingroom $@da_BasicSettings$[3], 20;
+OnWaitingRoom:
+	waitingroom $@da_BasicSettings$[3], 20;
 	end;
 }
 
@@ -2501,10 +2530,15 @@ OnInit:
 //				[4]: Nome de um grupo.
 //					id: Identificação do grupo.
 function	script	GetGroupInfo	{
-	if( !getarg(0) || getarg(0) == 4 )
+	if( getarg(0) == 0 )
+	{
+		query_sql "SELECT `auto_id` FROM `" + $@da_DataBase$[1] + "`", .@id;
+		return (getarraysize(.@id)?getarraysize(.@id):0);
+	}
+	else if( getarg(0) == 4 )
 	{
 		query_sql "SELECT `auto_id`, `name` FROM `" + $@da_DatBase$[1] + "` WHERE `auto_id`='" + getarg(1) + "'", .@id, .@name$;
-		return (!getarraysize(.@id)?0:(getarg(0)==4?.@name$[0]:.@id[0]));
+		return (!getarraysize(.@id)?0:.@name$[0]);
 	}
 	else if( getarg(0) == 1 )
 	{

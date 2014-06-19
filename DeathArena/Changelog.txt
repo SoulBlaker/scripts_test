@@ -1,3 +1,8 @@
+[2014/06/19] - SoulBlaker
+	Feito manutenção no npc, testes feito em jogo.
+		- Corrigido adicionar um grupo, remover um grupo, alterar nome de um grupo, e suas respectivas checagem.
+		- Corrigido algumas funções.
+		- Correções de váriaveis.
 [2014/06/18] - SoulBlaker
 	@@ Concluído o Ranking web Completo.
 	Correção em uma query do Ranking do npc.
