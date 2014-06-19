@@ -171,6 +171,7 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 	set .@loop_1, 1;
 	while(.@loop_1)
 	{
+		cutin "death_arena", 2;
 		mes $@da_BasicSettings$[4];
 		mes "Bem-vindo a ^" + $@da_Color$[5] + $@da_BasicSettings$[3] + "^000000.";
 		mes "Em que posso ajudar?";
@@ -2377,7 +2378,9 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 	
 	mes $@da_BasicSettings$[4];
 	mes "Volte quando desejar batalhar em uma arena!";
-	close;
+	close2;
+	cutin "", 255;
+	end;
 	
 OnWaitingRoom:
 	waitingroom $@da_BasicSettings$[3], 20;

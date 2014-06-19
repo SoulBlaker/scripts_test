@@ -19,7 +19,7 @@
 			1.1 - Instalação do Script NPC
 			1.2 - Configurações do Script NPC
 			1.3 - Instalação do Banco de Dados
-			1.4 - Instalação do Unreal Tournament PATCH
+			1.4 - Instalação do Unreal Tournament e arquivos do PATCH
 		2.0 - Ranking Web
 			2.1 - Instalação do Ranking Compacto
 			2.2 - Instalação do Ranking de Visualização Completa
@@ -115,9 +115,16 @@
 		Para instalar via phpMyAdmin (v4.0.9), basta acessar em seu navegador o endereço 'http://127.0.0.1/phpmyadmin', selecionar o banco de dados aonde
 		deseja adicionar o banco de dados, ir na aba 'Importar', clicar no upload button 'Escolher Arquivo' selecionando o mesmo e clicar no botão Executar.
 		
-	1.4 - Instalação do Unreal Tournament
+	1.4 - Instalação do Unreal Tournament e arquivos do PATCH
 	
-		Para instalar os sons do Unreal Tournament, pasta copiar os arquivos de sons que se encontra no diretório 'data/wav' e adicionar na sua pasta data/grf no mesmo diretório.
+		Para instalar os sons do Unreal Tournament e os arquivos do patch, pasta a pasta 'wav' e 'texture' que se encontra no diretório 'patch/data' e adicionar na sua pasta data ou
+		copiar o arquivo 'deatharena.grf' que se encontra no diretório 'patch', colar no diretório do seu jogo e adicionar ao arquivo DATA.INI.
+		
+		Exemplo DATA.ini:
+			1=seuro.grf
+			2=deatharena.grf
+			3=data.grf
+		
 	
 	2.0 - Ranking Web
 	

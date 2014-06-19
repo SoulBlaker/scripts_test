@@ -1,4 +1,5 @@
 [2014/06/19] - SoulBlaker
+	Adiciona cutin da death arena, adicionado grf para fácil implementação.
 	Feito manutenção no npc, testes feito em jogo.
 		- Corrigido adicionar arenas e remover arenas.
 		- Otmizado e corrigido todos erros e sistema relacionado ao gerenciamento das regras de restrições.
