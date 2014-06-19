@@ -1,6 +1,8 @@
 [2014/06/19] - SoulBlaker
+	Feito manutenção no npc, testes feito em jogo pt_2.
+		- Corrigido todo o módulo de gerenciar arenas.
 	Adiciona cutin da death arena, adicionado grf para fácil implementação.
-	Feito manutenção no npc, testes feito em jogo.
+	Feito manutenção no npc, testes feito em jogo pt_1.
 		- Corrigido adicionar arenas e remover arenas.
 		- Otmizado e corrigido todos erros e sistema relacionado ao gerenciamento das regras de restrições.
 		- Corrigido adicionar um grupo, remover um grupo, alterar nome de um grupo, e suas respectivas checagem.
