@@ -1,3 +1,9 @@
+[2014/06/20] - SoulBlaker
+	Feito manutenção no npc, testes feito em jogo pt_3.
+		- Correções no sistema de sons.
+		- Correções no sistema de avisos.
+		- Correções no sistema de computação.
+		- Correções no sistema de acesso a arenas.
 [2014/06/19] - SoulBlaker
 	Feito manutenção no npc, testes feito em jogo pt_2.
 		- Corrigido todo o módulo de gerenciar arenas.
