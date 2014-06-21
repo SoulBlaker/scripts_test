@@ -13,14 +13,16 @@
 // . Script:                                                  .
 // .  Death Arena                                             .
 // .----------------------------------------------------------.
-// . Por: SoulBlaker   Compátivel: eAthena Based         v1.0 .
+// . Por: SoulBlaker   Compátivel: eAthena Based       v1.1r1 .
 // .----------------------------------------------------------.
 // . Descrição:                                               .
 // .  Descrição do npc no arquivo Readme.txt na seção 1.0.    .
 // .----------------------------------------------------------.
 // . Changelog da Versão:                                     .
-// .  * 1.0 [SoulBlaker]                                      .
+// .  * 1.0.r1 [SoulBlaker]                                   .
 // .	- Iniciado NPC.                                       .
+// .  * 1.1.r1 [SoulBlaker]                                   .
+// .    - Iniciado Suporte a Configurações de Death Points.   .
 // *----------------------------------------------------------*
 
 // [Nota 1]: Ponha 0 para desabilitar esta opção.
@@ -34,6 +36,12 @@
 //			 quantidade de mortes o som é tocado, lembre-se que a matriz que seja configurada
 //			 na indice '0' será a que repetirá quando o jogador ultrapassar a quantidade máxima 
 //			 de mortes feita sobre os jogadores.
+// [Nota 5]: Se o tipo de conversão de death points for habilitado, o Shop da Death Arena será desabilitada também,
+//			 lembrando que a habilitação de entrega de Deah Points é nas configurações InGame da arena.
+//			 [0]: Desabilitar conversão de Death Points.
+//			 [1]: Converter Death Points para Kafra Points.
+//			 [2]: Converter Death Points para Cash Points.
+//			 [3]: Converter Death Points para Zeny.
 -	script	DeathArena#Main::DeathArena	-1,{
 
 OnInit:
@@ -48,7 +56,9 @@ OnInit:
 						"^8A2BE2[Death Arena]^000000",		// Nome do npc que será exibido nas janelas de dialogo do npc.
 						1,					// Checar se caso um item na restrição seja carta se ele está equipada em um equipamento?
 						10,					// Total de resultados exibidos por ranking. [Nota 3]
-						0					// Nível de GM para utilizar o comando de acessar raking.
+						0,					// Nível de GM para utilizar o comando de acessar raking.
+						0,					// Tipo de conversão de Death Points. [Nota 5]
+						1					// Habilitar Death Shop? [Nota 1]
 	;
 	
 	setarray $@da_Color$[0],
@@ -1371,7 +1381,13 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																				input .@MaxBaseLevel;
 																				
 																				mes $@da_BasicSettings$[4];
-																				mes "Tem certeza que o máximo de jogadores a entrar na arena seja ^" + $@da_Color$[3] + (.@MaxPlayer?.@MaxPlayer:"ilimitado") + "^000000, o nível minimo de base seja ^" + $@da_Color$[3] + (.@MinBaseLevel?.@MinBaseLevel:"desabilitado") + "^000000 e o nível máximo de base seja ^" + $@da_Color$[3] + (.@MaxBaseLevel?.@MaxBaseLevel:"desabilitado") + "^000000?";
+																				mes "Por favor, digite a quantidade de ^" + $@da_Color$[3] + "'Death Points'^000000 que os jogadores irá receber ao derrotar um adversário na arena ^" + $@da_Color$[3] + .@Name$ + ^000000.";
+																				mes "Digite 0 para que a entrega de Death Points seja desabilitada.";
+																				next;
+																				input .@DeathPoints;
+																				
+																				mes $@da_BasicSettings$[4];
+																				mes "Tem certeza que o máximo de jogadores a entrar na arena seja ^" + $@da_Color$[3] + (.@MaxPlayer?.@MaxPlayer:"ilimitado") + "^000000, o nível minimo de base seja ^" + $@da_Color$[3] + (.@MinBaseLevel?.@MinBaseLevel:"desabilitado") + "^000000, nível máximo de base seja ^" + $@da_Color$[3] + (.@MaxBaseLevel?.@MaxBaseLevel:"desabilitado") + "^000000 e a quantidade de Death Points que os jogadores receberam ao derrotar um adversário seja ^" + $@da_Color$[3] + (.@DeathPoints?.@DeathPoints:"desabilitado") + "^000000?";
 																				next;
 																				switch( select("- Sim, por favor.", "- Não, desejo mudar.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
 																				{
@@ -1422,12 +1438,13 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																										mes "^"+$@da_Color$[3] + "Máximo de Jogadores:^000000 " + (.@MaxPlayer?.@MaxPlayer:"ilimitado");
 																										mes "^"+$@da_Color$[3] + "Nível Minimo:^000000 " + (.@MinBaseLevel?.@MinBaseLevel:"desabilitado");
 																										mes "^"+$@da_Color$[3] + "Nível Máximo:^000000 " + (.@MaxBaseLevel?.@MaxBaseLevel:"desabilitado");
+																										mes "^"+$@da_Color$[3] + "Death Points:^000000 " + (.@DeathPoints?.@DeathPoints:"desabilitado");
 																										next;
 																										switch( select("- Sim, está tudo correto.", "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
 																										{
 																											case 1:
 																												// Adicionar arena.
-																												query_sql "INSERT INTO `" + $@da_DataBase$[0] + "` (map_index, coord_x, coord_y, name, type, max_player, max_level, min_level, group_id) VALUES('" + .@MapIndex$ + "', " + .@CoordX + ", " + .@CoordY + ", '" + .@Name$ + "', " + .@type + ", " + .@MaxPlayer + ", " + .@MaxBaseLevel + ", " + .@MinBaseLevel + ", " + .@groups_id[.@chooseGroup] + ")";
+																												query_sql "INSERT INTO `" + $@da_DataBase$[0] + "` (map_index, coord_x, coord_y, name, type, max_player, max_level, min_level, death_points, group_id) VALUES('" + .@MapIndex$ + "', " + .@CoordX + ", " + .@CoordY + ", '" + .@Name$ + "', " + .@type + ", " + .@MaxPlayer + ", " + .@MaxBaseLevel + ", " + .@MinBaseLevel + ", " + .@DeathPoints + ", " + .@groups_id[.@chooseGroup] + ")";
 																												mes $@da_BasicSettings$[4];
 																												mes "A arena '^" + $@da_Color$[3] + .@Name$ + "'^000000 foi adicionada.";
 																												next;
@@ -1628,7 +1645,7 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 														mes "Por favor, selecione uma arena de ^" + $@da_Color$[3] + .@mask_name$[.@type] + "^000000.";
 														next;
 														cleararray .@a_auto_id, 0, getarraysize(.@a_auto_id);
-														query_sql "SELECT `auto_id`, `name`, `type`, `map_index`, `coord_x`, `coord_y`, `max_player`, `min_level`, `max_level`, `group_id` FROM `" + $@da_DataBase$[0] + "` WHERE `type`='" + .@type + "' ORDER BY `name`", .@a_auto_id, .@a_name$, .@a_type, .@a_map_index$, .@a_coord_x, .@a_coord_y, .@a_max_player, .@a_min_level, .@a_max_level, .@a_group_id;
+														query_sql "SELECT `auto_id`, `name`, `type`, `map_index`, `coord_x`, `coord_y`, `max_player`, `min_level`, `max_level`, `death_points`, `group_id` FROM `" + $@da_DataBase$[0] + "` WHERE `type`='" + .@type + "' ORDER BY `name`", .@a_auto_id, .@a_name$, .@a_type, .@a_map_index$, .@a_coord_x, .@a_coord_y, .@a_max_player, .@a_min_level, .@a_max_level, .@a_death_points, .@a_group_id;
 														set .@BuildArenaMenu$, "";
 														for( set .@i, 0; .@i < getarraysize(.@a_auto_id); set .@i, .@i + 1 )
 															set .@BuildArenaMenu$, .@BuildArenaMenu$ + "- " + .@a_name$[.@i] + ".:";
@@ -1938,7 +1955,7 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																			mes $@da_BasicSettings$[4];
 																			mes "O que deseja alterar nos níveis e limites da arena ^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000?";
 																			next;
-																			switch( select("- Alterar máximo de jogadores.", "- Alterar nível minimo de Base.", "- Alterar nível máximo de Base.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
+																			switch( select("- Alterar máximo de jogadores.", "- Alterar nível minimo de Base.", "- Alterar nível máximo de Base.", "- Alterar quantidade de Death Points.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
 																			{
 																				case 1:
 																					// Máximo de jogadores.
@@ -2089,6 +2106,49 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																		}
 																		break;
 																	case 5:
+																		// Alterar Death Points.
+																		set .@loop_7, 1;
+																		while(.@loop_7)
+																		{
+																			mes $@da_BasicSettings$[4];
+																			mes "Por favor, digite uma nova quantidade de Death Points que deseja que os jogadores receba ao derrotar um adversário na arena ^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000.";
+																			mes "Digite 0 para que a entrega de Death Points seja desabilitada.";
+																			next;
+																			input .@death_points;
+																			
+																			mes $@da_BasicSettings$[4];
+																			mes "Você tem certeza que deseja alterar a quantidade de entrega de Death Points da arena ^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000 de ^" + $@da_Color$[3] + "'" + (.@a_death_points[.@chooseArena]?.@a_death_points[.@chooseArena]:"desabilitado") + "'^000000 para ^" + $@da_Color$[3] + "'" + (.@death_points?.@death_points:"desabilitado") + "'^000000?";
+																			next;
+																			switch( select("- Sim, por favor.", "- Não, desejo alterar para outro nível.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
+																			{
+																				case 1:
+																					// Alterar Death Points.
+																					query_sql "UPDATE `" + $@da_DataBase$[0] + "` SET `death_points`='" + .@death_points + "' WHERE `auto_id`='" + .@a_auto_id[.@chooseArena] + "'";
+																					mes $@da_BasicSettings$[4];
+																					mes "A quantidade de entrega de Death Points da arena ^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000 foi alterado de ^" + $@da_Color$[3] + "'" + (.@a_death_points[.@chooseArena]?.@a_death_points[.@chooseArena]:"desabilitado") + "'^000000 para ^" + $@da_Color$[3] + "'" + (.@death_points?.@death_points:"desabilitado") + "'^000000.";
+																					next;
+																					set .@a_death_points[.@chooseArena], .@death_points;
+																					set .@loop_7, 0;
+																					break;
+																				case 2:
+																					break;
+																				case 3:
+																					set .@loop_7, 0;
+																					break;
+																				case 4:
+																					set .@loop_7, 0;
+																					set .@loop_6, 0;
+																					set .@loop_5, 0;
+																					set .@loop_4, 0;
+																					set .@loop_3, 0;
+																					set .@loop_2, 0;
+																					set .@loop_1, 0;
+																					break;
+																						
+																			}
+																		}
+																		break;
+																	case 6:
 																		// Alterar grupo de restrições.
 																		set .@loop_7, 1;
 																		while(.@loop_7)
@@ -2148,10 +2208,10 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																			}
 																		}
 																		break;
-																	case 6:
+																	case 7:
 																		set .@loop_6, 0;
 																		break;
-																	case 7:
+																	case 8:
 																		set .@loop_6, 0;
 																		set .@loop_5, 0;
 																		set .@loop_4, 0;
@@ -2550,4 +2610,4 @@ function	script	GetInfoName	{
 		query_sql "SELECT `name` FROM `" + (getarg(0)==0?"guild":"party") + "` WHERE `" + (getarg(0)==0?"guild":"party") + "_id`='" + (getarg(0)==0?.@gid[0]:.@pid[0]) + "'", .@object_name$;
 
 	return (getarraysize(.@object_name$)?.@object_name$[0]:"N/a");
-}
+}}

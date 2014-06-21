@@ -1,3 +1,9 @@
+-- V1.1R1
+[2014/06/21] - SoulBlaker
+	Adicionado suporte a configurações de death points nas arenas.
+
+-- V1.0R1
+
 [2014/06/21] - SoulBlaker
 	Apurado todos os erros da versão 1.0, posto em release para testes ao publico.
 [2014/06/20] - SoulBlaker
