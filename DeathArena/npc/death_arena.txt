@@ -253,7 +253,7 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 													{
 														if( .@t == 0 )
 														{
-															if( countitem(.@object_value[.@i]) )
+															if( countitem(.@object_value[.@i]) || (atoi($@da_BasicSettings$[5]) && checkequipedcard(.@object_value[.@i])) )
 																set .@item_id, .@object_value[.@i];
 														}
 														else if( Class == .@object_value[.@i] )
@@ -1628,8 +1628,6 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 														mes "Por favor, selecione uma arena de ^" + $@da_Color$[3] + .@mask_name$[.@type] + "^000000.";
 														next;
 														cleararray .@a_auto_id, 0, getarraysize(.@a_auto_id);
-														//cleararray .@a_name$, "", getarraysize(.@a_name$);
-														//cleararray .@a_mapindex$, "", getarraysize(.@a_mapindex$);
 														query_sql "SELECT `auto_id`, `name`, `type`, `map_index`, `coord_x`, `coord_y`, `max_player`, `min_level`, `max_level`, `group_id` FROM `" + $@da_DataBase$[0] + "` WHERE `type`='" + .@type + "' ORDER BY `name`", .@a_auto_id, .@a_name$, .@a_type, .@a_map_index$, .@a_coord_x, .@a_coord_y, .@a_max_player, .@a_min_level, .@a_max_level, .@a_group_id;
 														set .@BuildArenaMenu$, "";
 														for( set .@i, 0; .@i < getarraysize(.@a_auto_id); set .@i, .@i + 1 )

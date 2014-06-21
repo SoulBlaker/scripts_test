@@ -70,7 +70,7 @@
 					2 -> Habilitar janela de chat que será exibido em cima do npc. (Abre suporte a um chat no npc com no máximo de 20 jogadores)
 					3 -> Mensagem a ser exibida na janela de chat (se a opção acima estiver habilitada) ou sobre referência ao npc.
 					4 -> Nome do npc a ser exibido nas janelas de dialogo.
-					5 -> Checar se um item na restrição seja carta, se ela está equipada em um equipamento. (Em planejamento ainda)
+					5 -> Checar se um item na restrição seja carta, se ela está equipada em um equipamento.
 					6 -> Total de resultados a ser exibido por página no raking do NPC. (Máximo 120 resultados)
 					7 -> Nível de GM para utilizar o comando @daranking, 0 é para todos os jogadores.
 			
