@@ -2610,4 +2610,4 @@ function	script	GetInfoName	{
 		query_sql "SELECT `name` FROM `" + (getarg(0)==0?"guild":"party") + "` WHERE `" + (getarg(0)==0?"guild":"party") + "_id`='" + (getarg(0)==0?.@gid[0]:.@pid[0]) + "'", .@object_name$;
 
 	return (getarraysize(.@object_name$)?.@object_name$[0]:"N/a");
-}}
+}
