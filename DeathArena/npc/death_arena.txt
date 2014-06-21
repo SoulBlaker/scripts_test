@@ -58,6 +58,7 @@ OnInit:
 						10,					// Total de resultados exibidos por ranking. [Nota 3]
 						0,					// Nível de GM para utilizar o comando de acessar raking.
 						0,					// Tipo de conversão de Death Points. [Nota 5]
+						1,					// Habilitar o uso do Death Points para todos os personagens da conta? [Nota 1]
 						1					// Habilitar Death Shop? [Nota 1]
 	;
 	
@@ -75,7 +76,8 @@ OnInit:
 						"da_arena",				// Banco de Dados de arenas.
 						"da_group",				// Banco de Dados do Grupo de restrições.
 						"da_restrictions",			// Banco de Dados das restrições.
-						"da_ranking"				// Banco de Dados do Ranking.
+						"da_ranking",				// Banco de Dados do Ranking.
+						"da_shop"					// Banco de Dados do Shop.
 	;
 
 	// Configurações dos sons da arena. [Nota 4]
@@ -128,6 +130,7 @@ OnPCKillEvent:
 		}
 
 		set .@type, callfunc("getArenaInfo", 1, strcharinfo(3));
+		set .@points, callfunc("getArenaInfo", 3, strcharinfo(3));
 		
 		// Nome dos personagens
 		set .@killed_name$, rid2name(killedrid);
@@ -164,6 +167,20 @@ OnPCKillEvent:
 			mapannounce strcharinfo(3), "O jogador [" + .@killer_name$ + "] derrotou o jogador [" + .@killed_name$ + "] e é a " + da_kill_count + "ª cabeça consecutiva que ele cortou!", bc_all, "0x00FF00";
 	
 		message strcharinfo(0), "Você derrotou " + da_kill_count + " jogadores.";
+		
+		if( .@points )
+		{
+			if( !atoi($@da_BasicSettings$[8]) )
+				setd (atoi($@da_BasicSettings$[9])?"#DEATH_POINTS":"DEATH_POINTS"), getd((atoi($@da_BasicSettings$[9])?"#DEATH_POINTS":"DEATH_POINTS")) + .@points;
+			else if( atoi($@da_BasicSettings$[8]) == 1 )
+				set #KAFRAPOINTS, #KAFRAPOINTS + .@points;
+			else if( atoi($@da_BasicSettings$[8]) == 2 )
+				set #CASHPOINTS, #CASHPOINTS + .@points;
+			else
+				set Zeny, Zeny + .@points;
+			
+			message strcharinfo(0), "Você recebeu " + .@points + (!atoi($@da_BasicSettings$[8])?" Death Points":(atoi($@da_BasicSettings$[8])==1?" Pontos Kafra":(atoi($@da_BasicSettings$[8])==2?" Pontos de Cash":" Zenys"))) + ".";
+		}
 	}
 	end;
 	
@@ -203,7 +220,7 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 		mes "Bem-vindo a ^" + $@da_Color$[5] + $@da_BasicSettings$[3] + "^000000.";
 		mes "Em que posso ajudar?";
 		next;
-		switch( select("- Ír para uma arena.", "- Ranking.", (getgmlevel()>=atoi($@da_BasicSettings$[0])?"^"+ $@da_Color$[4] + "- Gerenciar.^000000":""), "^" + $@da_Color$[0] + "- Cancelar.^000000") )
+		switch( select("- Ír para uma arena.", "- Ranking.", (atoi($@da_BasicSettings$[10])?"- Death Shop.":""), (getgmlevel()>=atoi($@da_BasicSettings$[0])?"^"+ $@da_Color$[4] + "- Gerenciar.^000000":""), "^" + $@da_Color$[0] + "- Cancelar.^000000") )
 		{
 			case 1:
 				// Ír para um arena.
@@ -497,6 +514,26 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 				}
 				break;
 			case 3:
+				// Death Shop.
+				mes $@da_BasicSettings$[4];
+				if( atoi($@da_BasicSettings$[8]) < 3 )
+				{
+					mes "Os preços do ^" + $@da_Color$[3] +"'Death Shop'^000000 não são informados são apenas para inventário, o valor será divulgado apos a seleção dos itens e será cobrado em ^" + $@da_Color$[3] +"'" + (atoi($@da_BasicSettings$[8])==1?"pontos Kafras":(atoi($@da_BasicSettings$[8])==2?"pontos de Cash":"Death Points")) + "'^000000.";
+					mes "Atualmente você tem ^" + $@da_Color$[3] + (atoi($@da_BasicSettings$[8])==1?#KAFRAPOINTS + " pontos Kafra":(atoi($@da_BasicSettings$[8])==2?#CASHPOINTS + " pontos de Cash":getd((atoi($@da_BasicSettings$[9])?"#DEATH_POINTS":"DEATH_POINTS")) + " Death Points")) + "^000000.";
+				}
+				mes "Muito bem, vou abrir o ^" + $@da_Color$[3] +"Death Shop^000000.";
+				close2;
+				npcshopdelitem "death_shop", 501;
+				query_sql "SELECT `item_id` FROM `" + $@da_DataBase$[4] + "`", .@item_id;
+				for( set .@i, 0; .@i < getarraysize(.@item_id); set .@i, .@i + 1 )
+				{
+					npcshopdelitem "death_shop", .@item_id[.@i];
+					npcshopadditem "death_shop", .@item_id[.@i], 0;
+				}
+				callshop "death_shop", 1;
+				npcshopattach "death_shop";
+				end;
+			case 4:
 				// Gerenciar.
 				OnManagerScript: //atcmd_func
 				set .@loop_2, 1;
@@ -1381,7 +1418,7 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																				input .@MaxBaseLevel;
 																				
 																				mes $@da_BasicSettings$[4];
-																				mes "Por favor, digite a quantidade de ^" + $@da_Color$[3] + "'Death Points'^000000 que os jogadores irá receber ao derrotar um adversário na arena ^" + $@da_Color$[3] + .@Name$ + ^000000.";
+																				mes "Por favor, digite a quantidade de ^" + $@da_Color$[3] + "'Death Points'^000000 que os jogadores irá receber ao derrotar um adversário na arena ^" + $@da_Color$[3] + .@Name$ + "^000000.";
 																				mes "Digite 0 para que a entrega de Death Points seja desabilitada.";
 																				next;
 																				input .@DeathPoints;
@@ -1667,9 +1704,9 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 															while( .@loop_6 )
 															{
 																mes $@da_BasicSettings$[4];
-																mes "O que deseja alterar na arena '^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000?";
+																mes "O que deseja alterar na arena ^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000?";
 																next;
-																switch( select("- Alterar nome.", "- Alterar tipo.", "- Alterar mapa e coordenadas.", "- Alterar níveis e limites.", "- Alterar Grupo de Restrições.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
+																switch( select("- Alterar nome.", "- Alterar tipo.", "- Alterar mapa e coordenadas.", "- Alterar níveis e limites.", "- Alterar quantidade de Death Points.", "- Alterar Grupo de Restrições.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
 																{
 																	case 1:
 																		// Alterar nome.
@@ -1955,7 +1992,7 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																			mes $@da_BasicSettings$[4];
 																			mes "O que deseja alterar nos níveis e limites da arena ^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000?";
 																			next;
-																			switch( select("- Alterar máximo de jogadores.", "- Alterar nível minimo de Base.", "- Alterar nível máximo de Base.", "- Alterar quantidade de Death Points.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
+																			switch( select("- Alterar máximo de jogadores.", "- Alterar nível minimo de Base.", "- Alterar nível máximo de Base.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
 																			{
 																				case 1:
 																					// Máximo de jogadores.
@@ -2453,7 +2490,7 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 					}
 				}
 				break;
-			case 4:
+			case 5:
 				set .@loop_1, 0;
 				break;
 		}
@@ -2467,6 +2504,55 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 	
 OnWaitingRoom:
 	waitingroom $@da_BasicSettings$[3], 20;
+	end;
+
+OnBuyItem:
+	set .@total_points, 0;
+	cutin "death_arena", 2;
+	mes $@da_BasicSettings$[4];
+	mes "Itens na lista de Compras:";
+	
+	for( set .@i, 0; .@i < getarraysize(@bought_nameid); set .@i, .@i + 1 )
+	{
+		set .@value, callfunc("GetShopValue", @bought_nameid[.@i])*@bought_quantity[.@i];
+		set .@total_points, .@total_points + .@value;
+		mes @bought_quantity[.@i] + " - " + getitemname(@bought_nameid[.@i]);
+		mes "Custo: " + .@value;
+	}
+	mes " ";
+	mes "Custo total: " + .@total_points + " pontos.";
+	next;
+	if( select("- Efetuar a compra.", "- Cancelar.") == 1 )
+	{
+		mes $@da_BasicSettings$[4];
+		if( !atoi($@da_BasicSettings$[8]) && getd((atoi($@da_BasicSettings$[9])?"#DEATH_POINTS":"DEATH_POINTS")) < .@total_points )
+			mes "Você não tem Death Points suficientes para efetuar a compra.";
+		else if( atoi($@da_BasicSettings$[8]) == 1 && #KAFRAPOINTS < .@total_points )
+			mes "Você não tem Pontos Kafras suficiente para efetuar a compra.";
+		else if( atoi($@da_BasicSettings$[8]) == 2 && #CASHPOINTS < .@total_points )
+			mes "Você não tem Pontos de Cash suficiente para efetuar a compra.";
+		else if( atoi($@da_BasicSettings$[8]) == 3 && Zeny < .@total_points )
+			mes "Você não tem Zeny suficiente para efetuar a compra.";
+		else {
+			mes "Compra efetuada com sucesso!";
+			
+			for( set .@i, 0; .@i < getarraysize(@bought_nameid); set .@i, .@i + 1 )
+				getitem @bought_nameid[.@i], @bought_quantity[.@i];
+				
+			if( !atoi($@da_BasicSettings$[8]) )
+				setd (atoi($@da_BasicSettings$[9])?"#DEATH_POINTS":"DEATH_POINTS"), getd((atoi($@da_BasicSettings$[9])?"#DEATH_POINTS":"DEATH_POINTS")) - .@total_points;
+			else if( atoi($@da_BasicSettings$[8]) == 1 )
+				set #KAFRAPOINTS, #KAFRAPOINTS + .@total_points;
+			else if( atoi($@da_BasicSettings$[8]) == 2 )
+				set #CASHPOINTS, #CASHPOINTS + .@total_points;
+			else
+				set Zeny, Zeny + .@total_points;
+		}
+	
+	}
+	
+	close2;
+	cutin "", 255;
 	end;
 }
 
@@ -2538,10 +2624,11 @@ function	script	getRankInfo	{
 //			[0]: Retorna com o id da arena.
 //			[1]: Retorna com o tipo da arena.
 //			[2]: Retorna com o nome da arena.
+//			[3]: Retorna com o Death Points que será entregue da arena.
 //		map_index: Mapa oande se encontra a arena.
 function	script	getArenaInfo	{
-	query_sql "SELECT `auto_id`, `name`, `type` FROM `" + $@da_DataBase$[0] + "` WHERE `map_index`='" + getarg(1) + "'", .@id, .@name$, .@type;
-	return (!getarraysize(.@id)?0:(getarg(0)==0?.@id[0]:(getarg(0)==1?.@type[0]:.@name$[0])));
+	query_sql "SELECT `auto_id`, `name`, `type`, `death_points` FROM `" + $@da_DataBase$[0] + "` WHERE `map_index`='" + getarg(1) + "'", .@id, .@name$, .@type, .@points;
+	return (!getarraysize(.@id)?0:(getarg(0)==0?.@id[0]:(getarg(0)==1?.@type[0]:(getarg(0)==2?.@name$[0]:.@points[0]))));
 }
 
 // * UpdateRanking(type, object_killer_id, object_killer_name, object_killed_id, object_killed_name)
@@ -2611,3 +2698,11 @@ function	script	GetInfoName	{
 
 	return (getarraysize(.@object_name$)?.@object_name$[0]:"N/a");
 }
+
+function	script	GetShopValue	{
+	query_sql "SELECT `value` FROM `" + $@da_DataBase$[4] + "` WHERE `item_id`='" + getarg(0) + "'", .@value;
+	return (getarraysize(.@value)?.@value[0]:0);
+}
+
+// Sistema de Death Shop
+-	shop	Death Shop#DEATHSHOP::death_shop	-1,501:-1

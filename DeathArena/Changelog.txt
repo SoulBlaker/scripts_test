@@ -1,5 +1,6 @@
 -- V1.1R1
 [2014/06/21] - SoulBlaker
+	Adicionado Sistema de Death Shop.
 	Adicionado suporte a configurações de death points nas arenas.
 
 -- V1.0R1

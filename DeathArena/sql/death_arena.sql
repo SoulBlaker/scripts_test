@@ -1,15 +1,16 @@
 --
 -- table `da_arena` {
--- 	auto_id		-> Auto-implementação de identificação da arena.
--- 	map_index	-> Mapa da arena.
--- 	coord_x		-> Coordenada X aonde os jogadores serão teleportados. (Padrão: 0 = random)
--- 	coord_y		-> Coordenada Y aonde os jogadores serão teleportados. (Padrão: 0 = random)
--- 	name		-> Nome da arena.
--- 	type		-> Tipo da arena. (0: Jogadores vs Jogadores/ 1: Clãns vs Clãns/ 2: Grupos vs Grupos)
--- 	max_player	-> Máximo de jogadores que podem acessar a arena. (0 é ilimitado)
--- 	min_level	-> Nível Minimo de Base para acessar a arena. (0 é desabilitado)
--- 	max_level	-> Nível Máximo de Base para acessar a arena. (1 é habilitado)
--- 	group		-> Identificação do Grupo de Restrições.
+-- 	auto_id		 -> Auto-implementação de identificação da arena.
+-- 	map_index	 -> Mapa da arena.
+-- 	coord_x		 -> Coordenada X aonde os jogadores serão teleportados. (Padrão: 0 = random)
+-- 	coord_y		 -> Coordenada Y aonde os jogadores serão teleportados. (Padrão: 0 = random)
+-- 	name		 -> Nome da arena.
+-- 	type		 -> Tipo da arena. (0: Jogadores vs Jogadores/ 1: Clãns vs Clãns/ 2: Grupos vs Grupos)
+-- 	max_player	 -> Máximo de jogadores que podem acessar a arena. (0 é ilimitado)
+-- 	min_level	 -> Nível Minimo de Base para acessar a arena. (0 é desabilitado)
+-- 	max_level	 -> Nível Máximo de Base para acessar a arena. (0 é desabilitado)
+-- 	group		 -> Identificação do Grupo de Restrições.
+--  death_points -> Pontos que o jogador irá receber da arena ao derrotar uma adversário. (0 é desabilitado)
 -- }
 --
 CREATE TABLE IF NOT EXISTS `da_arena` (
@@ -23,6 +24,7 @@ CREATE TABLE IF NOT EXISTS `da_arena` (
 	`max_level` int(4) unsigned NOT NULL default '0',
 	`min_level` int(4) unsigned NOT NULL default '0',
 	`group_id` int(11) unsigned NOT NULL default '0',
+	`death_points` int(11) unsigned NOT NULL default '0',
 	 PRIMARY KEY (`auto_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1;
 --
@@ -72,3 +74,14 @@ CREATE TABLE IF NOT EXISTS `da_ranking` (
 	`ration` int(4) unsigned NOT NULL default '0',
 	 PRIMARY KEY (`auto_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1;
+--
+-- table `da_shop` {
+-- 	item_id		-> Id do item a ser posto ao shop.
+-- 	value		-> Valor a ser cobrado do item.
+-- }
+--
+CREATE TABLE IF NOT EXISTS `da_shop` (
+	`item_id` int(11) unsigned  NOT NULL default '0',
+	`value` int(11) unsigned NOT NULL default '0',
+	 PRIMARY KEY (`item_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
