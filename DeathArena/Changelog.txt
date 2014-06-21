@@ -1,3 +1,5 @@
+[2014/06/21] - SoulBlaker
+	Apurado todos os erros da versão 1.0, posto em release para testes ao publico.
 [2014/06/20] - SoulBlaker
 	Feito manutenção no npc, testes feito em jogo pt_3.
 		- Correções no sistema de sons.

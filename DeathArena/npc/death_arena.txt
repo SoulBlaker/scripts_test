@@ -16,7 +16,7 @@
 // . Por: SoulBlaker   Compátivel: eAthena Based         v1.0 .
 // .----------------------------------------------------------.
 // . Descrição:                                               .
-// .  (Descrição)                                             .
+// .  Descrição do npc no arquivo Readme.txt na seção 1.0.    .
 // .----------------------------------------------------------.
 // . Changelog da Versão:                                     .
 // .  * 1.0 [SoulBlaker]                                      .
@@ -126,7 +126,6 @@ OnPCKillEvent:
 		// Id dos personagens
 		set .@killed_id, getcharid(0, .@killed_name$);
 		set .@killer_id, getcharid(0);
-		//debugmes "Assasinado RID: " + .@killed_id + " - Assassino RID: " + .@killer_id;
 		
 		// Id dos grupos
 		set .@killed_party_id, getcharid(1, .@killed_name$);
@@ -399,25 +398,20 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 									default:
 										set .@row_init, 0;
 										set .@row_end, atoi($@da_BasicSettings$[6])-1;
-										set .@row_position, 1;										
+										set .@row_position, 1;
 										set .@loop_4, 1;
 										while(.@loop_4)
 										{
-											mes "^"+$@da_Color$[6] + "=~*~*~*~*~*~*~*~*~*~*~*~*=^000000";
 											mes "^"+$@da_Color$[6] + "[Rank: " + .@mask_name$[.@type] + "]^000000";
-											mes "^"+$@da_Color$[6] + "=~*~*~*~*~*~*~*~*~*~*~*~*=^000000";
+											mes "¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨";
 											
-											query_sql "SELECT `object_id`, `object_name`, `wins`, `loss`, `ration` WHERE `type`='" + .@filter + "' ORDER BY `" + (.@filter==1?"loss":(.@filter==2?"ration":"wins")) + "` ASC LIMIT " + .@row_init + "," + atoi($@da_BasicSettings$[6]) + "", .@object_id, .@object_name$, .@wins, .@loss;
+											query_sql "SELECT `object_id`, `object_name`, `wins`, `loss`, `ration` FROM `" + $@da_DataBase$[3] + "` WHERE `type`='" + .@type + "' ORDER BY `" + (.@filter==1?"loss":(.@filter==2?"ration":"wins")) + "` DESC LIMIT " + .@row_init + "," + atoi($@da_BasicSettings$[6]) + "", .@object_id, .@object_name$, .@wins, .@loss, .@ration;
 											
-											if( !getarraysize(.@object_id) )
+											if( getarraysize(.@object_id) )
 											{
-												mes $@da_BasicSettings$[4];
-												mes "Não há nenhum resultados para o ^" + $@da_Color$[3] + "Rank de " + .@mask_name$[.@type] + "^000000.";
-											
 												for( set .@i, 0; .@i < getarraysize(.@object_id)&&.@loop_4; set .@i, .@i + 1 )
 												{
-													mes " ";
-													mes "^"+$@da_Color$[3] + "Posição: " + .@row_position;
+													mes "^"+$@da_Color$[3] + "Posição:^000000 " + .@row_position;
 												
 													if( .@type == 1 )
 														mes "^"+$@da_Color$[3] + "Clã:^000000 " + .@object_name$[.@i];
@@ -426,18 +420,17 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 													else
 													{
 														mes "^"+$@da_Color$[3] + "Jogador:^000000 " + .@object_name$[.@i];
-														mes "^"+$@da_Color$[3] + "Clã:^000000 " + (getcharid(2)?getguildname(getcharid(2)):"N/a");
-														mes "^"+$@da_Color$[3] + "Grupo:^000000 " + (getcharid(1)?getpartyname(getcharid(1)):"N/a");
+														mes "^"+$@da_Color$[3] + "Clã:^000000 " + callfunc("GetInfoName", 0, .@object_id[.@i]);
+														mes "^"+$@da_Color$[3] + "Grupo:^000000 " + callfunc("GetInfoName", 1, .@object_id[.@i]);
 													}
 												
 													mes "^"+$@da_Color$[3] + "Vitórias:^000000 " + .@wins[.@i];
 													mes "^"+$@da_Color$[3] + "Derrotas:^000000 " + .@loss[.@i];
 													mes "^"+$@da_Color$[3] + "Proporção:^000000 " + .@ration[.@i];
-												
-													mes " ";
 													mes "¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨";
+													mes " ";
 												
-													set .@row_position, .@row_postion + 1;
+													set .@row_position, .@row_position + 1;
 												}
 											
 												set .@tmp_row_init, .@row_init;
@@ -445,9 +438,9 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 												set .@row_init, .@row_end + 1;
 												set .@row_end, .@row_end + atoi($@da_BasicSettings$[6]);
 											
-												query_sql "SELECT `object_id` WHERE `type`='" + .@filter + "' ORDER BY `" + (.@filter==1?"loss":(.@filter==2?"ration":"wins")) + "` ASC LIMIT " + (.@row_end+1) + "," + (.@row_end+atoi($@da_BasicSettings$[6])) + "", .@tmp_object_next;
+												query_sql "SELECT `object_id` FROM `" + $@da_DataBase$[3] + "` WHERE `type`='" + .@filter + "' ORDER BY `" + (.@filter==1?"loss":(.@filter==2?"ration":"wins")) + "` ASC LIMIT " + (.@row_end+1) + "," + (.@row_end+atoi($@da_BasicSettings$[6])) + "", .@tmp_object_next;
 												next;
-												switch( select((.@row_init>$@da_BasicSettings$[6]?"^"+$@da_Color$[2]+"- Anterior.^000000":""), (getarraysize(.@tmp_object_next)?"^"+$@da_Color$[2]+"- Próximo.^000000":""), "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
+												switch( select((.@row_init>atoi($@da_BasicSettings$[6])?"^"+$@da_Color$[2]+"- Anterior.^000000":""), (getarraysize(.@tmp_object_next)?"^"+$@da_Color$[2]+"- Próximo.^000000":""), "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
 												{
 													case 1:
 														set .@row_init, .@tmp_row_init;
@@ -465,6 +458,10 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 														set .@loop_1, 0;
 														break;
 												}
+											}
+											else {
+												mes "Nenhum resultado a ser exibido.";
+												set .@loop_4, 0;
 											}
 										}
 										break;
@@ -496,7 +493,7 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 				while(.@loop_2)
 				{
 					mes $@da_BasicSettings$[4];
-					mes "O que deseja gerenciar na ^" + $@da_Color$[5] + $@da_BasicSettings$[3] + "^000000.?";
+					mes "O que deseja gerenciar na ^" + $@da_Color$[5] + $@da_BasicSettings$[3] + "^000000?";
 					next;
 					switch( select("- Gerenciar Grupos de Restrições.", "- Gerenciar Arenas.", "- Gerenciar Ranking.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
 					{
@@ -628,7 +625,7 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 															if( .@total_arena )
 															{
 																mes $@da_BasicSettings$[4];
-																mes "Há ^" + $@da_Color$[3] + "'" + .@total_arena + "'^000000 arenas cadastrada nesse grupo, oque deseja fazer com elas?";
+																mes "Há ^" + $@da_Color$[3] + "'" + .@total_arena + "'^000000 arenas cadastrada nesse grupo, o que deseja fazer com elas?";
 																next;
 																switch( select("- Mover para outro grupo.", "- Remover todas as arenas.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
 																{
@@ -2273,7 +2270,7 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 														next;
 														input .@object_id;
 														set .@rank_id, callfunc("getRankInfo", 0, .@type, .@object_id );
-														if( !.@id || !.@rank_id )
+														if( !.@object_id || !.@rank_id )
 														{
 															mes $@da_BasicSettings$[4];
 															if( !.@object_id )
@@ -2304,11 +2301,11 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 															while(.@loop_6)
 															{
 																setarray .@rank_points[0], callfunc("getRankInfo", 1, .@type, .@object_id ), callfunc("getRankInfo", 2, .@type, .@object_id ), callfunc("getRankInfo", 3, .@type, .@object_id );
-																set .@name$, callfunc("GetRankInfo", 4, .@type, .@object_id);
+																set .@name$, callfunc("getRankInfo", 4, .@type, .@object_id);
 																mes $@da_BasicSettings$[4];
-																mes "O que deseja alterar no ^" + $@da_Color$[3] + "'" + .@mask_name$[.@type] + .@name$ + "'^000000?";
+																mes "O que deseja alterar no ^" + $@da_Color$[3] + "'" + .@mask_name$[.@type] + " " + .@name$ + "'^000000?";
 																next;
-																set .@change, select("- Pontos de vitórias: " + .@rank_points[0] + ".", "- Pontos de derrotas: " + .@rank_points[1] + ".", "- Pontos proporcionais: " + .@rank_points[2] + ".", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000")-1;
+																set .@change, select("- Pontos de vitórias [" + .@rank_points[0] + " pnts].", "- Pontos de derrotas [" + .@rank_points[1] + " pnts].", "- Pontos proporcionais [" + .@rank_points[2] + " pnts].", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000")-1;
 																switch(.@change)
 																{
 																	default:
@@ -2329,7 +2326,7 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																			{
 																				case 1:
 																					// Alterar pontos.
-																					query_sql "UPDATE `" + $@da_DataBase$[3] + "` SET `" + (.@change==1?"deaths":(.@change==2?"ration":"kills")) + "`='" + .@points + "' WHERE `type`='" + .@type + "' AND `auto_id`='" + .@rank_id + "'";
+																					query_sql "UPDATE `" + $@da_DataBase$[3] + "` SET `" + (.@change==1?"loss":(.@change==2?"ration":"wins")) + "`='" + .@points + "' WHERE `type`='" + .@type + "' AND `auto_id`='" + .@rank_id + "'";
 																					mes $@da_BasicSettings$[4];
 																					mes "Os pontos de ^" + $@da_Color$[3] + "pontos de " + .@p_mask$[.@change] + "^000000 do ^" + $@da_Color$[3] +"'"+ .@p_mask_name$[.@change] + " " + .@name$ + "'^000000 de ^" + $@da_Color$[3] + .@rank_points[.@change] + "'^000000 para ^" + $@da_Color$[3] + .@points + "'^000000.";
 																					next;
@@ -2474,8 +2471,8 @@ function	script	checkRestriction	{
 //				[2]: Grupo.
 //		object_id: Id do objeto a ser consultado.
 function	script	getRankInfo	{
-	query_sql "SELECT `auto_id`, `wins`, `loss`, `ration`, `name` FROM " + $@da_DataBase$[3] + "` WHERE `object_id`='" + getarg(1) + "' AND `type`='" + getarg(2) + "'", .@id, .@wins, .@loss, .@ration, .@name$;
-	return (!getarraysize(.@id)?0:(getarg(1)==1?.@wins[0]:(getarg(1)==2?.@loss[0]:(getarg(1)==3?.@ration[0]:.@name$[0]))));
+	query_sql "SELECT `auto_id`, `wins`, `loss`, `ration`, `object_name` FROM `" + $@da_DataBase$[3] + "` WHERE `object_id`='" + getarg(2) + "' AND `type`='" + getarg(1) + "'", .@id, .@wins, .@loss, .@ration, .@name$;
+	return (!getarraysize(.@id)?0:(getarg(0)==0?.@id[0]:(getarg(0)==1?.@wins[0]:(getarg(0)==2)?.@loss[0]:(getarg(0)==3?.@ration[0]:.@name$[0]))));
 }
 
 // * getArenaInfo(type, map_index)
@@ -2541,4 +2538,18 @@ function	script	ReloadMapFlags	{
 	}
 	
 	return;
+}
+
+// * GetInfoName(<type>, <char_id>)
+//		type: Retorna com o nome do clã ou grupo, caso o jogador não este em um deles retorna com N/a.
+//			[0]: Nome do clã se o jogador estiver em um.
+//			[1]: Nome do grupo se o jogador estiver em um.
+//		char_id: Id do personagem.
+function	script	GetInfoName	{
+	query_sql "SELECT `guild_id`, `party_id` FROM `char` WHERE `char_id`='" + getarg(1) + "'", .@gid, .@pid;
+	
+	if( (getarg(0) == 0 && getarraysize(.@gid)) || (getarg(0) == 1 && getarraysize(.@pid)) )
+		query_sql "SELECT `name` FROM `" + (getarg(0)==0?"guild":"party") + "` WHERE `" + (getarg(0)==0?"guild":"party") + "_id`='" + (getarg(0)==0?.@gid[0]:.@pid[0]) + "'", .@object_name$;
+
+	return (getarraysize(.@object_name$)?.@object_name$[0]:"N/a");
 }
