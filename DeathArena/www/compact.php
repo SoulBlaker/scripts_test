@@ -3,6 +3,14 @@
 	<head>
 		<title>Death Arena 1.0</title>
 		<link rel="stylesheet" type="text/css" href="css/da_compact.css" />
+		<script src="scripts/jquery.js" type="text/javascript"></script>
+		<script src="scripts/easyTooltip.js" type="text/javascript"></script>
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$("a").easyTooltip();
+				$("span").easyTooltip();
+	    });
+		</script>
 	</head>
 	<body>
 	<?php
@@ -16,7 +24,7 @@
 	?>
 		<div id="layout">
 			<div id="logo">
-				<div id="filter-bar"><a href="?type=0">Jogadores</a>&nbsp;&nbsp;&nbsp;<a href="?type=1">Clãns</a>&nbsp;&nbsp;&nbsp;<a href="?type=2">Grupos</a></div>
+				<div id="filter-bar"><a href="?type=0" title="Rank de Jogadors">Jogadores</a>&nbsp;&nbsp;&nbsp;<a href="?type=1" title="Rank de Clãns">Clãns</a>&nbsp;&nbsp;&nbsp;<a href="?type=2" title="Rank de Grupos">Grupos</a></div>
 			</div>
 			<div id="content">
 		<?php		
@@ -30,9 +38,9 @@
 					<tr id="title">
 						<td></td>
 						<td><?=($type==1?"Clã":($type==2?"Grupo":"Jogador"))?></td>
-						<td>V</td>
-						<td>D</td>
-						<td>P</td>
+						<td><span title="Vitórias">V</span></td>
+						<td><span title="Derrotas">D</span></td>
+						<td><span title="Proporcional">P</span></td>
 					</tr>
 		<?php
 			for( $i=0, $line=0; $i < count($DeathArena->Ranking['object_name']); $i++ )

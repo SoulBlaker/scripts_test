@@ -61,18 +61,21 @@
 			Tipo: Array
 			Desc: Responsável pelas configurações básicas do npc.
 			Index:
-					0 -> Nível de GM para acessar o painel de administração.
-					1 -> Sistemas de eventos de avisos nas arenas.
+					0  -> Nível de GM para acessar o painel de administração.
+					1  -> Sistemas de eventos de avisos nas arenas.
 							0: Desativado
 							1: Habilitar mensagens globais no mapa avisando quando o jogador derrota outro.
 							2: Habilitar sons do Unreal Trounament.
 							3: Habilitar ambos.
-					2 -> Habilitar janela de chat que será exibido em cima do npc. (Abre suporte a um chat no npc com no máximo de 20 jogadores)
-					3 -> Mensagem a ser exibida na janela de chat (se a opção acima estiver habilitada) ou sobre referência ao npc.
-					4 -> Nome do npc a ser exibido nas janelas de dialogo.
-					5 -> Checar se um item na restrição seja carta, se ela está equipada em um equipamento.
-					6 -> Total de resultados a ser exibido por página no raking do NPC. (Máximo 120 resultados)
-					7 -> Nível de GM para utilizar o comando @daranking, 0 é para todos os jogadores.
+					2  -> Habilitar janela de chat que será exibido em cima do npc. (Abre suporte a um chat no npc com no máximo de 20 jogadores)
+					3  -> Mensagem a ser exibida na janela de chat (se a opção acima estiver habilitada) ou sobre referência ao npc.
+					4  -> Nome do npc a ser exibido nas janelas de dialogo.
+					5  -> Checar se um item na restrição seja carta, se ela está equipada em um equipamento.
+					6  -> Total de resultados a ser exibido por página no raking do NPC. (Máximo 120 resultados)
+					7  -> Nível de GM para utilizar o comando @daranking, 0 é para todos os jogadores.
+					8  -> Usar conversões para utilizar outros tipos de "moeda" invez de death points, o sistema não converte os pontos atuais, somente futuros e valores na Death Shop.
+					9  -> Caso seja utilizado Death Points, ele pode-rá ser usado por todos personagens da conta ou somente o personagem?
+					10 -> Habilitar a Death Shop.
 			
 			Var: $@da_DataBase$
 			Tipo: Array
@@ -82,6 +85,7 @@
 					1 -> Banco de Dados dos grupos de restrições.
 					2 -> Banco de Dados das regras de restrições.
 					3 -> Banco de Dados do Ranking.
+					4 -> Banco de Dados do Death Shop.
 					
 			Var: $@da_SoundEffect$
 			Tipo: Array

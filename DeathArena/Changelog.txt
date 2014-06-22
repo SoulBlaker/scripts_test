@@ -1,4 +1,7 @@
 -- V1.1R1
+[2014/06/22] - SoulBlaker
+	@@ Concluído sistema de Death Points & Death Shop.
+	Adicionado jQuery no Raking Compacto para visualizações de titulos.
 [2014/06/21] - SoulBlaker
 	Adicionado Sistema de Death Shop.
 	Adicionado suporte a configurações de death points nas arenas.

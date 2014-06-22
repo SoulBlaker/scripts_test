@@ -35,3 +35,15 @@ body { background-color:#000000; }
 
 #row-bar-left a, #row-bar-right a, #filter-bar a { color:#c45d6f; text-decoration:none; }
 #row-bar-left a:hover, #row-bar-right a:hover, #filter-bar a:hover { text-decoration:underline; }
+
+#easyTooltip {
+	padding: 5px 10px;
+	border: 1px solid #c45d6f;
+	background-color:#FFC0CB;
+	color: #c45d6f;
+	-webkit-border-radius:4px;
+	-moz-border-radius:4px;
+	border-radius:4px;
+}
+
+span { cursor: help; }

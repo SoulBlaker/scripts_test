@@ -23,6 +23,8 @@
 // .	- Iniciado NPC.                                       .
 // .  * 1.1.r1 [SoulBlaker]                                   .
 // .    - Iniciado Suporte a Configurações de Death Points.   .
+// .	- Adicionado Sistema de Death Shop.                   .
+// .    - Adicionado Gerenciamento de itens no Death Shop.    .
 // *----------------------------------------------------------*
 
 // [Nota 1]: Ponha 0 para desabilitar esta opção.
@@ -36,8 +38,8 @@
 //			 quantidade de mortes o som é tocado, lembre-se que a matriz que seja configurada
 //			 na indice '0' será a que repetirá quando o jogador ultrapassar a quantidade máxima 
 //			 de mortes feita sobre os jogadores.
-// [Nota 5]: Se o tipo de conversão de death points for habilitado, o Shop da Death Arena será desabilitada também,
-//			 lembrando que a habilitação de entrega de Deah Points é nas configurações InGame da arena.
+// [Nota 5]: Se o tipo de conversão de death points for habilitado, lembrando que a habilitação de entrega
+//           de Deah Points é nas configurações InGame da arena.
 //			 [0]: Desabilitar conversão de Death Points.
 //			 [1]: Converter Death Points para Kafra Points.
 //			 [2]: Converter Death Points para Cash Points.
@@ -69,7 +71,11 @@ OnInit:
 						"0000FF",				// Cor hexadecimal para uma referência um objeto para função.
 						"0000FF",				// Cor hexadecimal para opção do menu de administrador.
 						"0000FF",				// Cor hexadecimal para referência sobre o npc.
-						"0000FF" 				// Cor hexadecimal parao cabeçalho do rank.
+						"0000FF", 				// Cor hexadecimal para o cabeçalho do rank.
+						"B8860B",				// Cor hexadecimal para o cabeçalho da venda de itens do Death Shop.
+						"228B22",				// Cor hexadecimal para o cabeçalho de custo por item do Death Shop.
+						"FF0000",				// Cor hexadecimal para o cabeçalho de custo total do Death Shop.
+						"0000FF"				// Cor hexadecimal para a opção de efetuar compra do Death Shop.
 	;
 						
 	setarray $@da_DataBase$[0],
@@ -524,7 +530,7 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 				mes "Muito bem, vou abrir o ^" + $@da_Color$[3] +"Death Shop^000000.";
 				close2;
 				npcshopdelitem "death_shop", 501;
-				query_sql "SELECT `item_id` FROM `" + $@da_DataBase$[4] + "`", .@item_id;
+				query_sql "SELECT `item_id` FROM `" + $@da_DataBase$[4] + "` ORDER BY `type`, `name` ASC", .@item_id;
 				for( set .@i, 0; .@i < getarraysize(.@item_id); set .@i, .@i + 1 )
 				{
 					npcshopdelitem "death_shop", .@item_id[.@i];
@@ -542,7 +548,7 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 					mes $@da_BasicSettings$[4];
 					mes "O que deseja gerenciar na ^" + $@da_Color$[5] + $@da_BasicSettings$[3] + "^000000?";
 					next;
-					switch( select("- Gerenciar Grupos de Restrições.", "- Gerenciar Arenas.", "- Gerenciar Ranking.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
+					switch( select("- Gerenciar Grupos de Restrições.", "- Gerenciar Arenas.", "- Gerenciar Ranking.", "- Gerenciar Death Shop.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
 					{
 						case 1:
 							// Gerenciar Grupos de Restrições.
@@ -2481,9 +2487,293 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 							}
 							break;
 						case 4:
-							set .@loop_2, 0;
+							// Gerenciar Death Shop.
+							set .@loop_3, 1;
+							while(.@loop_3)
+							{
+								mes $@da_BasicSettings$[4];
+								mes "O que deseja gerenciar no ^" + $@da_Color$[3] + "Death Shop^000000?";
+								next;
+								switch( select("- Adicionar Itens.", "- Remover Itens.", "- Alterar Valor de Itens.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
+								{
+									case 1:
+										// Adicionar Itens.
+										set .@loop_4, 1;
+										while(.@loop_4)
+										{
+											mes $@da_BasicSettings$[4];
+											mes "Por favor, digite o ^" + $@da_Color$[3] + "Id do item^000000 que deseja adicionar ao ^" + $@da_Color$[3] + "Death Shop^000000.";
+											next;
+											input .@item_id;
+											if( !.@item_id || getitemname(.@item_id) == "" )
+											{
+												mes $@da_BasicSettings$[4];
+												mes "Você deve digitar o ^" + $@da_Color$[3] + "Id do item^000000 que deseja adicionar ao ^" + $@da_Color$[3] + "Death Shop^000000.";
+												mes "Deseja tentar novamente?";
+												next;
+												switch( select("- Sim, por favor.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
+												{
+													case 1:
+														break;
+													case 2:
+														set .@loop_4, 0;
+														break;
+													case 3:
+														set .@loop_4, 0;
+														set .@loop_3, 0;
+														set .@loop_2, 0;
+														set .@loop_1, 0;
+														break;
+												}
+											}
+											else if( callfunc("GetShopInfo", 0, .@item_id) )
+											{
+												mes $@da_BasicSettings$[4];
+												mes "O item ^" + $@da_Color$[3] + getitemname(.@item_id) + "^000000 já está cadastrado no ^" + $@da_Color$[3] + "Death Shop^000000.";
+												mes "Deseja cadastrar outo item?";
+												next;
+												switch( select("- Sim, por favor.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
+												{
+													case 1:
+														break;
+													case 2:
+														set .@loop_4, 0;
+														break;
+													case 3:
+														set .@loop_4, 0;
+														set .@loop_3, 0;
+														set .@loop_2, 0;
+														set .@loop_1, 0;
+														break;
+												}
+											}
+											else {
+												set .@loop_5, 1;
+												while(.@loop_5)
+												{
+													mes $@da_BasicSettings$[4];
+													mes "Digite o valor que será cobrado no item ^" + $@da_Color$[3] + getitemname(.@item_id) + "^000000 no ^" + $@da_Color$[3] + "Death Shop^000000.";
+													next;
+													input .@value;
+													if( !.@value )
+													{
+														mes $@da_BasicSettings$[4];
+														mes "Você deve digitar a ^" + $@da_Color$[3] + "quantidade^000000 do item ^" + $@da_Color$[3] + getitemname(.@item_id) + "^000000 que deseja adicionar ao ^" + $@da_Color$[3] + "Death Shop^000000.";
+														mes "Deseja tentar novamente?";
+														next;
+														switch( select("- Sim, por favor.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
+														{
+															case 1:
+																break;
+															case 2:
+																set .@loop_5, 0;
+																break;
+															case 3:
+																set .@loop_5, 0;
+																set .@loop_4, 0;
+																set .@loop_3, 0;
+																set .@loop_2, 0;
+																set .@loop_1, 0;
+																break;
+														}
+													}
+													else {
+														mes $@da_BasicSettings$[4];
+														mes "Você tem certeza que deseja adicionar ^" + $@da_Color$[3] + getitemname(.@item_id) + "^000000 no valor de ^" + $@da_Color$[3] + .@value + "^000000 ao ^" + $@da_Color$[3] + "Death Shop^000000?";
+														mes "Deseja tentar novamente?";
+														next;
+														switch( select("- Sim, por favor.", "- Não, adicionar outro item.", "- Não, adicionar outro valor.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
+														{
+															case 1:
+																// Adicionar itens ao Death Shop.
+																query_sql "INSERT INTO `" + $@da_DataBase$[4] + "` (item_id, value, name, type) VALUES (" + .@item_id + ", " + .@value + ", '" + getitemname(.@item_id) + "', " + getiteminfo(.@item_id, 2) + ")";
+																mes $@da_BasicSettings$[4];
+																mes "O item ^" + $@da_Color$[3] + getitemname(.@item_id) + "^000000 no valor de ^" + $@da_Color$[3] + .@value + "^000000 foi adicionado ao ^" + $@da_Color$[3] + "Death Shop^000000.";
+																next;
+																set .@loop_5, 0;
+																set .@loop_4, 0;
+																break;
+															case 2:
+																set .@loop_5, 0;
+																break;
+															case 3:
+																break;
+															case 4:
+																set .@loop_5, 0;
+																set .@loop_4, 0;
+																break;
+															case 5:
+																set .@loop_5, 0;
+																set .@loop_4, 0;
+																set .@loop_3, 0;
+																set .@loop_2, 0;
+																set .@loop_1, 0;
+																break;
+														}
+													}
+												}
+											}
+										}
+										break;
+									case 2:
+										// Remover Itens.
+										set .@loop_4, 1;
+										while(.@loop_4)
+										{
+											mes $@da_BasicSettings$[4];
+											mes "Por favor, selecione o ^" + $@da_Color$[3] + "item^000000 que deseja remover do ^" + $@da_Color$[3] + "Death Shop^000000.";
+											next;
+											cleararray .@item_id[0], 0, getarraysize(.@item_id);
+											query_sql "SELECT `item_id` FROM `" + $@da_DataBase$[4] + "` ORDER BY `type`, `name` ASC", .@item_id;
+											set .@BuildItemMenu$, "";
+											for( set .@i, 0; .@i < getarraysize(.@item_id); set .@i, .@i + 1 )
+												set .@BuildItemMenu$, .@BuildItemMenu$ + "- " + getitemname(.@item_id[.@i]) + ".:";
+												
+											set .@chooseItem, select(.@BuildItemMenu$+"^" + $@da_Color$[1] + "- Voltar.^000000:^" + $@da_Color$[0] + "- Cancelar.^000000")-1;
+																							
+											if( .@chooseItem == getarraysize(.@item_id) )
+												set .@loop_4, 0;
+											else if( .@chooseItem > getarraysize(.@item_id) )
+											{
+												set .@loop_4, 0;
+												set .@loop_3, 0;
+												set .@loop_2, 0;
+												set .@loop_1, 0;
+											}
+											else {
+												mes $@da_BasicSettings$[4];
+												mes "Tem certeza que deseja remover o item ^" + $@da_Color$[3] + getitemname(.@item_id[.@chooseItem]) + "^000000 do ^" + $@da_Color$[3] + "Death Shop^000000?";
+												next;
+												switch( select("- Sim, por favor.", "- Não, escolher outro item.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
+												{
+													case 1:
+														// Remover item do Death Shop.
+														query_sql "DELETE FROM `" + $@da_DataBase$[4] + "` WHERE `item_id`='" + .@item_id[.@chooseItem] + "'";
+														mes $@da_BasicSettings$[4];
+														mes "O item ^" + $@da_Color$[3] + getitemname(.@item_id[.@chooseItem]) + "^000000 foi removido do ^" + $@da_Color$[3] + "Death Shop^000000?";
+														next;
+														npcshopdelitem "death_shop", .@item_id[.@chooseItem];
+														set .@loop_4, 0;
+														break;
+													case 2:
+														break;
+													case 3:
+														set .@loop_4, 0;
+														break;
+													case 4:
+														set .@loop_4, 0;
+														set .@loop_3, 0;
+														set .@loop_2, 0;
+														set .@loop_1, 0;
+														break;
+												}
+											}
+										}
+										break;
+									case 3:
+										// Alterar valor dos Itens.
+										set .@loop_4, 1;
+										while(.@loop_4)
+										{
+											mes $@da_BasicSettings$[4];
+											mes "Por favor, selecione o ^" + $@da_Color$[3] + "item^000000 que deseja alterar do ^" + $@da_Color$[3] + "Death Shop^000000.";
+											next;
+											cleararray .@item_id[0], 0, getarraysize(.@item_id);
+											query_sql "SELECT `item_id`, `value` FROM `" + $@da_DataBase$[4] + "` ORDER BY `type`, `name` ASC", .@item_id, .@value;
+											set .@BuildItemMenu$, "";
+											for( set .@i, 0; .@i < getarraysize(.@item_id); set .@i, .@i + 1 )
+												set .@BuildItemMenu$, .@BuildItemMenu$ + "- " + getitemname(.@item_id[.@i]) + " -> " + .@value[.@i] + ".:";
+												
+											set .@chooseItem, select(.@BuildItemMenu$+"^" + $@da_Color$[1] + "- Voltar.^000000:^" + $@da_Color$[0] + "- Cancelar.^000000")-1;
+																							
+											if( .@chooseItem == getarraysize(.@item_id) )
+												set .@loop_4, 0;
+											else if( .@chooseItem > getarraysize(.@item_id) )
+											{
+												set .@loop_4, 0;
+												set .@loop_3, 0;
+												set .@loop_2, 0;
+												set .@loop_1, 0;
+											}
+											else {
+												set .@loop_5, 1;
+												while(.@loop_5)
+												{
+													mes $@da_BasicSettings$[4];
+													mes "Por favor, digite um novo valor para o item ^" + $@da_Color$[3] + getitemname(.@item_id[.@chooseItem]) + "^000000 do ^" + $@da_Color$[3] + "Death Shop^000000?";
+													next;
+													input .@n_value;
+												
+													if( !.@n_value || .@n_value == .@value[.@chooseItem] )
+													{
+														mes $@da_BasicSettings$[4];
+														mes "Você deve digitar um novo valor para o item ^" + $@da_Color$[3] + getitemname(.@item_id[.@chooseItem]) + "^000000 do ^" + $@da_Color$[3] + "Death Shop^000000?";
+														mes "Deseja tentar novamente?";
+														next;
+														switch( select("- Sim, por favor.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
+														{
+															case 1:
+																break;
+															case 2:
+																set .@loop_5, 0;
+															case 3:
+																set .@loop_5, 0;
+																set .@loop_4, 0;
+																set .@loop_3, 0;
+																set .@loop_2, 0;
+																set .@loop_1, 0;
+																break;
+														}
+													}
+													else {
+														mes $@da_BasicSettings$[4];
+														mes "Tem certeza que deseja remover o valor do item ^" + $@da_Color$[3] + getitemname(.@item_id[.@chooseItem]) + "^000000 de ^" + $@da_Color$[3] + .@value[.@chooseItem] + "^000000 para ^" + $@da_Color$[3] + .@n_value + "^000000 do ^" + $@da_Color$[3] + "Death Shop^000000?";
+														next;												
+														switch( select("- Sim, por favor.", "- Não, digitar outro valor.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
+														{
+															case 1:
+																// Alterar valor do item do Death Shop.
+																query_sql "UPDATE `" + $@da_DataBase$[4] + "` SET `value`='" + .@n_value + "' WHERE `item_id`='" + .@item_id[.@chooseItem] + "'";
+																mes $@da_BasicSettings$[4];
+																mes "O valor do item ^" + $@da_Color$[3] + getitemname(.@item_id[.@chooseItem]) + "^000000 foi alterado de ^" + $@da_Color$[3] + .@value[.@chooseItem] + "^000000 para ^" + $@da_Color$[3] + .@n_value + "^000000 do ^" + $@da_Color$[3] + "Death Shop^000000?";
+																next;
+																set .@loop_5, 0;
+																set .@loop_4, 0;
+																break;
+															case 2:
+																break;
+															case 3:
+																set .@loop_5, 0;
+																break;
+															case 4:
+																set .@loop_5, 0;
+																set .@loop_4, 0;
+																set .@loop_3, 0;
+																set .@loop_2, 0;
+																set .@loop_1, 0;
+																break;
+														}
+													}
+												}
+											}
+										}
+										break;
+										break;
+									case 4:
+										set .@loop_3, 0;
+										break;
+									case 5:
+										set .@loop_3, 0;
+										set .@loop_2, 0;
+										set .@loop_1, 0;
+										break;
+								}
+							}
 							break;
 						case 5:
+							set .@loop_2, 0;
+							break;
+						case 6:
 							set .@loop_1, 0;
 							set .@loop_2, 0;
 							break;
@@ -2510,19 +2800,19 @@ OnBuyItem:
 	set .@total_points, 0;
 	cutin "death_arena", 2;
 	mes $@da_BasicSettings$[4];
-	mes "Itens na lista de Compras:";
+	mes "^" + $@da_Color$[7] + "Itens na lista de Compras:^000000";
 	
 	for( set .@i, 0; .@i < getarraysize(@bought_nameid); set .@i, .@i + 1 )
 	{
-		set .@value, callfunc("GetShopValue", @bought_nameid[.@i])*@bought_quantity[.@i];
+		set .@value, callfunc("GetShopInfo", 1, @bought_nameid[.@i])*@bought_quantity[.@i];
 		set .@total_points, .@total_points + .@value;
-		mes @bought_quantity[.@i] + " - " + getitemname(@bought_nameid[.@i]);
-		mes "Custo: " + .@value;
+		mes "^" + $@da_Color$[3] + @bought_quantity[.@i] + "x " + getitemname(@bought_nameid[.@i]) + "^000000";
+		mes "^" + $@da_Color$[8] + "Custo:^000000 " + .@value + (!atoi($@da_BasicSettings$[8])?" Death Points":(atoi($@da_BasicSettings$[8])==1?" Pontos Kafra":(atoi($@da_BasicSettings$[8])==2?" Pontos de Cash":" Zenys"))) + ".";
 	}
 	mes " ";
-	mes "Custo total: " + .@total_points + " pontos.";
+	mes "^" + $@da_Color$[9] + "Custo total:^000000 " + .@total_points + (!atoi($@da_BasicSettings$[8])?" Death Points":(atoi($@da_BasicSettings$[8])==1?" Pontos Kafra":(atoi($@da_BasicSettings$[8])==2?" Pontos de Cash":" Zenys"))) + ".";
 	next;
-	if( select("- Efetuar a compra.", "- Cancelar.") == 1 )
+	if( select("^" + $@da_Color$[10] + "- Efetuar a compra.^000000", "- Cancelar.") == 1 )
 	{
 		mes $@da_BasicSettings$[4];
 		if( !atoi($@da_BasicSettings$[8]) && getd((atoi($@da_BasicSettings$[9])?"#DEATH_POINTS":"DEATH_POINTS")) < .@total_points )
@@ -2699,9 +2989,13 @@ function	script	GetInfoName	{
 	return (getarraysize(.@object_name$)?.@object_name$[0]:"N/a");
 }
 
-function	script	GetShopValue	{
-	query_sql "SELECT `value` FROM `" + $@da_DataBase$[4] + "` WHERE `item_id`='" + getarg(0) + "'", .@value;
-	return (getarraysize(.@value)?.@value[0]:0);
+// * GetShopInfo(<type>, <item_id>)
+//		type: Retorna com uma informação do Death Shop.
+//			[0]: Retorna 1 caso o item esteja cadastrado no Death Shop.
+//			[1]: Retorna com o valor do item caso esteja no Death Shop.
+function	script	GetShopInfo	{
+	query_sql "SELECT `item_id`, `value` FROM `" + $@da_DataBase$[4] + "` WHERE `item_id`='" + getarg(1) + "'", .@item_id, .@value;
+	return (getarg(0)==1&&getarraysize(.@value)?.@value[0]:(getarg(0)==0&&getarraysize(.@item_id)?1:0));
 }
 
 // Sistema de Death Shop
