@@ -1,5 +1,7 @@
 -- V1.1R1
 [2014/06/23] - SoulBlaker
+	Adicionad Suporte de mais informações no Raking-Web Compact, agora ele passa a ter todas as informações do Ranking-Web Full ao passar o
+	mouse em cima do nome do jogador/clãn/grupo, foi removido o VDP e acrescentado no mesmo.
 	Correções para adição de mapflags para tipo Grupo de arena.
 	Adicionado Suporte de quantidade de jogadores on-line de um clã/grupo e situação de on-line/off-line de um jogador no Ranking-Web Full.
 	Adicionado Suporte de quantidade de jogadores on-line de um clã/grupo e situação de on-line/off-line de um jogador no Ranking-InGame.

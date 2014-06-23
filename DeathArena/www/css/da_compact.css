@@ -23,6 +23,7 @@ body { background-color:#000000; }
 #content table { width:191px; border:0px; border-spacing:0px; padding: 0% 4% 4% 4%; }
 #content table #title { background-color:#c45d6f; color:#FFFFFF; }
 #content table td { text-align:center; }
+#content table #result-left { text-align:left; }
 
 #content table #line-1 { color:#c45d6f; }
 #content table #line-0 { background:#FFC0CB; color:#c45d6f; }
@@ -36,10 +37,12 @@ body { background-color:#000000; }
 #row-bar-left a, #row-bar-right a, #filter-bar a { color:#c45d6f; text-decoration:none; }
 #row-bar-left a:hover, #row-bar-right a:hover, #filter-bar a:hover { text-decoration:underline; }
 
+.title { text-decoration:underline; }
+
 #easyTooltip {
 	padding: 5px 10px;
 	border: 1px solid #c45d6f;
-	background-color:#FFC0CB;
+	background-color:#FFFFFF;
 	color: #c45d6f;
 	-webkit-border-radius:4px;
 	-moz-border-radius:4px;

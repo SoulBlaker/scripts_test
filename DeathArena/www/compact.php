@@ -37,22 +37,26 @@
 				<table>
 					<tr id="title">
 						<td></td>
-						<td><?=($type==1?"Clã":($type==2?"Grupo":"Jogador"))?></td>
-						<td><span title="Vitórias">V</span></td>
-						<td><span title="Derrotas">D</span></td>
-						<td><span title="Proporcional">P</span></td>
+						<td><?=($type==1?"Rank de Clãns":($type==2?"Rank de Grupos":"Rank de Jogadores"))?></td>
 					</tr>
 		<?php
 			for( $i=0, $line=0; $i < count($DeathArena->Ranking['object_name']); $i++ )
 			{
 				$position = ($i+$min_row)+1;
+				$player_online = $DeathArena->GetOnline($DeathArena->Ranking['object_id'][$i], $type);
 		?>
 				<tr id="line-<?=$line?>">
-					<td width="13%"><?=($position<=3?'<img src="images/medal_0' . $position . '.png" width="16" />':$position)?></td>
-					<td><span title="<?=$DeathArena->Ranking['object_name'][$i]?>"><?=substr($DeathArena->Ranking['object_name'][$i], 0, 10)?></span></td>
-					<td><?=$DeathArena->Ranking['wins'][$i]?></td>
-					<td><?=$DeathArena->Ranking['loss'][$i]?></td>
-					<td><?=$DeathArena->Ranking['ration'][$i]?></td>
+					<td width="16%"><?=($position<=3?'<img src="images/medal_0' . $position . '.png" width="16" />':$position)?></td>
+					<td>
+						<span title="
+									<span class='title'><?=($type==1?'Clã':($type==2?'Grupo':'Jogador'))?></span>: <?=$DeathArena->Ranking['object_name'][$i]?></span><br/>
+									<?=(!$type?'<span class=\'title\'>Clã</span>: ' . $DeathArena->GetCharInfo($DeathArena->Ranking['object_id'][$i], 0) . '<br/><span class=\'title\'>Grupo</span>: ' . $DeathArena->GetCharInfo($DeathArena->Ranking['object_id'][$i], 1) . '<br/>':'')?>
+									<span class='title'>Vitórias</span>: <?=$DeathArena->Ranking['wins'][$i]?></br>
+									<span class='title'>Derrotas</span>: <?=$DeathArena->Ranking['loss'][$i]?></br>
+									<span class='title'>Proporcional</span>: <?=$DeathArena->Ranking['ration'][$i]?><br/>
+									<span class='title'>Status</span>: <?=($type==0?(!$player_online?"off-line":"on-line"):(!$player_online?"off-line":$player_online." on-line"))?>
+						"><?=substr($DeathArena->Ranking['object_name'][$i], 0, 20)?></span>
+					</td>
 				</tr>
 		<?php
 				$line = ($line?0:1);
