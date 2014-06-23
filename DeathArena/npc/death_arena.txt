@@ -25,6 +25,7 @@
 // .    - Iniciado Suporte a Configurações de Death Points.   .
 // .	- Adicionado Sistema de Death Shop.                   .
 // .    - Adicionado Gerenciamento de itens no Death Shop.    .
+// .    - Adicionado informações de jogadores on-line.        .
 // *----------------------------------------------------------*
 
 // [Nota 1]: Ponha 0 para desabilitar esta opção.
@@ -38,8 +39,8 @@
 //			 quantidade de mortes o som é tocado, lembre-se que a matriz que seja configurada
 //			 na indice '0' será a que repetirá quando o jogador ultrapassar a quantidade máxima 
 //			 de mortes feita sobre os jogadores.
-// [Nota 5]: Se o tipo de conversão de death points for habilitado, lembrando que a habilitação de entrega
-//           de Deah Points é nas configurações InGame da arena.
+// [Nota 5]: Se o tipo de conversão de death points for habilitado, o Shop da Death Arena será desabilitada também,
+//			 lembrando que a habilitação de entrega de Deah Points é nas configurações InGame da arena.
 //			 [0]: Desabilitar conversão de Death Points.
 //			 [1]: Converter Death Points para Kafra Points.
 //			 [2]: Converter Death Points para Cash Points.
@@ -191,7 +192,7 @@ OnPCKillEvent:
 	end;
 	
 OnLoadMapFlags:
-	for( set .@type, 0; .@type < 2; set .@type, .@type + 1 )
+	for( set .@type, 0; .@type <= 2; set .@type, .@type + 1 )
 	{
 		query_sql "SELECT `map_index`, `group_id` FROM `" + $@da_DataBase$[0] + "` WHERE `type`='" + .@type + "'", .@mapindex$, .@group_id;
 		
@@ -352,7 +353,7 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 												// Entrar na arena.
 												mes "^" + $@da_Color$[3] + "Arena:^000000 " + .@name$[.@chooseArena];
 												mes "^" + $@da_Color$[3] + "Tipo: ^000000" + .@mask_name$[.@type];
-												mes "^" + $@da_Color$[3] + "Mapa: ^000000" + .@map_index$[.@chooseArena] + (.@coord_x[.@chooseArena]&&.@coord_y[.@chooseArena]?"x["+.@coord_x[.@chooseArena]+"] - y["+.@coord_y[.@chooseArena]+"]":"");
+												mes "^" + $@da_Color$[3] + "Mapa: ^000000" + .@map_index$[.@chooseArena] + (.@coord_x[.@chooseArena]&&.@coord_y[.@chooseArena]?" x["+.@coord_x[.@chooseArena]+"] - y["+.@coord_y[.@chooseArena]+"]":"");
 												mes "^" + $@da_Color$[3] + "Máximo de Jogadores: ^000000" + (.@max_playe[.@chooseArena]?.@max_player[.@chooseArena]:"ilimitado");
 												mes "^" + $@da_Color$[3] + "Nível Minimo de Base: ^000000" + (.@min_level[.@chooseArena]?.@min_level[.@chooseArena]:"qualquer");
 												mes "^" + $@da_Color$[3] + "Nível Máximo de Base: ^000000" + (.@max_level[.@chooseArena]?.@max_level[.@chooseArena]:"qualquer");
@@ -444,6 +445,7 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 											{
 												for( set .@i, 0; .@i < getarraysize(.@object_id)&&.@loop_4; set .@i, .@i + 1 )
 												{
+													set .@online, callfunc("GetOnline", .@type, .@object_id[.@i]);
 													mes "^"+$@da_Color$[3] + "Posição:^000000 " + .@row_position;
 												
 													if( .@type == 1 )
@@ -453,10 +455,11 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 													else
 													{
 														mes "^"+$@da_Color$[3] + "Jogador:^000000 " + .@object_name$[.@i];
-														mes "^"+$@da_Color$[3] + "Clã:^000000 " + callfunc("GetInfoName", 0, .@object_id[.@i]);
-														mes "^"+$@da_Color$[3] + "Grupo:^000000 " + callfunc("GetInfoName", 1, .@object_id[.@i]);
+														mes "^"+$@da_Color$[3] + "Clã:^000000 " + callfunc("GetCharInfo", 0, .@object_id[.@i]);
+														mes "^"+$@da_Color$[3] + "Grupo:^000000 " + callfunc("GetCharInfo", 1, .@object_id[.@i]);
 													}
-												
+													
+													mes "^"+$@da_Color$[3] + "Status:^000000 " + (.@type==0?(.@online?"on-line":"off-line"):.@online) + (.@type>0?" jogadores online":"") + "^000000";
 													mes "^"+$@da_Color$[3] + "Vitórias:^000000 " + .@wins[.@i];
 													mes "^"+$@da_Color$[3] + "Derrotas:^000000 " + .@loss[.@i];
 													mes "^"+$@da_Color$[3] + "Proporção:^000000 " + .@ration[.@i];
@@ -2975,18 +2978,29 @@ function	script	ReloadMapFlags	{
 	return;
 }
 
-// * GetInfoName(<type>, <char_id>)
+// * GetCharInfo(<type>, <char_id>)
 //		type: Retorna com o nome do clã ou grupo, caso o jogador não este em um deles retorna com N/a.
 //			[0]: Nome do clã se o jogador estiver em um.
 //			[1]: Nome do grupo se o jogador estiver em um.
+//			[2]: Retorna se o Personagem está on-line.
 //		char_id: Id do personagem.
-function	script	GetInfoName	{
+function	script	GetCharInfo	{
 	query_sql "SELECT `guild_id`, `party_id` FROM `char` WHERE `char_id`='" + getarg(1) + "'", .@gid, .@pid;
 	
 	if( (getarg(0) == 0 && getarraysize(.@gid)) || (getarg(0) == 1 && getarraysize(.@pid)) )
 		query_sql "SELECT `name` FROM `" + (getarg(0)==0?"guild":"party") + "` WHERE `" + (getarg(0)==0?"guild":"party") + "_id`='" + (getarg(0)==0?.@gid[0]:.@pid[0]) + "'", .@object_name$;
 
 	return (getarraysize(.@object_name$)?.@object_name$[0]:"N/a");
+}
+
+// * GetOnline(<type>, <object_id>)
+//		type: Retorna com quantidades onlines.
+//			[0]: Retorna se um jogador está online.
+//			[1]: Retorna com a quantidade de jogadores online de um clã.
+//			[2]: Retorna com a quantidade de jogadores online de um grupo.
+function	script	GetOnline	{
+	query_sql "SELECT `online` FROM `char` WHERE `" + (getarg(0)==1?"guild_id":(getarg(0)==2?"party_id":"char_id")) + "`='" + getarg(1) + "' AND `online`='1'", .@online;
+	return (!getarraysize(.@online)?0:(!getarg(0)?.@online[0]:getarraysize(.@online)));
 }
 
 // * GetShopInfo(<type>, <item_id>)

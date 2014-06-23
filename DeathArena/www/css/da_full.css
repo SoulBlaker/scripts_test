@@ -30,6 +30,9 @@ body { background-color:#000000; margin: 2% 2% 2% 20%; position:absolute; }
 #rank table #title td, #rank table #line-0 td, #rank table #line-1 td { padding-top:5px; padding-bottom:5px; font-size:13px; text-align:center; }
 #rank table #line-0, #rank table #line-1 { color:#000; font-family: "Lucida Console", Monaco, monospace; font-size:12px; text-align:center; }
 #rank table #line-0 { background:#CDC9C9; }
+#rank table #on-line { color:#006400; }
+#rank table #off-line { color:#FF0000; }
+
 #footer { font-size:12px; background-color:#c45d6f; }
 #footer a { color:#FFFFFF; text-decoration:none; }
 #footer a:hover { text-decoration:underline; }

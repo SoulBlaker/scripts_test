@@ -12,7 +12,6 @@ class DeathArena {
 	
 	public $max_row = 10;
 	
-	// [Sistema]
 	public $Ranking = array();
 	
 	public function __construct()
@@ -61,10 +60,16 @@ class DeathArena {
 		return (@mysql_error()||!mysql_num_rows($consult_db)?"N/a":mysql_result($consult_db, 0, 'name'));
 	}
 	
-	public function PartyName( $party_id)
+	public function PartyName( $party_id )
 	{
 		$consult_db = mysql_query("SELECT `name` FROM `" . $this->mysqlDB['party_db'] . "` WHERE `party_id`='" . $party_id . "'");
 		return (@mysql_error()||!mysql_num_rows($consult_db)?"N/a":mysql_result($consult_db, 0, 'name'));
+	}
+	
+	public function GetOnline( $object_id, $type )
+	{
+		$consult_db = mysql_query("SELECT `online` FROM `" . $this->mysqlDB['char_db'] . "` WHERE `" . (!$type?'char_id':($type==1?'guild_id':'party_id')) . "`='" . $object_id . "' AND `online`='1'");
+		return (@mysql_error()||!mysql_num_rows($consult_db)?0:(!$type?mysql_result($consult_db, 0, 'online'):mysql_num_rows($consult_db)));
 	}
 }
 ?>

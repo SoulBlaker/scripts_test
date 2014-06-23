@@ -48,19 +48,20 @@
 				<div id="rank">
 					<table>
 						<tr id="title">
-							<td width="8%">&nbsp;</td>
-							<td width="30%"><?=($type==1?"Clã":($type==2?"Grupo":"Jogador"))?></td>
-							<td width="10%">Vitórias</td>
-							<td width="10%">Derrotas</td>
+							<td width="5%">&nbsp;</td>
+							<td><?=($type==1?"Clã":($type==2?"Grupo":"Jogador"))?></td>
+							<td>Vitórias</td>
+							<td>Derrotas</td>
 				<?php
 					if( $type == 0 ):
 				?>
-							<td width="20%">Clã</td>
-							<td width="20%">Grupo</td>
+							<td>Clã</td>
+							<td>Grupo</td>
 				<?php
 					endif;
 				?>
-							<td width="10%">Proporcional</td>
+							<td>Proporcional</td>
+							<td>Status</td>
 						</tr>
 						
 						<?php
@@ -80,13 +81,16 @@
 									<td><?=$DeathArena->GetCharInfo($DeathArena->Ranking['object_id'][$i], 1)?></td>
 						<?php
 							endif;
+							
+							$player_online = $DeathArena->GetOnline($DeathArena->Ranking['object_id'][$i], $type);
 						?>
 									<td><?=$DeathArena->Ranking['ration'][$i]?></td>
+									<td id="<?=($player_online?'on-line':'off-line')?>"><?=($type==0?(!$player_online?"off-line":"on-line"):(!$player_online?"off-line":$player_online." on-line"))?></td>
 								</tr>
-					<?php
-						$line = ($line?0:1);
+						<?php
+								$line = ($line?0:1);
 							}
-					?>
+						?>
 					</table>
 				</div>
 				<?php endif; ?>
