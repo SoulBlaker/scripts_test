@@ -10,6 +10,7 @@
 -- 	min_level	 -> Nível Minimo de Base para acessar a arena. (0 é desabilitado)
 -- 	max_level	 -> Nível Máximo de Base para acessar a arena. (0 é desabilitado)
 -- 	group		 -> Identificação do Grupo de Restrições.
+--  death_match  -> Habilitação da Death Match na arena. (0 é desabilitado)
 --  death_points -> Pontos que o jogador irá receber da arena ao derrotar uma adversário. (0 é desabilitado)
 -- }
 --
@@ -24,6 +25,7 @@ CREATE TABLE IF NOT EXISTS `da_arena` (
 	`max_level` int(4) unsigned NOT NULL default '0',
 	`min_level` int(4) unsigned NOT NULL default '0',
 	`group_id` int(11) unsigned NOT NULL default '0',
+	`death_match` int(1) NOT NULL default '0',
 	`death_points` int(11) unsigned NOT NULL default '0',
 	 PRIMARY KEY (`auto_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1;

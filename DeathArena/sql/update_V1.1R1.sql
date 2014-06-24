@@ -1,4 +1,5 @@
-ALTER TABLE  `da_arena` ADD COLUMN `death_points` int(11) unsigned NOT NULL DEFAULT '0' AFTER `group_id` ;
+ALTER TABLE `da_arena` ADD COLUMN `death_match` int(1) unsigned NOT NULL DEFAULT '0' AFTER `group_id` ;
+ALTER TABLE `da_arena` ADD COLUMN `death_points` int(11) unsigned NOT NULL DEFAULT '0' AFTER `death_match` ;
 
 CREATE TABLE IF NOT EXISTS `da_shop` (
 	`item_id` int(11) unsigned  NOT NULL default '0',

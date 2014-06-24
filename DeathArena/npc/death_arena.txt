@@ -21,11 +21,13 @@
 // . Changelog da Versão:                                     .
 // .  * 1.0.r1 [SoulBlaker]                                   .
 // .	- Iniciado NPC.                                       .
-// .  * 1.1.r1 [SoulBlaker]                                   .
+// .  * 1.1 [SoulBlaker]                                      .
 // .    - Iniciado Suporte a Configurações de Death Points.   .
 // .	- Adicionado Sistema de Death Shop.                   .
 // .    - Adicionado Gerenciamento de itens no Death Shop.    .
 // .    - Adicionado informações de jogadores on-line.        .
+// .	- Adicionado Sistema de Death Match.                  .
+// .    - Correções nos map-flags.                            .
 // *----------------------------------------------------------*
 
 // [Nota 1]: Ponha 0 para desabilitar esta opção.
@@ -191,6 +193,12 @@ OnPCKillEvent:
 	}
 	end;
 	
+OnPCDieEvent:
+	set .@map$, strcharinfo(3);
+	if( callfunc("getArenaInfo", 0, strcharinfo(3)) && callfunc("getArenaInfo", 4, strcharinfo(3)) )
+		recovery;
+	end;
+	
 OnLoadMapFlags:
 	for( set .@type, 0; .@type <= 2; set .@type, .@type + 1 )
 	{
@@ -205,9 +213,9 @@ OnLoadMapFlags:
 			setmapflag .@mapindex$[.@i], mf_nowarpto;
 			setmapflag .@mapindex$[.@i], mf_pvp;
 			
-			if( .@type == 1 )
+			if( .@type == 0 || .@type == 2 )
 				setmapflag .@mapindex$[.@i], mf_pvp_noguild;
-			else if( .@type == 2 )
+			else if( .@type == 0 || .@type == 1 )
 				setmapflag .@mapindex$[.@i], mf_pvp_noparty;
 				
 			if( callfunc("GetGroupInfo", 2, .@group_id[.@i]) )
@@ -237,7 +245,7 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 					mes $@da_BasicSettings$[4];
 					mes "Muito bem, escolha o tipo de arena que deseja entrar.";
 					next;
-					set .@type, select("- Jogadores vs Jogadores.", "- Clãns vs Clãns.", "- Grupos vs Grupos.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000")-1;
+					set .@type, select((callfunc("countArena", 0)?"- Jogadores vs Jogadores.":""), (callfunc("countArena", 1)?"- Clãns vs Clãns.":""), (callfunc("countArena", 2)?"- Grupos vs Grupos.":""), "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000")-1;
 					switch(.@type)
 					{
 						default:
@@ -248,7 +256,7 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 								mes $@da_BasicSettings$[4];
 								mes "Escolha ^" + $@da_Color$[3] + "arena de " + .@mask_name$[.@type] + "^000000 que deseja entrar.";
 								next;
-								query_sql "SELECT `auto_id`, `map_index`, `coord_x`, `coord_y`, `name`, `max_player`, `min_level`, `max_level`, `group_id` FROM `" + $@da_DataBase$[0] + "` WHERE `type`='" + .@type + "' ORDER BY `name` ASC", .@auto_id, .@map_index$, .@coord_x, .@coord_y, .@name$, .@max_player, .@min_level, .@max_level, .@group_id;
+								query_sql "SELECT `auto_id`, `map_index`, `coord_x`, `coord_y`, `name`, `max_player`, `min_level`, `max_level`, `group_id`, `death_match` FROM `" + $@da_DataBase$[0] + "` WHERE `type`='" + .@type + "' ORDER BY `name` ASC", .@auto_id, .@map_index$, .@coord_x, .@coord_y, .@name$, .@max_player, .@min_level, .@max_level, .@group_id, .@death_match;
 								
 								set .@BuildArenaMenu$, "";
 								for( set .@i, 0; .@i < getarraysize(.@auto_id); set .@i, .@i + 1 )
@@ -357,6 +365,7 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 												mes "^" + $@da_Color$[3] + "Máximo de Jogadores: ^000000" + (.@max_playe[.@chooseArena]?.@max_player[.@chooseArena]:"ilimitado");
 												mes "^" + $@da_Color$[3] + "Nível Minimo de Base: ^000000" + (.@min_level[.@chooseArena]?.@min_level[.@chooseArena]:"qualquer");
 												mes "^" + $@da_Color$[3] + "Nível Máximo de Base: ^000000" + (.@max_level[.@chooseArena]?.@max_level[.@chooseArena]:"qualquer");
+												mes "^" + $@da_Color$[3] + "Death Math: ^000000" + (!.@death_match?"desligado":"ligado");
 												
 												set .@item_list$, "";
 												set .@class_list$, "";
@@ -1290,7 +1299,7 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 											mes $@da_BasicSettings$[4];
 											mes "Por favor, escolha um tipo para a nova ^" + $@da_Color$[3] + "Arenas^000000?";
 											next;
-											set .@type, select("- Jogadores vs Jogadores.", "- Clãns vs Clãns.", "- Grupos vs Grupos.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000")-1;
+											set .@type, select((callfunc("countArena", 0)<120?"- Jogadores vs Jogadores.":""), (callfunc("countArena", 1)<120?"- Clãns vs Clãns.":""), (callfunc("countArena", 2)<120?"- Grupos vs Grupos.":""), "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000")-1;
 											switch(.@type)
 											{
 												default:
@@ -1442,99 +1451,132 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																						while(.@loop_9)
 																						{
 																							mes $@da_BasicSettings$[4];
-																							mes "Por favor, selecione o ^" + $@da_Color$[3] + "'Grupo de Restrições'^000000 que deseja adicionar a arena ^" + $@da_Color$[3] + .@Name$ + "^000000.";
+																							mes "Deseja ligar o ^" + $@da_Color$[3] + "Death Match^000000 na arena?";
 																							next;
-																							query_sql "SELECT `auto_id`, `name` FROM `" + $@da_DataBase$[1] + "` ORDER BY `name` ASC", .@groups_id, .@groups_name$;
-
-																							set .@BuildGroupMenu$, "";
-																							for( set .@i, 0; .@i < getarraysize(.@groups_id); set .@i, .@i + 1 )
-																								set .@BuildGroupMenu$, .@BuildGroupMenu$ + (callfunc("GetGroupInfo", 1, .@groups_id$[.@i])<120?"- " + .@groups_name$[.@i] + ".":"") + ":";
-																								
-																							set .@chooseGroup, select(.@BuildGroupMenu$+"^" + $@da_Color$[1] + "- Voltar.^000000:^" + $@da_Color$[0] + "- Cancelar.^000000")-1;
-																							
-																							if( .@chooseGroup == getarraysize(.@groups_id) )
-																								set .@loop_9, 0;
-																							else if( .@chooseGroup > getarraysize(.@groups_id) )
+																							set .@DeathMatch, select("- Sim, por favor.", "- Não, obrigado.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000");
+																							switch( .@DeathMatch )
 																							{
-																								set .@loop_9, 0;
-																								set .@loop_8, 0;
-																								set .@loop_7, 0;
-																								set .@loop_6, 0;
-																								set .@loop_5, 0;
-																								set .@loop_4, 0;
-																								set .@loop_3, 0;
-																								set .@loop_2, 0;
-																								set .@loop_1, 0;
-																							}
-																							else {
-																								mes $@da_BasicSettings$[4];
-																								mes "Tem certeza que deseja adicionar o grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "^000000' de restrições na arena '^" + $@da_Color$[3] + .@Name$ + "^000000'?";
-																								next;
-																								switch( select("- Sim, por favor.", "- Não, desejo selecionar outro grupo.", "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
-																								{
-																									case 1:
+																								default:
+																									set .@DeathMatch, (.@DeathMatch?0:1);
+																									set .@loop_10, 1;
+																									while(.@loop_10)
+																									{
 																										mes $@da_BasicSettings$[4];
-																										mes "Por favor, confirme as informações abaixo para concluír o cadastrado da arena:";
-																										mes " ";
-																										mes "^"+$@da_Color$[3] + "Arena:^000000 " + .@Name$;
-																										mes "^"+$@da_Color$[3] + "Tipo:^000000 " + .@mask_name$[.@type];
-																										mes "^"+$@da_Color$[3] + "Grupo de Restrições:^000000 "+ .@groups_name$[.@chooseGroup];
-																										mes "^"+$@da_Color$[3] + "Mapa:^000000 " + .@MapIndex$;
-																										mes "^"+$@da_Color$[3] + "Coordenadas:^000000 " + (.@CoordX&&.@CoordY?"x[" + .@CoordX + "] - y[" + .@CoordY + "]":"aleatória");
-																										mes "^"+$@da_Color$[3] + "Máximo de Jogadores:^000000 " + (.@MaxPlayer?.@MaxPlayer:"ilimitado");
-																										mes "^"+$@da_Color$[3] + "Nível Minimo:^000000 " + (.@MinBaseLevel?.@MinBaseLevel:"desabilitado");
-																										mes "^"+$@da_Color$[3] + "Nível Máximo:^000000 " + (.@MaxBaseLevel?.@MaxBaseLevel:"desabilitado");
-																										mes "^"+$@da_Color$[3] + "Death Points:^000000 " + (.@DeathPoints?.@DeathPoints:"desabilitado");
+																										mes "Por favor, selecione o ^" + $@da_Color$[3] + "'Grupo de Restrições'^000000 que deseja adicionar a arena ^" + $@da_Color$[3] + .@Name$ + "^000000.";
 																										next;
-																										switch( select("- Sim, está tudo correto.", "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
+																										query_sql "SELECT `auto_id`, `name` FROM `" + $@da_DataBase$[1] + "` ORDER BY `name` ASC", .@groups_id, .@groups_name$;
+
+																										set .@BuildGroupMenu$, "";
+																										for( set .@i, 0; .@i < getarraysize(.@groups_id); set .@i, .@i + 1 )
+																											set .@BuildGroupMenu$, .@BuildGroupMenu$ + (callfunc("GetGroupInfo", 1, .@groups_id$[.@i])<120?"- " + .@groups_name$[.@i] + ".":"") + ":";
+																											
+																										set .@chooseGroup, select(.@BuildGroupMenu$+"^" + $@da_Color$[1] + "- Voltar.^000000:^" + $@da_Color$[0] + "- Cancelar.^000000")-1;
+																										
+																										if( .@chooseGroup == getarraysize(.@groups_id) )
+																											set .@loop_10, 0;
+																										else if( .@chooseGroup > getarraysize(.@groups_id) )
 																										{
-																											case 1:
-																												// Adicionar arena.
-																												query_sql "INSERT INTO `" + $@da_DataBase$[0] + "` (map_index, coord_x, coord_y, name, type, max_player, max_level, min_level, death_points, group_id) VALUES('" + .@MapIndex$ + "', " + .@CoordX + ", " + .@CoordY + ", '" + .@Name$ + "', " + .@type + ", " + .@MaxPlayer + ", " + .@MaxBaseLevel + ", " + .@MinBaseLevel + ", " + .@DeathPoints + ", " + .@groups_id[.@chooseGroup] + ")";
-																												mes $@da_BasicSettings$[4];
-																												mes "A arena '^" + $@da_Color$[3] + .@Name$ + "'^000000 foi adicionada.";
-																												next;
-																												donpcevent "DeathArena::OnLoadMapFlags";
-																												set .@loop_9, 0;
-																												set .@loop_8, 0;
-																												set .@loop_7, 0;
-																												set .@loop_6, 0;
-																												set .@loop_5, 0;
-																												set .@loop_4, 0;
-																												break;
-																											case 2:
-																												set .@loop_9, 0;
-																												break;
-																											case 3:
-																												set .@loop_9, 0;
-																												set .@loop_8, 0;
-																												set .@loop_7, 0;
-																												set .@loop_6, 0;
-																												set .@loop_5, 0;
-																												set .@loop_4, 0;
-																												set .@loop_3, 0;
-																												set .@loop_2, 0;
-																												set .@loop_1, 0; 
-																												break;
+																											set .@loop_10, 0;
+																											set .@loop_9, 0;
+																											set .@loop_8, 0;
+																											set .@loop_7, 0;
+																											set .@loop_6, 0;
+																											set .@loop_5, 0;
+																											set .@loop_4, 0;
+																											set .@loop_3, 0;
+																											set .@loop_2, 0;
+																											set .@loop_1, 0;
 																										}
-																										break;
-																									case 2:
-																										break;
-																									case 3:
-																										set .@loop_9, 0;
-																										break;
-																									case 4:
-																										set .@loop_9, 0;
-																										set .@loop_8, 0;
-																										set .@loop_7, 0;
-																										set .@loop_6, 0;
-																										set .@loop_5, 0;
-																										set .@loop_4, 0;
-																										set .@loop_3, 0;
-																										set .@loop_2, 0;
-																										set .@loop_1, 0;
-																										break;
-																								}
+																										else {
+																											mes $@da_BasicSettings$[4];
+																											mes "Tem certeza que deseja adicionar o grupo '^" + $@da_Color$[3] + "'" + .@groups_name$[.@chooseGroup] + "^000000' de restrições na arena '^" + $@da_Color$[3] + .@Name$ + "^000000'?";
+																											next;
+																											switch( select("- Sim, por favor.", "- Não, desejo selecionar outro grupo.", "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
+																											{
+																												case 1:
+																													mes $@da_BasicSettings$[4];
+																													mes "Por favor, confirme as informações abaixo para concluír o cadastrado da arena:";
+																													mes " ";
+																													mes "^"+$@da_Color$[3] + "Arena:^000000 " + .@Name$;
+																													mes "^"+$@da_Color$[3] + "Tipo:^000000 " + .@mask_name$[.@type];
+																													mes "^"+$@da_Color$[3] + "Grupo de Restrições:^000000 "+ .@groups_name$[.@chooseGroup];
+																													mes "^"+$@da_Color$[3] + "Mapa:^000000 " + .@MapIndex$;
+																													mes "^"+$@da_Color$[3] + "Coordenadas:^000000 " + (.@CoordX&&.@CoordY?"x[" + .@CoordX + "] - y[" + .@CoordY + "]":"aleatória");
+																													mes "^"+$@da_Color$[3] + "Máximo de Jogadores:^000000 " + (.@MaxPlayer?.@MaxPlayer:"ilimitado");
+																													mes "^"+$@da_Color$[3] + "Nível Minimo:^000000 " + (.@MinBaseLevel?.@MinBaseLevel:"desabilitado");
+																													mes "^"+$@da_Color$[3] + "Nível Máximo:^000000 " + (.@MaxBaseLevel?.@MaxBaseLevel:"desabilitado");
+																													mes "^"+$@da_Color$[3] + "Death Points:^000000 " + (.@DeathPoints?.@DeathPoints:"desabilitado");
+																													mes "^"+$@da_Color$[3] + "Death Match:^000000 " + (.@DeathMatch?"ligado":"desligado");
+																													next;
+																													switch( select("- Sim, está tudo correto.", "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
+																													{
+																														case 1:
+																															// Adicionar arena.
+																															query_sql "INSERT INTO `" + $@da_DataBase$[0] + "` (map_index, coord_x, coord_y, name, type, max_player, max_level, min_level, death_points, death_match, group_id) VALUES('" + .@MapIndex$ + "', " + .@CoordX + ", " + .@CoordY + ", '" + .@Name$ + "', " + .@type + ", " + .@MaxPlayer + ", " + .@MaxBaseLevel + ", " + .@MinBaseLevel + ", " + .@DeathPoints + ", " + .@DeathMatch + ", " + .@groups_id[.@chooseGroup] + ")";
+																															mes $@da_BasicSettings$[4];
+																															mes "A arena '^" + $@da_Color$[3] + .@Name$ + "'^000000 foi adicionada.";
+																															next;
+																															donpcevent "DeathArena::OnLoadMapFlags";
+																															set .@loop_10, 0;
+																															set .@loop_9, 0;
+																															set .@loop_8, 0;
+																															set .@loop_7, 0;
+																															set .@loop_6, 0;
+																															set .@loop_5, 0;
+																															set .@loop_4, 0;
+																															break;
+																														case 2:
+																															set .@loop_10, 0;
+																															break;
+																														case 3:
+																															set .@loop_10, 0;
+																															set .@loop_9, 0;
+																															set .@loop_8, 0;
+																															set .@loop_7, 0;
+																															set .@loop_6, 0;
+																															set .@loop_5, 0;
+																															set .@loop_4, 0;
+																															set .@loop_3, 0;
+																															set .@loop_2, 0;
+																															set .@loop_1, 0; 
+																															break;
+																													}
+																													break;
+																												case 2:
+																													break;
+																												case 3:
+																													set .@loop_10, 0;
+																													break;
+																												case 4:
+																													set .@loop_10, 0;
+																													set .@loop_9, 0;
+																													set .@loop_8, 0;
+																													set .@loop_7, 0;
+																													set .@loop_6, 0;
+																													set .@loop_5, 0;
+																													set .@loop_4, 0;
+																													set .@loop_3, 0;
+																													set .@loop_2, 0;
+																													set .@loop_1, 0;
+																													break;
+																											}
+																										}
+																									}
+																									break;
+																								case 3:
+																									set .@loop_9, 0;
+																									break;
+																								case 4:
+																									set .@loop_9, 0;
+																									set .@loop_8, 0;
+																									set .@loop_7, 0;
+																									set .@loop_6, 0;
+																									set .@loop_5, 0;
+																									set .@loop_4, 0;
+																									set .@loop_3, 0;
+																									set .@loop_2, 0;
+																									set .@loop_1, 0;
+																									break;
 																							}
 																						}
 																						break;
@@ -1596,7 +1638,7 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 											mes $@da_BasicSettings$[4];
 											mes "Por favor, selecione o ^" + $@da_Color$[3] + "tipo da arena^000000 que deseja remover uma arena.";
 											next;
-											set .@type, select("- Jogadores vs Jogadores.", "- Clãns vs Clãns.", "- Grupos vs Grupos.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000")-1;
+											set .@type, select( (callfunc("countArena", 0)?"- Jogadores vs Jogadores.":""), (callfunc("countArena", 1)?"- Clãns vs Clãns.":""), (callfunc("countArena", 2)?"- Grupos vs Grupos.":""), "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000")-1;
 											switch( .@type )
 											{
 												default:
@@ -1679,7 +1721,7 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 											mes $@da_BasicSettings$[4];
 											mes "Por favor, selecione o ^" + $@da_Color$[3] + "tipo da arena^000000 que deseja alterar uma arena.";
 											next;
-											set .@type, select("- Jogadores vs Jogadores.", "- Clãns vs Clãns.", "- Grupos vs Grupos.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000")-1;
+											set .@type, select( (callfunc("countArena", 0)?"- Jogadores vs Jogadores.":""), (callfunc("countArena", 1)?"- Clãns vs Clãns.":""), (callfunc("countArena", 2)?"- Grupos vs Grupos.":""), "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000")-1;
 											switch( .@type )
 											{
 												default:
@@ -1691,7 +1733,7 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 														mes "Por favor, selecione uma arena de ^" + $@da_Color$[3] + .@mask_name$[.@type] + "^000000.";
 														next;
 														cleararray .@a_auto_id, 0, getarraysize(.@a_auto_id);
-														query_sql "SELECT `auto_id`, `name`, `type`, `map_index`, `coord_x`, `coord_y`, `max_player`, `min_level`, `max_level`, `death_points`, `group_id` FROM `" + $@da_DataBase$[0] + "` WHERE `type`='" + .@type + "' ORDER BY `name`", .@a_auto_id, .@a_name$, .@a_type, .@a_map_index$, .@a_coord_x, .@a_coord_y, .@a_max_player, .@a_min_level, .@a_max_level, .@a_death_points, .@a_group_id;
+														query_sql "SELECT `auto_id`, `name`, `type`, `map_index`, `coord_x`, `coord_y`, `max_player`, `min_level`, `max_level`, `death_points`, `death_match`, `group_id` FROM `" + $@da_DataBase$[0] + "` WHERE `type`='" + .@type + "' ORDER BY `name`", .@a_auto_id, .@a_name$, .@a_type, .@a_map_index$, .@a_coord_x, .@a_coord_y, .@a_max_player, .@a_min_level, .@a_max_level, .@a_death_points, .@a_death_match, .@a_group_id;
 														set .@BuildArenaMenu$, "";
 														for( set .@i, 0; .@i < getarraysize(.@a_auto_id); set .@i, .@i + 1 )
 															set .@BuildArenaMenu$, .@BuildArenaMenu$ + "- " + .@a_name$[.@i] + ".:";
@@ -1715,7 +1757,7 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																mes $@da_BasicSettings$[4];
 																mes "O que deseja alterar na arena ^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000?";
 																next;
-																switch( select("- Alterar nome.", "- Alterar tipo.", "- Alterar mapa e coordenadas.", "- Alterar níveis e limites.", "- Alterar quantidade de Death Points.", "- Alterar Grupo de Restrições.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
+																switch( select("- Alterar nome.", "- Alterar tipo.", "- Alterar mapa e coordenadas.", "- Alterar níveis e limites.", "- Alterar quantidade de Death Points.", "- Alterar Grupo de Restrições.", "- " + (.@a_death_match[.@chooseArena]?"Desligar":"Ligar") + " Death Match.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
 																{
 																	case 1:
 																		// Alterar nome.
@@ -2255,9 +2297,36 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																		}
 																		break;
 																	case 7:
-																		set .@loop_6, 0;
+																		// Ligar/Desligar Death Match.
+																		mes $@da_BasicSettings$[4];
+																		mes "Tem certeza que deseja ^" + $@da_Color$[3] + (.@a_death_match[.@chooseArena]?"Desligar":"Ligar") + "^000000 o Death Match na arena ^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000?";
+																		next;
+																		switch( select("- Sim, por favor.", "^" + $@da_Color$[1] + "- Voltar.^000000", "^" + $@da_Color$[0] + "- Cancelar.^000000") )
+																		{
+																			case 1:
+																				// Ligar/Desligar Death Match.
+																				query_sql "UPDATE `" + $@da_DataBase$[0] + "` SET `death_match`='" + (.@a_death_match[.@chooseArena]?0:1) + "' WHERE `auto_id`='" + .@a_auto_id[.@chooseArena] + "'";
+																				mes $@da_BasicSettings$[4];
+																				mes "O Death Match da arena ^" + $@da_Color$[3] + "'" + .@a_name$[.@chooseArena] + "'^000000 foi alterada de ^" + $@da_Color$[3] + "'" + (.@a_death_match[.@chooseArena]?"habilitado":"desabilitado") + "'^000000 para ^" + $@da_Color$[3] + "'" + (.@a_death_match[.@chooseArena]?"desabilitado":"habilitado") + "'^000000.";
+																				next;
+																				set .@a_death_match[.@chooseArena], (.@a_death_match[.@chooseArena]?0:1);
+																				break;
+																			case 2:
+																				break;
+																			case 3:
+																				set .@loop_6, 0;
+																				set .@loop_5, 0;
+																				set .@loop_4, 0;
+																				set .@loop_3, 0;
+																				set .@loop_2, 0;
+																				set .@loop_1, 0;
+																				break;
+																		}
 																		break;
 																	case 8:
+																		set .@loop_6, 0;
+																		break;
+																	case 9:
 																		set .@loop_6, 0;
 																		set .@loop_5, 0;
 																		set .@loop_4, 0;
@@ -2918,10 +2987,22 @@ function	script	getRankInfo	{
 //			[1]: Retorna com o tipo da arena.
 //			[2]: Retorna com o nome da arena.
 //			[3]: Retorna com o Death Points que será entregue da arena.
-//		map_index: Mapa oande se encontra a arena.
+//			[4]: Retorna com o Flag de Death Match da arena.
+//			[5]: Retorna com o id do Grupo da arena.
+//		map_index: Mapa aonde se encontra a arena.
 function	script	getArenaInfo	{
-	query_sql "SELECT `auto_id`, `name`, `type`, `death_points` FROM `" + $@da_DataBase$[0] + "` WHERE `map_index`='" + getarg(1) + "'", .@id, .@name$, .@type, .@points;
-	return (!getarraysize(.@id)?0:(getarg(0)==0?.@id[0]:(getarg(0)==1?.@type[0]:(getarg(0)==2?.@name$[0]:.@points[0]))));
+	query_sql "SELECT `auto_id`, `name`, `type`, `death_points`, `death_match`, `group_id` FROM `" + $@da_DataBase$[0] + "` WHERE `map_index`='" + getarg(1) + "'", .@id, .@name$, .@type, .@points, .@deathmatch, .@groupid;
+	return (!getarraysize(.@id)?0:(getarg(0)==0?.@id[0]:(getarg(0)==1?.@type[0]:(getarg(0)==2?.@name$[0]:(getarg(0)==3?.@points[0]:(getarg(0)==4?.@deathmatch[0]:.@groupid[0]))))));
+}
+
+// * countArena(type)
+//		type: Retorna com a quantidade de arenas por tipo.
+//			[0]: Arena de Jogadores vs Jogadores.
+//			[1]: Arena de Clãns vs Clãns.
+//			[2]: Arena de Grupos vs Grupos.
+function	script	countArena	{
+	query_sql "SELECT `auto_id` FROM `" + $@da_DataBase$[0] + "` WHERE `type`='" + getarg(0) + "'", .@aid;
+	return getarraysize(.@aid);
 }
 
 // * UpdateRanking(type, object_killer_id, object_killer_name, object_killed_id, object_killed_name)
@@ -2960,19 +3041,30 @@ function	script	UpdateRanking	{
 //				map_index2: Mapa novo para adicionar os mapflags.
 //				type2: Tipo da arena.
 function	script	ReloadMapFlags	{
-	setarray .@map_flags[0], mf_nosave, mf_nomemo, mf_noteleport, mf_nowarp, mf_nowarpto, mf_pvp, mf_nocommand, mf_pvp_noguild, mf_pvp_noparty;
 	if( getarg(1) == 0 )
 	{
+		setarray .@map_flags[0], mf_nosave, mf_nomemo, mf_noteleport, mf_nowarp, mf_nowarpto, mf_pvp, mf_nocommand, mf_pvp_noguild, mf_pvp_noparty;
 		for( set .@i, 0; .@i < getarraysize(.@map_flags); set .@i, .@i + 1 )
 			removemapflag getarg(0), .@map_flags[.@i];
 			
 	}
 	else {
-		for( set .@i, 0; .@i < getarraysize(.@map_flags); set .@i, .@i + 1 )
-		{
-			if( (.@i <= 6) || (.@i == 6 && getarg(3) == 1) || (.@i == 7 && getarg(3) == 2) )
-				setmapflag getarg(2), .@map_flags[.@i];
-		}
+		setmapflag getarg(2), mf_nosave;
+		setmapflag getarg(2), mf_nomemo;
+		setmapflag getarg(2), mf_noteleport;
+		setmapflag getarg(2), mf_nowarp;
+		setmapflag getarg(2), mf_nowarpto;
+		setmapflag getarg(2), mf_pvp;
+		
+		if( getarg(3) == 0 || getarg(3) == 2 )
+			setmapflag getarg(2), mf_pvp_noguild;
+		else if( getarg(3) == 0 || getarg(3) == 1 )
+			setmapflag getarg(2), mf_pvp_noparty;
+		
+		set .@group, callfunc("getArenaInfo", 5, getarg(2));
+
+		if( callfunc("getGroupInfo", 2, .@group) )
+			setmapflag getarg(2), mf_nocommand;
 	}
 	
 	return;
