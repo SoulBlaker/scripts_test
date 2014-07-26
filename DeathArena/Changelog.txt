@@ -1,4 +1,6 @@
 -- V1.1R1
+[2014/07/26] - SoulBlaker
+	Enviado imagens do Ranking Compact que estava falando.
 [2014/06/23] - SoulBlaker
 	Apurados erros herdados da V1.0R1, preparando para lançar V1.1R1
 	Adicionado sistema de Death Match e correções nos mapflags.
