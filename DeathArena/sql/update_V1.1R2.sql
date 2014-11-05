@@ -1,0 +1,1 @@
+ALTER TABLE `da_ranking` MODIFY `ration` int(4) NOT NULL DEFAULT '0';

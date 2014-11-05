@@ -12,6 +12,8 @@
 -- 	group		 -> Identificação do Grupo de Restrições.
 --  death_match  -> Habilitação da Death Match na arena. (0 é desabilitado)
 --  death_points -> Pontos que o jogador irá receber da arena ao derrotar uma adversário. (0 é desabilitado)
+--  event_time   -> Grupo de horários de eventos (A arena só irá ser aberta se estiver no horário do grupo, 0 desabilita eventos na arena)
+--  event_reward -> Grupo de recompensas da arena. (0 é desabilitado a recompensa)
 -- }
 --
 CREATE TABLE IF NOT EXISTS `da_arena` (
@@ -27,6 +29,8 @@ CREATE TABLE IF NOT EXISTS `da_arena` (
 	`group_id` int(11) unsigned NOT NULL default '0',
 	`death_match` int(1) NOT NULL default '0',
 	`death_points` int(11) unsigned NOT NULL default '0',
+	`event_time` int(1) NOT NULL default '0',
+	`event_reward` int(1) NOT NULL default '0',
 	 PRIMARY KEY (`auto_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1;
 --
@@ -73,7 +77,7 @@ CREATE TABLE IF NOT EXISTS `da_ranking` (
 	`type` int(1) unsigned NOT NULL default '0',
 	`wins` int(4) unsigned NOT NULL default '0',
 	`loss` int(4) unsigned NOT NULL default '0',
-	`ration` int(4) unsigned NOT NULL default '0',
+	`ration` int(4) NOT NULL default '0',
 	 PRIMARY KEY (`auto_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1;
 --

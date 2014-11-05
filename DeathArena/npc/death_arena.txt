@@ -13,7 +13,7 @@
 // . Script:                                                  .
 // .  Death Arena                                             .
 // .----------------------------------------------------------.
-// . Por: SoulBlaker   Compátivel: eAthena Based       v1.1r1 .
+// . Por: SoulBlaker   Compátivel: eAthena Based       v1.1r2 .
 // .----------------------------------------------------------.
 // . Descrição:                                               .
 // .  Descrição do npc no arquivo Readme.txt na seção 1.0.    .
@@ -28,6 +28,9 @@
 // .    - Adicionado informações de jogadores on-line.        .
 // .	- Adicionado Sistema de Death Match.                  .
 // .    - Correções nos map-flags.                            .
+// . * 1.1r2 [SoulBlaker]                                     .
+// .    - Correções na função de contagem de quantidade de    .
+// .      itens e classes na Grupo de Restrições.             .
 // *----------------------------------------------------------*
 
 // [Nota 1]: Ponha 0 para desabilitar esta opção.
@@ -2950,7 +2953,7 @@ function	script	GetGroupInfo	{
 	else if( getarg(0) == 2 || getarg(0) == 3 )
 	{
 		query_sql "SELECT `auto_id` FROM `" + $@da_DataBase$[2] + "` WHERE `type`='" + (getarg(0)==2?0:1) + "' AND `group_id`='" + getarg(1) + "'", .@id;
-		return (getarraysize(.@id)?.@id[0]:0);
+		return (getarraysize(.@id)?getarraysize(.@id):0);
 	}
 	else
 		return 0;
