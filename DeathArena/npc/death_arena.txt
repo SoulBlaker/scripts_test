@@ -31,6 +31,7 @@
 // . * 1.1r2 [SoulBlaker]                                     .
 // .    - Correções na função de contagem de quantidade de    .
 // .      itens e classes na Grupo de Restrições.             .
+// .    - Aplicado correção para ligar o DeathMatch.          .
 // *----------------------------------------------------------*
 
 // [Nota 1]: Ponha 0 para desabilitar esta opção.
@@ -1460,7 +1461,7 @@ prontera,162,185,3	script	Death Arena#da_arena01::da_arena	4_F_NFDEADKAFRA,{
 																							switch( .@DeathMatch )
 																							{
 																								default:
-																									set .@DeathMatch, (.@DeathMatch?0:1);
+																									set .@DeathMatch, (.@DeathMatch==2?0:1);
 																									set .@loop_10, 1;
 																									while(.@loop_10)
 																									{
