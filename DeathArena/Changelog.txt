@@ -1,4 +1,6 @@
 -- V1.1R1
+[2015/03/27] - SoulBlaker
+	Correção no getGroupInfo para GetGroupInfo com a case sensitive do Hercules e Cronus.
 [2014/11/05] - SoulBlaker
 	Enviado correção na função que obtem a quantidade de itens e classes em um grupo de restrição.
 	Enviado update da tabela sql para suportar valores negativo no ration.

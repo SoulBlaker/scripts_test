@@ -2924,7 +2924,7 @@ OnBuyItem:
 
 // Funções
 
-// * getGroupInfo(type {,id})
+// * GetGroupInfo(type {,id})
 //		type: Tipo da informação que deseja adquirir.
 //				[0]: Total de grupos cadastrado.
 //				[1]: Total de arenas cadastrada de um grupo.
@@ -3067,7 +3067,7 @@ function	script	ReloadMapFlags	{
 		
 		set .@group, callfunc("getArenaInfo", 5, getarg(2));
 
-		if( callfunc("getGroupInfo", 2, .@group) )
+		if( callfunc("GetGroupInfo", 2, .@group) )
 			setmapflag getarg(2), mf_nocommand;
 	}
 	
